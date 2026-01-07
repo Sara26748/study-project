@@ -1,0 +1,135 @@
+/* Custom styles for table enhancements */
+.table-section {
+    margin-top: 2rem; /* Abstand zwischen Tabellen */
+    border: 1px solid #ddd; /* Sichtbarer Rahmen */
+    padding: 1rem; /* Innenabstand */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Leichter Schatten */
+    border-radius: 8px; /* Abgerundete Ecken */
+    background-color: #f8f9fa; /* Heller grauer Hintergrund für bessere Übersichtlichkeit */
+}
+
+.table-section h3 {
+    font-size: 1.5rem; /* Größere Überschriften */
+    font-weight: bold; /* Fett */
+    margin-bottom: 1rem;
+}
+
+/* Zusätzliche feine Rahmen für Zellen, falls table-bordered nicht ausreicht */
+.table-bordered th,
+.table-bordered td {
+    border: 1px solid #dee2e6; /* Feine Rahmenlinien */
+}
+
+/* Abwechselnde Zeilenfarben, falls table-striped nicht reicht */
+.table-striped tbody tr:nth-of-type(odd) {
+    background-color: rgba(0, 0, 0, 0.05); /* Hellgrau für ungerade Zeilen */
+}
+
+.table-striped tbody tr:nth-of-type(even) {
+    background-color: #ffffff; /* Weiß für gerade Zeilen */
+}
+
+/* Modern Header & Navigation Styles */
+.navbar {
+    z-index: 1030;
+}
+
+/* Header Logo Hover */
+.navbar-brand:hover {
+    opacity: 0.85;
+    transition: opacity 0.2s ease;
+}
+
+/* User Dropdown Button Focus */
+#userDropdown:focus {
+    outline: 2px solid #0d6efd;
+    outline-offset: 2px;
+    border-radius: 4px;
+}
+
+/* Dropdown Menu Items */
+.dropdown-item {
+    transition: all 0.2s ease;
+}
+
+.dropdown-item:focus {
+    background-color: #f8f9fa;
+    outline: 2px solid #0d6efd;
+    outline-offset: -2px;
+}
+
+.dropdown-item:hover {
+    background-color: #f8f9fa;
+    color: #0d6efd;
+}
+
+/* Active Navigation State in Dropdown */
+.dropdown-item.active {
+    background-color: rgba(13, 110, 253, 0.1) !important;
+    color: #0d6efd !important;
+    font-weight: 600;
+}
+
+/* Services Submenu Button */
+#servicesSubmenu:focus {
+    outline: 2px solid #0d6efd;
+    outline-offset: -2px;
+}
+
+#servicesSubmenu:hover {
+    background-color: #f8f9fa;
+    color: #0d6efd;
+}
+
+/* User Avatar Hover Effect */
+#userDropdown:hover .rounded-circle {
+    transform: scale(1.05);
+    transition: transform 0.2s ease;
+}
+
+/* Modern Back Buttons - SaaS Clean Style */
+.btn-outline-primary.bg-light {
+    border: 1px solid #e0e7ff !important;
+    background-color: #f8f9ff !important;
+    color: #0d6efd !important;
+}
+
+.btn-outline-primary.bg-light:hover {
+    background-color: #0d6efd !important;
+    color: white !important;
+    border-color: #0d6efd !important;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(13, 110, 253, 0.15) !important;
+}
+
+.btn-outline-primary.bg-light:focus {
+    box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.1) !important;
+    border-color: #0d6efd !important;
+}
+
+.btn-outline-primary.bg-light:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(13, 110, 253, 0.1) !important;
+}
+
+/* Modern Footer Styles */
+footer {
+    margin-top: auto;
+}
+
+footer .container {
+    padding-top: 1.5rem;
+    padding-bottom: 1.5rem;
+}
+
+/* Responsive: Hide user name on small screens */
+@media (max-width: 767px) {
+    .navbar-brand span {
+        font-size: 0.9rem;
+    }
+    
+    footer .container {
+        padding-top: 1rem;
+        padding-bottom: 1rem;
+    }
+}

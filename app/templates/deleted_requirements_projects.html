@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block title %}Gelöschte Requirements - Projekte{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="mb-4">Projekte</h1>
+
+    <div class="list-group">
+        {% for project in projects %}
+            <a href="{{ url_for('main.deleted_requirements', project_id=project.id) }}" class="list-group-item list-group-item-action">
+                {{ project.name }}
+            </a>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

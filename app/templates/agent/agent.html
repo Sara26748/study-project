@@ -1,0 +1,1126 @@
+{% extends "base.html" %} {% block title %}KI-Cockpit - {{ project.name }}{%
+endblock %} {% block content %}
+
+<style>
+  /* Modern Color Palette */
+  :root {
+    --primary-gradient: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);
+    --success-gradient: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+    --card-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+    --card-hover-shadow: 0 15px 50px rgba(0, 0, 0, 0.12);
+    --input-focus-shadow: 0 0 0 3px rgba(13, 110, 253, 0.1);
+  }
+
+  /* Drag & Drop Zone Styling */
+  .drop-zone {
+    border: 2px dashed #cbd5e1;
+    border-radius: 1rem;
+    padding: 2rem;
+    text-align: center;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    cursor: pointer;
+    position: relative;
+  }
+
+  .drop-zone:hover,
+  .drop-zone.dragover {
+    border-color: #0d6efd;
+    background: linear-gradient(135deg, #e7f1ff 0%, #cfe2ff 100%);
+    transform: translateY(-2px);
+  }
+
+  .drop-zone-input {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    opacity: 0;
+    cursor: pointer;
+  }
+
+  .drop-zone-content i {
+    font-size: 3rem;
+    color: #0d6efd;
+    margin-bottom: 1rem;
+    transition: transform 0.3s ease;
+  }
+
+  .drop-zone:hover .drop-zone-content i {
+    transform: scale(1.1);
+  }
+
+  .drop-zone-content p {
+    margin-bottom: 0.5rem;
+    color: #334155;
+    font-weight: 600;
+  }
+
+  .file-info {
+    display: none;
+    margin-top: 1rem;
+    padding: 0.75rem 1.5rem;
+    background: var(--success-gradient);
+    color: white;
+    border-radius: 9999px;
+    font-size: 0.875rem;
+    display: inline-flex;
+    align-items: center;
+    box-shadow: 0 4px 15px rgba(17, 153, 142, 0.3);
+  }
+
+  /* Modern Card Styling */
+  .config-card {
+    background: white;
+    border-radius: 1rem;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    border: 1px solid #e2e8f0;
+    transition: all 0.3s ease;
+  }
+
+  .config-card:hover {
+    box-shadow: var(--card-shadow);
+    border-color: #cbd5e1;
+  }
+
+  .config-card-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1rem;
+  }
+
+  .config-card-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    background: var(--primary-gradient);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.25rem;
+    margin-right: 1rem;
+  }
+
+  .config-card-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin: 0;
+  }
+
+  .config-card-subtitle {
+    font-size: 0.875rem;
+    color: #64748b;
+    margin: 0;
+  }
+
+  /* Quick Start Badges */
+  .quick-start-badge {
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    user-select: none;
+    border: 2px solid #e2e8f0 !important;
+    padding: 0.6rem 1rem !important;
+    font-weight: 500;
+  }
+
+  .quick-start-badge:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    border-color: #0d6efd !important;
+  }
+
+  /* Expert Settings */
+  .expert-settings-toggle {
+    cursor: pointer;
+    user-select: none;
+    display: flex;
+    align-items: center;
+    color: #64748b;
+    font-weight: 600;
+    padding: 0.75rem;
+    border-radius: 0.5rem;
+    transition: all 0.2s ease;
+  }
+
+  .expert-settings-toggle {
+    color: var(--bs-primary);
+  }
+
+  .expert-settings-toggle:hover {
+    background: #f8fafc;
+    color: var(--bs-primary);
+  }
+
+  .expert-caret {
+    transition: transform 0.3s ease;
+  }
+
+  .expert-caret.rotate {
+    transform: rotate(180deg);
+  }
+
+  /* Modern Form Controls */
+  .form-control,
+  .form-select {
+    border: 2px solid #e2e8f0;
+    border-radius: 0.75rem;
+    padding: 0.75rem 1rem;
+    transition: all 0.2s ease;
+    font-size: 0.95rem;
+  }
+
+  .form-control:focus,
+  .form-select:focus {
+    border-color: #0d6efd;
+    box-shadow: var(--input-focus-shadow);
+  }
+
+  /* Column Badge Styling */
+  .column-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.5rem 1rem;
+    background: #f1f5f9;
+    border: 2px solid #e2e8f0;
+    border-radius: 0.75rem;
+    margin: 0.25rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+  }
+
+  .column-badge.standard {
+    background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);
+    color: white;
+    border-color: transparent;
+  }
+
+  .column-badge.custom {
+    background: white;
+  }
+
+  .column-badge .remove-column {
+    margin-left: 0.5rem;
+    cursor: pointer;
+    opacity: 0.6;
+    transition: opacity 0.2s;
+  }
+
+  .column-badge .remove-column:hover {
+    opacity: 1;
+  }
+
+  /* Model Selection Cards */
+  .model-card {
+    border: 2px solid #e2e8f0;
+    border-radius: 1rem;
+    padding: 1rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    background: white;
+  }
+
+  .model-card:hover {
+    border-color: #0d6efd;
+    box-shadow: 0 4px 12px rgba(13, 110, 253, 0.1);
+  }
+
+  .model-card.selected {
+    border-color: #0d6efd;
+    background: linear-gradient(135deg, #e7f1ff 0%, #cfe2ff 100%);
+  }
+
+  .model-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+  }
+
+  .model-badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+
+  .model-badge.recommended {
+    background: var(--success-gradient);
+    color: white;
+  }
+
+  .model-badge.advanced {
+    background: var(--primary-gradient);
+    color: white;
+  }
+
+  /* Number Input Group */
+  .number-input-group {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .number-input-group input[type="number"] {
+    max-width: 100px;
+  }
+
+  /* Generate Button */
+  .btn-generate {
+    background: var(--primary-gradient);
+    border: none;
+    color: white;
+    font-weight: 600;
+    font-size: 1.1rem;
+    padding: 1rem 2rem;
+    border-radius: 0.75rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(13, 110, 253, 0.3);
+  }
+
+  .btn-generate:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(13, 110, 253, 0.4);
+    background: linear-gradient(135deg, #0b5ed7 0%, #0a58ca 100%);
+  }
+
+  /* Animations */
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .animate-fade-in {
+    animation: fadeIn 0.3s ease;
+  }
+
+  /* Loading State */
+  #loading-state {
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    border-radius: 1rem;
+    padding: 3rem;
+  }
+
+  .progress {
+    background: #e2e8f0;
+    border-radius: 9999px;
+    overflow: hidden;
+  }
+
+  .progress-bar {
+    background: var(--primary-gradient);
+  }
+</style>
+
+<div class="container mt-5">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <a
+        href="{{ url_for('main.manage_project', project_id=project.id) }}"
+        class="btn btn-outline-primary border-0 bg-light text-primary shadow-sm btn-sm mb-2 d-inline-flex align-items-center"
+        style="transition: all 0.2s ease"
+      >
+        <i class="bi bi-arrow-left me-2"></i> Zurück
+      </a>
+      <h1 class="fw-bold">
+        <i class="bi bi-robot me-2 text-primary"></i>KI-Cockpit
+      </h1>
+      <p class="text-muted">
+        Generiere professionelle Anforderungen für
+        <strong>{{ project.name }}</strong>
+      </p>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-lg-10 mx-auto">
+      <div class="card shadow-lg border-0" style="border-radius: 1.5rem">
+        <div class="card-body p-4 p-md-5">
+          <!-- Loading State (Hidden by default) -->
+          <div id="loading-state" class="d-none text-center py-5">
+            <div class="mb-4">
+              <div
+                class="spinner-border text-primary"
+                role="status"
+                style="width: 3rem; height: 3rem"
+              ></div>
+            </div>
+            <h4 class="fw-bold mb-3 animate-fade-in">
+              KI analysiert Ihre Anforderungen...
+            </h4>
+
+            <div
+              class="progress mb-4 mx-auto"
+              style="height: 6px; max-width: 300px"
+            >
+              <div
+                class="progress-bar progress-bar-striped progress-bar-animated"
+                role="progressbar"
+                style="width: 0%"
+                id="ai-progress"
+              ></div>
+            </div>
+
+            <div
+              class="text-muted small text-start mx-auto"
+              style="max-width: 300px"
+            >
+              <div id="step-1" class="mb-2 text-truncate">
+                <i class="bi bi-circle me-2 text-primary"></i> Kontext verstehen
+              </div>
+              <div id="step-2" class="mb-2">
+                <i class="bi bi-circle me-2 text-primary"></i> Struktur
+                analysieren
+              </div>
+              <div id="step-3" class="mb-2">
+                <i class="bi bi-circle me-2 text-primary"></i> Anforderungen
+                formulieren
+              </div>
+              <div id="step-4">
+                <i class="bi bi-circle me-2 text-primary"></i> Qualitäts-Check
+              </div>
+            </div>
+          </div>
+
+          <form id="agent-form">
+            <!-- Product System (Optional) -->
+            <div class="config-card">
+              <div class="config-card-header">
+                <div class="config-card-icon">
+                  <i class="bi bi-box-seam"></i>
+                </div>
+                <div>
+                  <h3 class="config-card-title">Produktsystem (Optional)</h3>
+                  <p class="config-card-subtitle">
+                    Definieren Sie das Zielsystem für die Anforderungen
+                  </p>
+                </div>
+              </div>
+              <input
+                type="text"
+                class="form-control"
+                id="product_system"
+                name="product_system"
+                placeholder="z.B. Montagesystem A, Cloud-Plattform XY..."
+              />
+              <small class="text-muted mt-2 d-block">
+                <i class="bi bi-info-circle me-1 text-primary"></i>
+                Alle generierten Anforderungen beziehen sich auf dieses System
+              </small>
+            </div>
+
+            <!-- Context (Excel) -->
+            <div class="config-card">
+              <div class="config-card-header">
+                <div class="config-card-icon">
+                  <i class="bi bi-file-earmark-spreadsheet"></i>
+                </div>
+                <div>
+                  <h3 class="config-card-title">
+                    Kontext hochladen (Optional)
+                  </h3>
+                  <p class="config-card-subtitle">
+                    Bestehende Anforderungen zur Verbesserung
+                  </p>
+                </div>
+              </div>
+              <div class="drop-zone" id="drop-zone">
+                <input
+                  class="drop-zone-input"
+                  type="file"
+                  id="excel_file"
+                  name="excel_file"
+                  accept=".xlsx, .xls"
+                />
+                <div class="drop-zone-content mt-2">
+                  <i class="bi bi-cloud-upload"></i>
+                  <p>Excel-Datei hier ablegen oder klicken</p>
+                  <small class="text-muted"
+                    >Unterstützt .xlsx und .xls Dateien</small
+                  >
+                </div>
+                <div id="file-name-display" class="d-none mt-3">
+                  <span class="file-info"
+                    ><i class="bi bi-check-circle-fill me-2"></i>
+                    <span id="file-name-text"></span
+                  ></span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Instruction -->
+            <div class="config-card">
+              <div class="config-card-header">
+                <div class="config-card-icon">
+                  <i class="bi bi-chat-left-text"></i>
+                </div>
+                <div>
+                  <h3 class="config-card-title">Was soll die KI tun?</h3>
+                  <p class="config-card-subtitle">
+                    Beschreiben Sie Ihr Vorhaben
+                  </p>
+                </div>
+              </div>
+              <textarea
+                class="form-control shadow-sm"
+                id="user_description"
+                name="user_description"
+                rows="5"
+                placeholder="Beschreibe dein Vorhaben detailliert..."
+              ></textarea>
+
+              <div class="mt-3">
+                <small class="text-muted d-block mb-2"
+                  ><i class="bi bi-lightning-charge me-1 text-primary"></i
+                  >Schnellstart (Klicken zum Einfügen):</small
+                >
+                <span
+                  class="badge bg-light text-dark quick-start-badge"
+                  data-prompt="Erstelle eine technische Spezifikation für eine SaaS-Plattform mit Fokus auf Skalierbarkeit und Multi-Tenancy."
+                >
+                  🚀 SaaS Plattform
+                </span>
+                <span
+                  class="badge bg-light text-dark quick-start-badge"
+                  data-prompt="Analysiere die hochgeladene Datei auf Lücken und ergänze fehlende Sicherheits-Anforderungen gemäß ISO 27001."
+                >
+                  🛡️ Sicherheits-Check
+                </span>
+                <span
+                  class="badge bg-light text-dark quick-start-badge"
+                  data-prompt="Erstelle User Stories für eine mobile App (iOS/Android) mit Fokus auf intuitive UX."
+                >
+                  📱 Mobile App
+                </span>
+                <span
+                  class="badge bg-light text-dark quick-start-badge"
+                  data-prompt="Zerlege komplexe Themen in atomare, testbare Anforderungen."
+                >
+                  ⚛️ Atomare Anforderungen
+                </span>
+              </div>
+            </div>
+
+            <!-- Configuration -->
+            <div class="config-card">
+              <div class="config-card-header">
+                <div class="config-card-icon">
+                  <i class="bi bi-sliders"></i>
+                </div>
+                <div>
+                  <h3 class="config-card-title">
+                    Konfiguration der Generierung
+                  </h3>
+                  <p class="config-card-subtitle">
+                    Steuern Sie Anzahl und Ausgabe
+                  </p>
+                </div>
+              </div>
+
+              <!-- Mode Selection -->
+              <div class="mb-4 bg-light p-3 rounded border">
+                <label class="form-label fw-bold mb-3"><i class="bi bi-arrows-angle-expand me-1 text-primary"></i>Generierungs-Modus</label>
+                
+                <div class="d-flex flex-column gap-2">
+                    <!-- Standard -->
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="generation_mode" id="mode_standard" value="standard" checked>
+                        <label class="form-check-label" for="mode_standard">
+                            <strong>Neue Anforderungen erstellen</strong>
+                            <div class="text-muted small">Erstellt komplett neue Anforderungen basierend auf Ihrer Beschreibung.</div>
+                        </label>
+                    </div>
+
+                    <!-- Extend -->
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="generation_mode" id="mode_extend" value="extend">
+                        <label class="form-check-label" for="mode_extend">
+                            <strong>Bestehende erweitern</strong>
+                            <div class="text-muted small">Liest bestehende Anforderungen und fügt sinnvoll neue hinzu.</div>
+                        </label>
+                    </div>
+
+                    <!-- Improve -->
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="generation_mode" id="mode_improve" value="improve">
+                        <label class="form-check-label" for="mode_improve">
+                            <strong>Bestehende verbessern</strong>
+                            <div class="text-muted small">Optimiert Formulierung und Details Ihrer bestehenden Anforderungen. Keine neuen Einträge.</div>
+                        </label>
+                    </div>
+                </div>
+                
+                <!-- Hidden inputs for backend compatibility (will be set via JS) -->
+                <input type="hidden" id="improve_only" name="improve_only" value="false">
+                <input type="hidden" id="extend_existing" name="extend_existing" value="false">
+              </div>
+
+              <!-- Number of Requirements -->
+              <div class="mb-4">
+                <label class="form-label fw-semibold mb-2">
+                  <i class="bi bi-hash me-1 text-primary"></i>Anzahl der
+                  Anforderungen
+                </label>
+                <div class="number-input-group">
+                  <select
+                    class="form-select"
+                    id="num_requirements_mode"
+                    name="num_requirements_mode"
+                    style="max-width: 200px"
+                  >
+                    <option value="auto" selected>Automatisch</option>
+                    <option value="manual">Manuell festlegen</option>
+                  </select>
+                  <input
+                    type="number"
+                    class="form-control"
+                    id="num_requirements_value"
+                    name="num_requirements_value"
+                    value="5"
+                    min="1"
+                    max="20"
+                    disabled
+                  />
+                </div>
+                <small class="text-muted mt-2 d-block">
+                  <i class="bi bi-info-circle me-1 text-primary"></i>
+                  Bei "Automatisch" entscheidet die KI basierend auf dem Kontext
+                  (3-10 Requirements)
+                </small>
+              </div>
+
+              <!-- Table Columns Schema -->
+              <div class="mb-3">
+                <label class="form-label fw-semibold mb-2">
+                  <i class="bi bi-table me-1 text-primary"></i>Tabellenspalten
+                  (Schema der Ausgabe)
+                </label>
+                <div id="columns-display" class="mb-3">
+                  <span class="column-badge standard">
+                    <i class="bi bi-star-fill me-1" style="color: white"></i
+                    >Titel
+                    <small class="ms-1 opacity-75">(Standard)</small>
+                  </span>
+                  <span class="column-badge standard">
+                    <i class="bi bi-star-fill me-1" style="color: white"></i
+                    >Beschreibung
+                    <small class="ms-1 opacity-75">(Standard)</small>
+                  </span>
+                  <span class="column-badge standard">
+                    <i class="bi bi-star-fill me-1" style="color: white"></i
+                    >Kategorie
+                    <small class="ms-1 opacity-75">(Standard)</small>
+                  </span>
+                  <!-- Custom columns will be added here dynamically -->
+                </div>
+                <div class="input-group">
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="new_column_input"
+                    placeholder="Neue Spalte hinzufügen (z.B. Priorität, Kosten, Verantwortlich...)"
+                  />
+                  <button
+                    type="button"
+                    class="btn btn-outline-primary"
+                    id="add-column-btn"
+                  >
+                    <i class="bi bi-plus-circle me-1"></i>Spalte hinzufügen
+                  </button>
+                </div>
+                <small class="text-muted mt-2 d-block">
+                  <i class="bi bi-lightbulb me-1 text-primary"></i>
+                  Beispiele: Priorität, Kosten, Verantwortlich, Farbe, Status,
+                  Deadline
+                </small>
+              </div>
+            </div>
+
+            <!-- AI Model Selection -->
+            <div class="config-card">
+              <div class="config-card-header">
+                <div class="config-card-icon">
+                  <i class="bi bi-cpu"></i>
+                </div>
+                <div>
+                  <h3 class="config-card-title">KI-Modell wählen</h3>
+                  <p class="config-card-subtitle">
+                    Wählen Sie das passende Modell für Ihre Aufgabe
+                  </p>
+                </div>
+              </div>
+
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <div class="model-card selected" data-model="gpt-4o-mini">
+                    <div class="model-card-header">
+                      <h5 class="mb-0 fw-bold">GPT-4o Mini</h5>
+                      <span class="model-badge recommended">Empfohlen</span>
+                    </div>
+                    <p class="text-muted small mb-2">Schnell & Günstig</p>
+                    <p class="small mb-0">
+                      Ideal für die meisten Aufgaben. Beste Balance zwischen
+                      Qualität und Geschwindigkeit.
+                    </p>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="model-card" data-model="gpt-4o">
+                    <div class="model-card-header">
+                      <h5 class="mb-0 fw-bold">GPT-4o</h5>
+                      <span class="model-badge advanced">Erweitert</span>
+                    </div>
+                    <p class="text-muted small mb-2">Höchste Qualität</p>
+                    <p class="small mb-0">
+                      Für komplexe Anforderungen mit maximaler Präzision und
+                      Detailtiefe.
+                    </p>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="model-card" data-model="gpt-4-turbo">
+                    <div class="model-card-header">
+                      <h5 class="mb-0 fw-bold">GPT-4 Turbo</h5>
+                      <span class="model-badge advanced">Erweitert</span>
+                    </div>
+                    <p class="text-muted small mb-2">Leistungsstark</p>
+                    <p class="small mb-0">
+                      Optimiert für große Kontexte und umfangreiche
+                      Anforderungsdokumente.
+                    </p>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="model-card" data-model="gpt-3.5-turbo">
+                    <div class="model-card-header">
+                      <h5 class="mb-0 fw-bold">GPT-3.5 Turbo</h5>
+                    </div>
+                    <p class="text-muted small mb-2">Schnell & Einfach</p>
+                    <p class="small mb-0">
+                      Für einfache Anforderungen und schnelle Prototypen.
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <input
+                type="hidden"
+                id="ai_model"
+                name="ai_model"
+                value="gpt-4o-mini"
+              />
+            </div>
+
+            <!-- Expert Settings -->
+            <div class="config-card">
+              <div
+                class="expert-settings-toggle"
+                data-bs-toggle="collapse"
+                data-bs-target="#expertSettings"
+              >
+                <i class="bi bi-gear-fill me-2 text-primary"></i>
+                Experten-Einstellungen
+                <i
+                  class="bi bi-chevron-down ms-auto expert-caret text-primary"
+                ></i>
+              </div>
+
+              <div class="collapse" id="expertSettings">
+                <div
+                  class="mt-3 p-3"
+                  style="background: #f8fafc; border-radius: 0.75rem"
+                >
+                  <label
+                    class="form-label small text-muted text-uppercase fw-bold"
+                    >Zusätzliche Parameter (Key-Value)</label
+                  >
+                  <div id="inputs-container">
+                    <div class="input-group mb-2">
+                      <input
+                        type="text"
+                        class="form-control"
+                        placeholder="Key (z.B. 'Sprache')"
+                        name="key[]"
+                      />
+                      <input
+                        type="text"
+                        class="form-control"
+                        placeholder="Value (z.B. 'Deutsch')"
+                        name="value[]"
+                      />
+                      <button
+                        type="button"
+                        class="btn btn-outline-danger remove-input"
+                      >
+                        <i class="bi bi-trash"></i>
+                      </button>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    class="btn btn-sm btn-outline-primary mt-2 w-100"
+                    id="add-input"
+                  >
+                    <i class="bi bi-plus-circle me-1"></i>Parameter hinzufügen
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <hr class="my-4" />
+
+            <div class="d-grid">
+              <button
+                type="submit"
+                class="btn btn-generate btn-lg py-3 shadow-sm"
+                id="generate-btn"
+              >
+                <span
+                  class="spinner-border spinner-border-sm d-none me-2"
+                  role="status"
+                  aria-hidden="true"
+                ></span>
+                <i class="bi bi-stars me-2"></i> Anforderungen Generieren
+              </button>
+            </div>
+          </form>
+
+          <div id="response-message" class="mt-4 d-none"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Custom columns management
+  const customColumns = [];
+
+  // Drag & Drop Handling
+  const dropZone = document.getElementById("drop-zone");
+  const fileInput = document.getElementById("excel_file");
+  const fileNameDisplay = document.getElementById("file-name-display");
+  const fileNameText = document.getElementById("file-name-text");
+
+  // Loading Elements
+  const loadingState = document.getElementById("loading-state");
+  const agentForm = document.getElementById("agent-form");
+  const progressBar = document.getElementById("ai-progress");
+
+  // Number of requirements toggle
+  const numReqMode = document.getElementById("num_requirements_mode");
+  const numReqValue = document.getElementById("num_requirements_value");
+
+  numReqMode.addEventListener("change", function () {
+    numReqValue.disabled = this.value === "auto";
+  });
+
+  // Mode Toggle Logic
+  const modeRadios = document.querySelectorAll('input[name="generation_mode"]');
+  const hiddenImprove = document.getElementById("improve_only");
+  const hiddenExtend = document.getElementById("extend_existing");
+
+  function updateMode() {
+      const selected = document.querySelector('input[name="generation_mode"]:checked').value;
+      
+      // Update hidden fields for backend
+      hiddenImprove.value = (selected === 'improve').toString();
+      hiddenExtend.value = (selected === 'extend').toString();
+      
+      // Update UI state
+      if (selected === 'improve') {
+          // Locked count for improvement
+          numReqMode.disabled = true;
+          numReqValue.disabled = true;
+      } else {
+          // Enabled for New and Extend
+          numReqMode.disabled = false;
+          numReqValue.disabled = numReqMode.value === "auto";
+      }
+  }
+
+  modeRadios.forEach(radio => {
+      radio.addEventListener('change', updateMode);
+  });
+  
+  // Initialize state
+  updateMode();
+
+  // Column management
+  document
+    .getElementById("add-column-btn")
+    .addEventListener("click", function () {
+      const input = document.getElementById("new_column_input");
+      const columnName = input.value.trim();
+
+      if (columnName && !customColumns.includes(columnName)) {
+        customColumns.push(columnName);
+        addColumnBadge(columnName);
+        input.value = "";
+      }
+    });
+
+  function addColumnBadge(columnName) {
+    const display = document.getElementById("columns-display");
+    const badge = document.createElement("span");
+    badge.className = "column-badge custom animate-fade-in";
+    badge.innerHTML = `
+          <i class="bi bi-tag me-1 text-primary"></i>${columnName}
+          <span class="remove-column" data-column="${columnName}">
+              <i class="bi bi-x-circle text-primary"></i>
+          </span>
+      `;
+    display.appendChild(badge);
+
+    // Add remove handler
+    badge
+      .querySelector(".remove-column")
+      .addEventListener("click", function () {
+        const col = this.getAttribute("data-column");
+        const index = customColumns.indexOf(col);
+        if (index > -1) {
+          customColumns.splice(index, 1);
+        }
+        badge.remove();
+      });
+  }
+
+  // Model selection
+  document.querySelectorAll(".model-card").forEach((card) => {
+    card.addEventListener("click", function () {
+      document
+        .querySelectorAll(".model-card")
+        .forEach((c) => c.classList.remove("selected"));
+      this.classList.add("selected");
+      document.getElementById("ai_model").value =
+        this.getAttribute("data-model");
+    });
+  });
+
+  function simulateProgress() {
+    agentForm.classList.add("d-none");
+    loadingState.classList.remove("d-none");
+
+    // Update Step 1 text if file is present
+    const files = fileInput.files;
+    const step1Text = document.getElementById("step-1");
+    if (files.length > 0) {
+      step1Text.innerHTML = `<i class="bi bi-circle me-2"></i> Analysiere Datei: <strong>${files[0].name}</strong>`;
+    } else {
+      step1Text.innerHTML = `<i class="bi bi-circle me-2"></i> Analysiere Beschreibung...`;
+    }
+
+    let width = 0;
+    const interval = setInterval(() => {
+      width += Math.random() * 10;
+      if (width > 100) width = 100;
+
+      progressBar.style.width = width + "%";
+
+      // Update steps based on progress
+      if (width > 10) updateStep(1);
+      if (width > 40) updateStep(2);
+      if (width > 70) updateStep(3);
+      if (width > 90) updateStep(4);
+
+      if (width >= 100) clearInterval(interval);
+    }, 500);
+  }
+
+  function updateStep(num) {
+    const step = document.getElementById("step-" + num);
+    step.classList.add("fw-bold", "text-primary");
+    const icon = step.querySelector("i");
+    icon.classList.remove("bi-circle");
+    icon.classList.add("bi-check-circle-fill", "text-primary");
+  }
+
+  ["dragenter", "dragover", "dragleave", "drop"].forEach((eventName) => {
+    dropZone.addEventListener(eventName, preventDefaults, false);
+  });
+
+  function preventDefaults(e) {
+    e.preventDefault();
+    e.stopPropagation();
+  }
+
+  ["dragenter", "dragover"].forEach((eventName) => {
+    dropZone.addEventListener(eventName, highlight, false);
+  });
+
+  ["dragleave", "drop"].forEach((eventName) => {
+    dropZone.addEventListener(eventName, unhighlight, false);
+  });
+
+  function highlight(e) {
+    dropZone.classList.add("dragover");
+  }
+
+  function unhighlight(e) {
+    dropZone.classList.remove("dragover");
+  }
+
+  dropZone.addEventListener("drop", handleDrop, false);
+
+  function handleDrop(e) {
+    const dt = e.dataTransfer;
+    const files = dt.files;
+    fileInput.files = files;
+    updateFileDisplay();
+  }
+
+  fileInput.addEventListener("change", updateFileDisplay);
+
+  function updateFileDisplay() {
+    if (fileInput.files.length > 0) {
+      fileNameText.textContent = fileInput.files[0].name;
+      fileNameDisplay.classList.remove("d-none");
+      // Hide icon/text to make it cleaner
+      dropZone.querySelector(".drop-zone-content").classList.add("d-none");
+      // Re-center info
+      fileNameDisplay.classList.add("text-center", "w-100");
+    }
+  }
+
+  // Quick Start Badges
+  document.querySelectorAll(".quick-start-badge").forEach((badge) => {
+    badge.addEventListener("click", () => {
+      const prompt = badge.getAttribute("data-prompt");
+      const textarea = document.getElementById("user_description");
+      // Append
+      if (textarea.value.trim() !== "") {
+        textarea.value += "\n\n" + prompt;
+      } else {
+        textarea.value = prompt;
+      }
+      // Flash effect
+      badge.classList.remove("bg-light", "text-dark");
+      badge.classList.add("bg-primary", "text-white");
+      setTimeout(() => {
+        badge.classList.remove("bg-primary", "text-white");
+        badge.classList.add("bg-light", "text-dark");
+      }, 300);
+    });
+  });
+
+  // Expert Settings Toggle Animation
+  const expertToggle = document.getElementById("expertSettings");
+  expertToggle.addEventListener("show.bs.collapse", () => {
+    document.querySelector(".expert-caret").classList.add("rotate");
+  });
+  expertToggle.addEventListener("hide.bs.collapse", () => {
+    document.querySelector(".expert-caret").classList.remove("rotate");
+  });
+
+  // Add new key-value pair input
+  document.getElementById("add-input").addEventListener("click", function () {
+    const container = document.getElementById("inputs-container");
+    const div = document.createElement("div");
+    div.className = "input-group mb-2 animate-fade-in";
+    div.innerHTML = `
+    <input type="text" class="form-control" placeholder="Key" name="key[]">
+    <input type="text" class="form-control" placeholder="Value" name="value[]">
+    <button type="button" class="btn btn-outline-danger remove-input"><i class="bi bi-trash"></i></button>
+  `;
+    container.appendChild(div);
+  });
+
+  // Remove key-value pair input
+  document
+    .getElementById("inputs-container")
+    .addEventListener("click", function (e) {
+      if (e.target.closest(".remove-input")) {
+        e.target.closest(".input-group").remove();
+      }
+    });
+
+  // Handle form submission
+  document
+    .getElementById("agent-form")
+    .addEventListener("submit", function (e) {
+      e.preventDefault();
+
+      const btn = document.getElementById("generate-btn");
+      const spinner = btn.querySelector(".spinner-border");
+      const messageDiv = document.getElementById("response-message");
+
+      // Disable button and show spinner
+      btn.disabled = true;
+      spinner.classList.remove("d-none");
+      messageDiv.classList.add("d-none");
+
+      // Trigger new loading simulation
+      simulateProgress();
+
+      // Collect form data directly
+      const formData = new FormData(e.target);
+
+      // Add custom columns as a JSON array
+      if (customColumns.length > 0) {
+        formData.append("custom_columns", JSON.stringify(customColumns));
+      }
+
+      // Send POST request with FormData (Content-Type will be set automatically)
+      fetch("/agent/generate/{{ project.id }}", {
+        method: "POST",
+        body: formData,
+      })
+        .then((response) => response.json())
+        .then((result) => {
+          messageDiv.classList.remove("d-none");
+
+          if (result.ok) {
+            // Success
+            messageDiv.className = "alert alert-success mt-3 shadow-sm";
+            
+            let actionText = "Requirement(s) wurden erfolgreich generiert und gespeichert.";
+            if (result.was_improved) {
+                actionText = "Requirement(s) wurden erfolgreich verbessert und gespeichert (keine neuen erstellt).";
+            } else if (result.was_extended) {
+                actionText = "NEUE Requirement(s) wurden basierend auf dem Bestand erfolgreich erstellt und hinzugefügt.";
+            }
+                
+            messageDiv.innerHTML = `
+        <i class="bi bi-check-circle-fill me-2"></i>
+        <strong>Erfolg!</strong> ${result.count} ${actionText}
+        <br><span class="small text-muted ms-4">Sie werden in Kürze zum Projekt weitergeleitet...</span>
+      `;
+
+            // Redirect after 2 seconds
+            setTimeout(function () {
+              window.location.href = result.redirect;
+            }, 2000);
+          } else {
+            // Error from backend
+            messageDiv.className = "alert alert-danger mt-3 shadow-sm";
+            messageDiv.innerHTML = `<strong>Fehler:</strong> ${result.error}`;
+            btn.disabled = false;
+            spinner.classList.add("d-none");
+            // Show form again
+            loadingState.classList.add("d-none");
+            agentForm.classList.remove("d-none");
+          }
+        })
+        .catch((error) => {
+          // Network or parsing error
+          messageDiv.classList.remove("d-none");
+          messageDiv.className = "alert alert-danger mt-3 shadow-sm";
+          messageDiv.innerHTML = `<strong>Netzwerkfehler:</strong> ${error.message}`;
+          btn.disabled = false;
+          spinner.classList.add("d-none");
+          // Show form again
+          loadingState.classList.add("d-none");
+          agentForm.classList.remove("d-none");
+        });
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,248 @@
+{% extends "base.html" %} 
+{% block title %}Kanban Board - {{ project.name }}{% endblock %} 
+
+<!-- Card Macro moved to top for scope visibility -->
+{% macro render_card(item) %}
+<div class="card mb-3 kanban-card shadow-sm" 
+     draggable="true" 
+     ondragstart="drag(event)" 
+     id="card-{{ item.version.id }}"
+     data-version-id="{{ item.version.id }}"
+     data-req-id="{{ item.req.id }}">
+    
+    <div class="card-header d-flex justify-content-between align-items-center py-2">
+        <small class="text-muted fw-bold">#{{ item.version.id }}</small>
+        {% if item.version.is_blocked %}
+            <i class="bi bi-lock-fill text-danger lock-icon" title="Blockiert von {{ item.version.blocked_by.email }}"></i>
+        {% else %}
+            <i class="bi bi-lock-fill text-danger lock-icon d-none"></i>
+        {% endif %}
+    </div>
+    <div class="card-body py-2">
+        <h6 class="card-title">{{ item.version.title }}</h6>
+        <p class="card-text small text-muted text-truncate" style="max-height: 3em;">
+            {{ item.version.description }}
+        </p>
+        <div class="d-flex justify-content-between align-items-center mt-2">
+            <span class="badge bg-secondary font-monospace">{{ item.version.category or '' }}</span>
+            
+             <!-- Example custom data display (first one) -->
+             {% if custom_columns %}
+             <span class="badge bg-info text-dark" title="{{ custom_columns[0] }}">
+                {{ item.version.get_custom_data().get(custom_columns[0], '')|truncate(10) }}
+             </span>
+             {% endif %}
+        </div>
+    </div>
+    <div class="card-footer bg-white border-top-0 pt-0 pb-2 text-end">
+        <small class="text-muted" style="font-size: 0.7rem;">
+            {{ item.version.created_by.email.split('@')[0] }}
+        </small>
+    </div>
+</div>
+{% endmacro %}
+
+{% block content %}
+<div class="container-fluid mt-3">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <a href="{{ url_for('main.manage_project', project_id=project.id) }}" class="btn btn-outline-secondary">
+            <i class="bi bi-list-ul"></i> Listenansicht
+        </a>
+        <h2 class="d-inline-block ms-3">Kanban Board: {{ project.name }}</h2>
+    </div>
+    <div>
+        <a href="{{ url_for('agent.agent_page', project_id=project.id) }}" class="btn btn-primary">
+            <i class="bi bi-robot"></i> KI-Agent
+        </a>
+        <button id="refresh-board" class="btn btn-outline-primary" title="Board aktualisieren">
+            <i class="bi bi-arrow-clockwise"></i>
+        </button>
+    </div>
+  </div>
+
+  <div class="row kanban-board">
+    <!-- Spalte: Offen -->
+    <div class="col-md-4">
+      <div class="card bg-light h-100">
+        <div class="card-header bg-danger text-white fw-bold text-center">
+            Offen <span class="badge bg-white text-danger ms-2 count-badge">{{ kanban_data['Offen']|length }}</span>
+        </div>
+        <div class="card-body kanban-column" id="col-Offen" ondrop="drop(event)" ondragover="allowDrop(event)">
+            {% for item in kanban_data['Offen'] %}
+                {{ render_card(item) }}
+            {% endfor %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Spalte: In Arbeit -->
+    <div class="col-md-4">
+      <div class="card bg-light h-100">
+        <div class="card-header bg-warning text-dark fw-bold text-center">
+            In Arbeit <span class="badge bg-white text-dark ms-2 count-badge">{{ kanban_data['In Arbeit']|length }}</span>
+        </div>
+        <div class="card-body kanban-column" id="col-In Arbeit" ondrop="drop(event)" ondragover="allowDrop(event)">
+            {% for item in kanban_data['In Arbeit'] %}
+                {{ render_card(item) }}
+            {% endfor %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Spalte: Fertig -->
+    <div class="col-md-4">
+      <div class="card bg-light h-100">
+        <div class="card-header bg-success text-white fw-bold text-center">
+            Fertig <span class="badge bg-white text-success ms-2 count-badge">{{ kanban_data['Fertig']|length }}</span>
+        </div>
+        <div class="card-body kanban-column" id="col-Fertig" ondrop="drop(event)" ondragover="allowDrop(event)">
+            {% for item in kanban_data['Fertig'] %}
+                {{ render_card(item) }}
+            {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<style>
+    .kanban-column {
+        min-height: 400px;
+        transition: background-color 0.2s;
+    }
+    .kanban-column.drag-over {
+        background-color: #e9ecef;
+        border: 2px dashed #adb5bd;
+    }
+    .kanban-card {
+        cursor: grab;
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .kanban-card:active {
+        cursor: grabbing;
+    }
+    .kanban-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 .5rem 1rem rgba(0,0,0,.15)!important;
+    }
+    .gu-mirror {
+        position: fixed !important;
+        margin: 0 !important;
+        z-index: 9999 !important;
+        opacity: 0.8;
+    }
+</style>
+
+<script>
+    // Drag & Drop Logic
+    function allowDrop(ev) {
+        ev.preventDefault();
+        ev.currentTarget.classList.add('drag-over');
+    }
+
+    function leaveDrop(ev) {
+        ev.currentTarget.classList.remove('drag-over');
+    }
+
+    // Add event listener to remove drag-over style when leaving
+    document.querySelectorAll('.kanban-column').forEach(col => {
+        col.addEventListener('dragleave', leaveDrop);
+    });
+
+    function drag(ev) {
+        ev.dataTransfer.setData("text", ev.target.id);
+        ev.dataTransfer.effectAllowed = "move";
+    }
+
+    function drop(ev) {
+        ev.preventDefault();
+        // Remove style
+        document.querySelectorAll('.kanban-column').forEach(col => col.classList.remove('drag-over'));
+        
+        var data = ev.dataTransfer.getData("text");
+        var card = document.getElementById(data);
+        
+        // Find drop target (column)
+        var target = ev.target;
+        while (!target.classList.contains('kanban-column')) {
+            target = target.parentElement;
+            if (!target) return; // Dropped outside
+        }
+        
+        var newStatus = target.id.replace("col-", "");
+        
+        // Move element in DOM
+        target.appendChild(card);
+        
+        // Update count badges
+        updateBadges();
+
+        // AJAX update
+        var versionId = card.getAttribute('data-version-id');
+        updateStatus(versionId, newStatus);
+    }
+    
+    function updateStatus(versionId, status) {
+        const formData = new FormData();
+        formData.append('status', status);
+        
+        fetch(`/requirement_version/${versionId}/update_status`, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Optional: Flash success message or change card style
+                console.log("Status updated to " + status);
+            } else {
+                alert("Fehler beim Aktualisieren: " + (data.error || "Unbekannt"));
+                location.reload(); // Revert
+            }
+        })
+        .catch(err => {
+            console.error(err);
+            alert("Netzwerkfehler");
+            location.reload();
+        });
+    }
+
+    function updateBadges() {
+        document.querySelectorAll('.kanban-column').forEach(col => {
+            var count = col.children.length;
+            var header = col.parentElement.querySelector('.count-badge');
+            if(header) header.innerText = count;
+        });
+    }
+    
+    // Polling for Updates
+    setInterval(function() {
+        fetch("{{ url_for('main.requirements_status_json', project_id=project.id) }}")
+            .then(response => response.json())
+            .then(data => {
+                data.forEach(item => {
+                    var card = document.querySelector(`.kanban-card[data-version-id="${item.version_id}"]`);
+                    if (card) {
+                        // Check if status changed externally (someone else moved it)
+                        // This is tricky without fully re-rendering. 
+                        // For now let's just update the Lock icon.
+                        
+                        var lockIcon = card.querySelector('.lock-icon');
+                        if (item.is_blocked) {
+                            lockIcon.classList.remove('d-none');
+                            lockIcon.title = "Blockiert von " + item.blocked_by;
+                        } else {
+                            lockIcon.classList.add('d-none');
+                        }
+                    }
+                });
+            });
+    }, 5000); // Poll every 5 seconds
+
+</script>
+{% endblock %}

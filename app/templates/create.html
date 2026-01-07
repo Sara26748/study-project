@@ -1,0 +1,831 @@
+{% extends "base.html" %} {% block title %}Manage Project{% endblock %} {% block
+content %} {% if not project %}
+<h1 class="mt-5 pt-3">Neues Projekt erstellen</h1>
+<p>Hier kannst du neue Projekte erstellen.</p>
+
+<form method="POST" class="mb-4">
+  <div class="row">
+    <div class="col-md-9">
+      <input
+        type="text"
+        name="project_name"
+        class="form-control"
+        placeholder="Projektname"
+        required
+      />
+    </div>
+    <div class="col-md-3">
+      <button type="submit" class="btn btn-primary">Projekt erstellen</button>
+    </div>
+  </div>
+</form>
+
+<a href="{{ url_for('main.home') }}" class="btn btn-outline-primary border-0 bg-light text-primary shadow-sm d-inline-flex align-items-center" style="transition: all 0.2s ease;">
+  <i class="bi bi-arrow-left me-2"></i>Zurück zur Startseite
+</a>
+
+{% else %}
+<!-- Project View -->
+<!-- Project Dashboard Header -->
+<div class="d-flex justify-content-between align-items-center mb-4 mt-3 animate-fade-in">
+    <div>
+        <a href="{{ url_for('main.home') }}" class="text-decoration-none text-primary small mb-1 d-inline-flex align-items-center fw-medium" style="transition: color 0.2s ease;" onmouseover="this.style.color='#0a58ca'" onmouseout="this.style.color='#0d6efd'">
+            <i class="bi bi-arrow-left me-1"></i> Zurück zur Übersicht
+        </a>
+        <h2 class="fw-bold m-0">{{ project.name }}</h2>
+        {% if project.shared_with %}
+        <div class="mt-2">
+            {% for user in project.shared_with %}
+            <span class="badge bg-light text-dark border me-1">
+                <i class="bi bi-person-check"></i> {{ user.email }}
+            </span>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+    
+    <!-- Live Presence Indicator -->
+    <div id="activeUsersContainer" class="d-flex align-items-center gap-2">
+        <!-- Active users will be dynamically inserted here -->
+    </div>
+    
+    <div class="d-flex gap-2">
+        <!-- Tools directly accessible -->
+        <a href="{{ url_for('main.kanban_view', project_id=project.id) }}" class="btn btn-white border shadow-sm text-secondary" title="Kanban Board">
+            <i class="bi bi-kanban"></i> 
+        </a>
+        <button class="btn btn-white border shadow-sm text-warning" id="check-conflicts-btn" title="Widersprüche prüfen">
+            <i class="bi bi-exclamation-triangle"></i>
+        </button>
+        <button class="btn btn-white border shadow-sm text-info" data-bs-toggle="modal" data-bs-target="#shareProjectModal" title="Projekt teilen">
+            <i class="bi bi-share"></i>
+        </button>
+
+        <!-- Main CTA -->
+        <a href="{{ url_for('agent.agent_page', project_id=project.id) }}" class="btn btn-primary d-flex align-items-center shadow-sm px-4">
+            <i class="bi bi-stars me-2"></i> KI-Agent
+        </a>
+        
+        <!-- Data Menu Removed - moved to toolbar -->
+    </div>
+</div>
+
+<!-- Conflict Modal (Preserved) -->
+<div class="modal fade" id="conflictModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Gefundene Widersprüche (KI-Analyse)</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div id="conflict-loader" class="text-center py-4 d-none">
+           <div class="spinner-border text-primary" role="status">
+             <span class="visually-hidden">Loading...</span>
+           </div>
+           <p class="mt-2 text-muted">KI analysiert alle Anforderungen auf logische Brüche...</p>
+        </div>
+        <div id="conflict-results"></div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Schließen</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const btn = document.getElementById('check-conflicts-btn');
+    const modalEl = document.getElementById('conflictModal');
+    if(!btn || !modalEl) return;
+    
+    const modal = new bootstrap.Modal(modalEl);
+    const resultsDiv = document.getElementById('conflict-results');
+    const loader = document.getElementById('conflict-loader');
+    
+    btn.addEventListener('click', function() {
+        modal.show();
+        resultsDiv.innerHTML = '';
+        loader.classList.remove('d-none');
+        
+        fetch("{{ url_for('main.detect_conflicts_route', project_id=project.id) }}")
+          .then(response => response.json())
+          .then(data => {
+              loader.classList.add('d-none');
+              if (data.conflicts && data.conflicts.length > 0) {
+                  let html = '<div class="alert alert-warning">Folgende potenzielle Konflikte wurden gefunden:</div>';
+                  html += '<div class="list-group">';
+                  data.conflicts.forEach(c => {
+                      html += `
+                      <div class="list-group-item">
+                          <div class="d-flex w-100 justify-content-between">
+                              <h6 class="mb-1 text-danger"><i class="bi bi-lightning-fill"></i> Konflikt zwischen Req #${c.req_id_1} & #${c.req_id_2}</h6>
+                              <span class="badge bg-danger">${c.severity || 'Hoch'}</span>
+                          </div>
+                          <p class="mb-1">${c.description}</p>
+                      </div>`;
+                  });
+                  html += '</div>';
+                  resultsDiv.innerHTML = html;
+              } else {
+                  resultsDiv.innerHTML = '<div class="alert alert-success"><i class="bi bi-check-circle"></i> Keine logischen Widersprüche gefunden.</div>';
+              }
+          })
+          .catch(err => {
+              loader.classList.add('d-none');
+              resultsDiv.innerHTML = `<div class="alert alert-danger">Fehler bei der Analyse: ${err}</div>`;
+          });
+    });
+});
+</script>
+
+<!-- JS Variables -->
+<script>
+  window.PROJECT_CUSTOM_COLUMNS = {{ custom_columns|tojson|safe }};
+  window.PROJECT_ID = {{ project.id }};
+</script>
+
+<!-- Toolbar & Filter -->
+<div class="card border-0 shadow-sm mb-4">
+    <div class="card-body p-3">
+        <div class="row g-2 align-items-center">
+            <!-- Search -->
+            <div class="col-md-3">
+                <div class="input-group">
+                    <span class="input-group-text bg-white border-end-0 text-muted"><i class="bi bi-search"></i></span>
+                    <input type="text" class="form-control border-start-0 ps-0" id="filterText" placeholder="Suche...">
+                </div>
+            </div>
+            
+            <!-- Filters -->
+            <div class="col-md-2">
+                 <select class="form-select border-0 bg-light" id="filterStatus">
+                    <option value="">Status: Alle</option>
+                    <option value="Offen">Offen</option>
+                    <option value="In Arbeit">In Arbeit</option>
+                    <option value="Fertig">Fertig</option>
+                 </select>
+            </div>
+            <div class="col-md-2">
+                 <select class="form-select border-0 bg-light" id="filterCategory">
+                    <option value="">Kategorie: Alle</option>
+                 </select>
+            </div>
+            
+            <!-- Actions -->
+            <div class="col-md-5 text-end d-flex gap-2 justify-content-end align-items-center">
+                <!-- Export/Import Buttons (Larger & Labeled) -->
+                <a href="{{ url_for('main.export_excel', project_id=project.id) }}" class="btn btn-outline-success px-3 d-flex align-items-center shadow-sm" title="Liste als Excel exportieren">
+                    <i class="bi bi-file-earmark-arrow-up me-2 fw-bold"></i> Export
+                </a>
+                <button class="btn btn-outline-primary px-3 d-flex align-items-center shadow-sm" type="button" data-bs-toggle="modal" data-bs-target="#importExcelModal" title="Excel-Datei importieren">
+                    <i class="bi bi-file-earmark-arrow-down me-2 fw-bold"></i> Import
+                </button>
+
+                <div class="border-start mx-2" style="height: 24px;"></div>
+
+                <div class="d-inline-block">
+                    <button
+                        class="btn btn-sm btn-outline-secondary"
+                        type="button"
+                        data-bs-toggle="collapse"
+                        data-bs-target="#addColumnForm"
+                    >
+                        <i class="bi bi-plus-lg"></i> Spalte
+                    </button>
+                    <!-- Column Remove Dropdown -->
+                     <div class="dropdown d-inline-block">
+                        <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                           <i class="bi bi-gear"></i>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><h6 class="dropdown-header">Spalten verwalten</h6></li>
+                            <li><small class="text-muted px-3 d-block mb-2">
+                                <i class="bi bi-shield-fill-check text-success"></i> = Geschützte Spalten (nicht löschbar)
+                            </small></li>
+                            
+                            <!-- Special Columns Toggle -->
+                            <li class="px-3 py-1 bg-light">
+                                <small class="text-muted fw-bold">Anzeige-Optionen</small>
+                            </li>
+                            <li class="d-flex justify-content-between align-items-center px-3 py-2">
+                                <span class="small"><i class="bi bi-circle-half text-secondary me-1"></i>Quantifizierbar</span>
+                                <div class="form-check form-switch m-0">
+                                    <input class="form-check-input" type="checkbox" role="switch" id="toggleQuantifiableCol" checked>
+                                </div>
+                            </li>
+                            <li><hr class="dropdown-divider"></li>
+
+                            <!-- Protected Standard Columns (cannot be deleted) -->
+                            <li class="px-3 py-1 bg-light">
+                                <small class="text-muted fw-bold">Standard-Spalten (Geschützt)</small>
+                            </li>
+                            <li class="d-flex justify-content-between align-items-center px-3 py-1">
+                                <span class="small"><i class="bi bi-shield-fill-check text-success me-1"></i>ID</span>
+                                <span class="badge bg-success bg-opacity-10 text-success">Geschützt</span>
+                            </li>
+                            <li class="d-flex justify-content-between align-items-center px-3 py-1">
+                                <span class="small"><i class="bi bi-shield-fill-check text-success me-1"></i>Version</span>
+                                <span class="badge bg-success bg-opacity-10 text-success">Geschützt</span>
+                            </li>
+                            <li class="d-flex justify-content-between align-items-center px-3 py-1">
+                                <span class="small"><i class="bi bi-shield-fill-check text-success me-1"></i>Title</span>
+                                <span class="badge bg-success bg-opacity-10 text-success">Geschützt</span>
+                            </li>
+                            <li class="d-flex justify-content-between align-items-center px-3 py-1">
+                                <span class="small"><i class="bi bi-shield-fill-check text-success me-1"></i>Description</span>
+                                <span class="badge bg-success bg-opacity-10 text-success">Geschützt</span>
+                            </li>
+                            <li class="d-flex justify-content-between align-items-center px-3 py-1">
+                                <span class="small"><i class="bi bi-shield-fill-check text-success me-1"></i>Category</span>
+                                <span class="badge bg-success bg-opacity-10 text-success">Geschützt</span>
+                            </li>
+                            <li class="d-flex justify-content-between align-items-center px-3 py-1">
+                                <span class="small"><i class="bi bi-shield-fill-check text-success me-1"></i>Status</span>
+                                <span class="badge bg-success bg-opacity-10 text-success">Geschützt</span>
+                            </li>
+                            
+                            <!-- Custom Columns (can be deleted) -->
+                            {% if custom_columns %}
+                            <li><hr class="dropdown-divider"></li>
+                            <li class="px-3 py-1 bg-light">
+                                <small class="text-muted fw-bold">Custom-Spalten</small>
+                            </li>
+                            {% for column in custom_columns %}
+                            <li class="d-flex justify-content-between align-items-center px-3 py-1">
+                                <span class="small"><i class="bi bi-tag text-primary me-1"></i>{{ column }}</span>
+                                <form method="POST" action="{{ url_for('main.remove_column', project_id=project.id, column_name=column) }}" class="d-inline" onsubmit="return confirm('Spalte {{ column }} wirklich löschen?')">
+                                    <button type="submit" class="btn btn-link text-danger p-0 ms-2" title="Spalte löschen">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </form>
+                            </li>
+                            {% endfor %}
+                            {% else %}
+                            <li><hr class="dropdown-divider"></li>
+                            <li><span class="text-muted small px-3">Keine Custom-Spalten vorhanden</span></li>
+                            {% endif %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="dynamicFiltersContainer" class="mt-2 row g-2"></div>
+
+        <!-- Add Column Collapse -->
+        <div class="collapse mt-3 border-top pt-3" id="addColumnForm">
+          <form
+            method="POST"
+            action="{{ url_for('main.add_column', project_id=project.id) }}"
+            class="row g-3 align-items-center"
+          >
+            <div class="col-auto">
+                <span class="fw-bold small">Neue Spalte hinzufügen:</span>
+            </div>
+            <div class="col-auto">
+              <input
+                type="text"
+                class="form-control form-control-sm"
+                name="column_name"
+                placeholder="Name (z.B. 'Priorität')"
+                required
+              />
+            </div>
+            <div class="col-auto">
+              <button type="submit" class="btn btn-primary btn-sm">Hinzufügen</button>
+            </div>
+            <div class="col-auto">
+                <small class="text-muted">Die KI wird diese Spalte bei zukünftigen Generierungen berücksichtigen.</small>
+            </div>
+          </form>
+        </div>
+    </div>
+</div>
+
+<!-- Main Requirements Table -->
+<div class="card shadow-sm border-0">
+  <div class="card-header bg-white py-3 border-0">
+    <h5 class="mb-0 fw-bold text-secondary">Anforderungen</h5>
+  </div>
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead class="bg-secondary bg-opacity-10 text-dark">
+          <tr>
+            <th class="ps-4 py-3" style="width: 5%">Ver.</th>
+            <th class="py-3" style="width: 5%">ID</th>
+            <th class="py-3" style="width: 20%">Titel</th>
+            <th class="py-3" style="width: 25%">Beschreibung</th>
+            {% for column in custom_columns %}
+            <th class="py-3" style="width: 10%">{{ column }}</th>
+            {% endfor %}
+            <th class="py-3" style="width: 10%">Kategorie</th>
+            <th class="py-3" style="width: 10%">Status</th>
+            <th class="py-3 text-center quantifiable-col" style="width: 8%">
+              <span title="Quantifizierbar: Diese Anforderung kann quantitativ gemessen werden (z.B. Performance-Werte, Zeitlimits, etc.)">
+                Quantifizierbar
+              </span>
+            </th>
+            <th class="text-end pe-4 py-3" style="width: 8%">Aktionen</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% if req_with_versions %} {% for req, versions in req_with_versions %}
+          <tr id="req-row-{{ req.id }}" 
+              data-req-id="{{ req.id }}" 
+              class="requirement-row-clickable" 
+              style="cursor: pointer;"
+              onmouseover="this.style.backgroundColor='#f8f9fa'" 
+              onmouseout="this.style.backgroundColor=''">
+            <td class="ps-4" onclick="event.stopPropagation();">
+              <select
+                class="form-select form-select-sm border-0 bg-transparent text-primary fw-bold p-0 version-selector"
+                style="width: auto; cursor: pointer;"
+                data-req-id="{{ req.id }}"
+              >
+                {% for ver in versions %}
+                <option value="{{ ver.version_index }}" {% if loop.last %}selected{% endif %}>
+                  {{ ver.version_label }}
+                </option>
+                {% endfor %}
+              </select>
+            </td>
+            <td class="text-muted small">#{{ loop.index }}</td>
+            <td>
+                <span class="fw-bold title-cell text-dark">{{ versions[-1].title }}</span>
+                <br>
+                <small class="text-muted user-cell">
+                     {% if versions[-1].created_by %}
+                     <i class="bi bi-person-plus-fill text-success"></i> Erstellt: {{ versions[-1].created_by.email.split('@')[0] }}
+                     {% endif %}
+                     {% if versions[-1].last_modified_by and versions[-1].last_modified_by.id != versions[-1].created_by.id %}
+                     <br><i class="bi bi-pencil-fill text-primary"></i> Bearbeitet: {{ versions[-1].last_modified_by.email.split('@')[0] }}
+                     {% endif %}
+                </small>
+            </td>
+            <td class="description-cell text-secondary small" style="max-width: 300px; cursor: pointer;" onclick="window.location.href='{{ url_for('main.requirement_history', rid=req.id) }}'">
+                <div class="description-preview" 
+                     style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; cursor: help;"
+                     data-bs-toggle="popover" 
+                     data-bs-trigger="hover focus"
+                     data-bs-placement="top"
+                     data-bs-content="{{ versions[-1].description|replace('"', '&quot;')|replace("'", "&#39;") }}"
+                     data-bs-html="false"
+                     data-description-full="{{ versions[-1].description|e }}"
+                     title="Vollständige Beschreibung">
+                    {{ versions[-1].description }}
+                </div>
+            </td>
+            {% for column in custom_columns %}
+            <td class="custom-data-cell" data-column="{{ column }}" onclick="window.location.href='{{ url_for('main.requirement_history', rid=req.id) }}'">
+              {{ versions[-1].get_custom_data().get(column, "–") }}
+            </td>
+            {% endfor %}
+            <td class="category-cell" onclick="window.location.href='{{ url_for('main.requirement_history', rid=req.id) }}'">
+                <span class="badge bg-light text-secondary border">{{ versions[-1].category or "–" }}</span>
+            </td>
+            <td class="status-cell" onclick="window.location.href='{{ url_for('main.requirement_history', rid=req.id) }}'">
+              <span class="badge rounded-pill bg-{{ versions[-1].get_status_color() }}"
+                >{{ versions[-1].status }}</span
+              >
+            </td>
+            <td class="quantifiable-cell text-center quantifiable-col" onclick="event.stopPropagation();">
+              {% set custom_data = versions[-1].get_custom_data() %}
+              {% set is_quantifiable = custom_data.get('is_quantifiable', 'false') == 'true' or custom_data.get('is_quantifiable', False) == True %}
+              <form method="POST" action="{{ url_for('main.toggle_quantifiable', version_id=versions[-1].id) }}" class="d-inline toggle-quantifiable-form">
+                <button type="submit" class="btn btn-sm btn-link p-0 border-0" title="{% if is_quantifiable %}Quantifizierbar - Klicken zum Deaktivieren{% else %}Nicht quantifizierbar - Klicken zum Aktivieren{% endif %}">
+                  <i class="bi {% if is_quantifiable %}bi-check-circle-fill text-success{% else %}bi-circle text-muted{% endif %}" style="font-size: 1.3rem;"></i>
+                </button>
+              </form>
+            </td>
+            
+            <td class="actions-cell text-end pe-4">
+              <div class="d-flex justify-content-end align-items-center">
+                    <!-- Direct Lock Button -->
+                    <form method="POST" action="{{ url_for('main.toggle_block_requirement', version_id=versions[-1].id) }}" class="d-inline me-1">
+                        <button type="submit" class="btn btn-sm btn-icon rounded-circle {% if versions[-1].is_blocked %}text-danger{% else %}text-success{% endif %}" title="{% if versions[-1].is_blocked %}Freigeben{% else %}Blockieren{% endif %}">
+                            <i class="bi {% if versions[-1].is_blocked %}bi-lock-fill{% else %}bi-unlock{% endif %}"></i>
+                        </button>
+                    </form>
+
+                    <div class="dropdown">
+                        <button class="btn btn-sm btn-light btn-icon rounded-circle" type="button" data-bs-toggle="dropdown" onclick="event.stopPropagation();">
+                            <i class="bi bi-three-dots-vertical"></i>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end shadow border-0">
+                            <li>
+                                <button class="dropdown-item edit-requirement-btn" 
+                                    type="button"
+                                    data-req-id="{{ req.id }}" 
+                                    data-version-id="{{ versions[-1].id }}"
+                                    {% if versions[-1].is_blocked %}disabled{% endif %}>
+                                    <i class="bi bi-pencil me-2"></i> Bearbeiten
+                                </button>
+                            </li>
+                            <li>
+                                 <button class="dropdown-item generate-test-btn" data-version-id="{{ versions[-1].id }}">
+                                    <i class="bi bi-card-checklist me-2"></i> Testfälle generieren
+                                 </button>
+                            </li>
+                            <li><hr class="dropdown-divider"></li>
+                            
+                            <!-- Regenerate -->
+                            <li>
+                               <form method="POST" action="{{ url_for('main.regenerate_requirement', req_id=req.id) }}">
+                                    <button type="submit" class="dropdown-item text-success" {% if versions[-1].is_blocked %}disabled{% endif %}>
+                                        <i class="bi bi-magic me-2"></i> Neu generieren (KI)
+                                    </button>
+                               </form>
+                            </li>
+                            
+                            <li><hr class="dropdown-divider"></li>
+                            
+                            <!-- Delete -->
+                            <li>
+                                <form method="POST" action="{{ url_for('main.delete_requirement_version', version_id=versions[-1].id) }}" class="delete-version-form">
+                                    <button type="submit" class="dropdown-item text-danger" onclick="return confirm('Wirklich löschen?')">
+                                        <i class="bi bi-trash me-2"></i> Löschen
+                                    </button>
+                                </form>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+              <div class="d-none" id="versions-data-{{ req.id }}">
+                {% for ver in versions %}
+                <div
+                  class="version-data"
+                  data-version-index="{{ ver.version_index }}"
+                  data-version-id="{{ ver.id }}"
+                  data-title="{{ ver.title }}"
+                  data-description="{{ ver.description }}"
+                  data-category="{{ ver.category or '' }}"
+                  data-status="{{ ver.status }}"
+                  data-status-color="{{ ver.get_status_color() }}"
+                  data-custom-data="{{ ver.get_custom_data_json()|safe }}"
+                  data-is-quantifiable="{{ 'true' if (ver.get_custom_data().get('is_quantifiable', 'false') == 'true' or ver.get_custom_data().get('is_quantifiable', False) == True) else 'false' }}"
+                ></div>
+                {% endfor %}
+              </div>
+            </td>
+          </tr>
+          {% endfor %} {% else %}
+          <tr>
+            <td colspan="{{ 9 + custom_columns|length }}" class="text-center py-5">
+              <div class="text-muted">
+                  <i class="bi bi-inbox fs-1 d-block mb-3"></i>
+                  <p>Noch keine Anforderungen vorhanden.</p>
+                  <a href="{{ url_for('agent.agent_page', project_id=project.id) }}" class="btn btn-primary mt-2">
+                      Erste Anforderung generieren
+                  </a>
+              </div>
+            </td>
+          </tr>
+          {% endif %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Modals -->
+<div class="modal fade" id="testCaseModal" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Generierte Testfälle</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <div id="test-loader" class="text-center py-5 d-none">
+             <div class="spinner-border text-info" role="status"></div>
+             <p class="mt-2">KI generiert Testfälle...</p>
+        </div>
+        <textarea id="test-case-result" class="form-control" rows="15" readonly></textarea>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Schließen</button>
+        <button type="button" class="btn btn-primary" onclick="navigator.clipboard.writeText(document.getElementById('test-case-result').value)">
+            <i class="bi bi-clipboard"></i> Kopieren
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="shareProjectModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Projekt teilen</h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+        ></button>
+      </div>
+      <form
+        method="POST"
+        action="{{ url_for('main.share_project', project_id=project.id) }}"
+      >
+        <div class="modal-body">
+          <div class="mb-3">
+            <label for="shareEmail" class="form-label">E-Mail-Adresse</label>
+            <input
+              type="email"
+              class="form-control"
+              id="shareEmail"
+              name="email"
+              required
+            />
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button
+            type="button"
+            class="btn btn-secondary"
+            data-bs-dismiss="modal"
+          >
+            Abbrechen
+          </button>
+          <button type="submit" class="btn btn-primary">Teilen</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="importExcelModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Excel importieren</h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+        ></button>
+      </div>
+      <form
+        method="POST"
+        action="{{ url_for('main.import_excel', project_id=project.id) }}"
+        enctype="multipart/form-data"
+      >
+        <div class="modal-body">
+          <input
+            type="file"
+            class="form-control"
+            name="excel_file"
+            accept=".xlsx,.xls"
+            required
+          />
+        </div>
+        <div class="modal-footer">
+          <button
+            type="button"
+            class="btn btn-secondary"
+            data-bs-dismiss="modal"
+          >
+            Abbrechen
+          </button>
+          <button type="submit" class="btn btn-primary">Importieren</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="editRequirementModal" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Anforderung bearbeiten</h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+        ></button>
+      </div>
+      <form id="editRequirementForm" method="POST">
+        <div class="modal-body">
+          <input type="hidden" id="editVersionId" name="version_id" />
+          <input
+            type="hidden"
+            id="editSaveType"
+            name="save_type"
+            value="intermediate"
+          />
+          <div class="mb-3">
+            <label for="editTitle" class="form-label">Title *</label>
+            <input
+              type="text"
+              class="form-control"
+              id="editTitle"
+              name="title"
+              required
+            />
+          </div>
+          <div class="mb-3">
+            <label for="editDescription" class="form-label"
+              >Beschreibung *</label
+            >
+            <textarea
+              class="form-control"
+              id="editDescription"
+              name="description"
+              rows="4"
+              required
+            ></textarea>
+          </div>
+          <div class="mb-3">
+            <label for="editCategory" class="form-label">Kategorie</label>
+            <input
+              type="text"
+              class="form-control"
+              id="editCategory"
+              name="category"
+            />
+          </div>
+          <div class="mb-3">
+            <label for="editStatus" class="form-label">Status</label>
+            <select class="form-select" id="editStatus" name="status">
+              <option value="Offen">Offen</option>
+              <option value="In Arbeit">In Arbeit</option>
+              <option value="Fertig">Fertig</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <div class="form-check">
+              <input
+                class="form-check-input"
+                type="checkbox"
+                id="editQuantifiable"
+                name="is_quantifiable"
+              />
+              <label class="form-check-label" for="editQuantifiable">
+                <strong>Quantifizierbar</strong>
+                <small class="text-muted d-block">Diese Anforderung kann quantitativ gemessen werden (z.B. Performance-Werte, Zeitlimits, etc.)</small>
+              </label>
+            </div>
+          </div>
+          <div id="dynamicColumnsContainer"></div>
+        </div>
+        <div class="modal-footer">
+          <button
+            type="button"
+            class="btn btn-secondary"
+            data-bs-dismiss="modal"
+          >
+            Abbrechen
+          </button>
+          <button
+            type="submit"
+            class="btn btn-warning"
+            onclick="document.getElementById('editSaveType').value='intermediate'"
+          >
+            Zwischenspeichern
+          </button>
+          <button
+            type="submit"
+            class="btn btn-success"
+            onclick="document.getElementById('editSaveType').value='final'"
+          >
+            Speichern (Fertig)
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script src="{{ url_for('static', filename='project.js') }}"></script>
+<script src="{{ url_for('static', filename='presence.js') }}"></script>
+
+<script>
+// Initialize Bootstrap Popovers for description tooltips
+document.addEventListener('DOMContentLoaded', function() {
+    var popoverTriggerList = [].slice.call(document.querySelectorAll('.description-preview[data-bs-toggle="popover"]'));
+    var popoverList = popoverTriggerList.map(function (popoverTriggerEl) {
+        // Get full description from data attribute
+        var fullDescription = popoverTriggerEl.getAttribute('data-description-full') || popoverTriggerEl.textContent;
+        
+        return new bootstrap.Popover(popoverTriggerEl, {
+            trigger: 'hover focus',
+            html: false,
+            placement: 'top',
+            content: fullDescription,
+            title: 'Vollständige Beschreibung'
+        });
+    });
+    
+    // Re-initialize popovers when version changes
+    document.addEventListener('change', function(e) {
+        if (e.target.classList.contains('version-selector')) {
+            // Destroy existing popovers and reinitialize
+            popoverList.forEach(function(popover) {
+                if (popover) popover.dispose();
+            });
+            
+            // Reinitialize after a short delay to allow DOM update
+            setTimeout(function() {
+                var newPopoverTriggerList = [].slice.call(document.querySelectorAll('.description-preview[data-bs-toggle="popover"]'));
+                popoverList = newPopoverTriggerList.map(function (popoverTriggerEl) {
+                    var fullDescription = popoverTriggerEl.getAttribute('data-description-full') || popoverTriggerEl.textContent;
+                    return new bootstrap.Popover(popoverTriggerEl, {
+                        trigger: 'hover focus',
+                        html: false,
+                        placement: 'top',
+                        content: fullDescription,
+                        title: 'Vollständige Beschreibung'
+                    });
+                });
+            }, 100);
+        }
+    });
+});
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const testModalEl = document.getElementById('testCaseModal');
+    if (!testModalEl) return;
+    
+    const testModal = new bootstrap.Modal(testModalEl);
+    const testResult = document.getElementById('test-case-result');
+    const testLoader = document.getElementById('test-loader');
+    
+    // Use event delegation for buttons that might be dynamically loaded or in table
+    document.body.addEventListener('click', function(e) {
+        const btn = e.target.closest('.generate-test-btn');
+        if (btn) {
+            e.preventDefault();
+            const versionId = btn.getAttribute('data-version-id');
+            
+            testResult.value = '';
+            testResult.classList.add('d-none');
+            testLoader.classList.remove('d-none');
+            testModal.show();
+            
+            fetch(`/requirement_version/${versionId}/generate_tests`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                testLoader.classList.add('d-none');
+                testResult.classList.remove('d-none');
+                
+                if (data.result) {
+                    testResult.value = data.result;
+                } else {
+                    testResult.value = "Fehler: " + (data.error || "Unbekannter Fehler");
+                }
+            })
+            .catch(err => {
+                testLoader.classList.add('d-none');
+                testResult.classList.remove('d-none');
+                testResult.value = "Netzwerkfehler: " + err;
+            });
+        }
+    });
+});
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const toggleQuantifiable = document.getElementById('toggleQuantifiableCol');
+    if (!toggleQuantifiable) return;
+    
+    // Function to update visibility
+    function updateQuantifiableVisibility(show) {
+        const elements = document.querySelectorAll('.quantifiable-col');
+        elements.forEach(el => {
+            if (show) {
+                el.classList.remove('d-none');
+            } else {
+                el.classList.add('d-none');
+            }
+        });
+        localStorage.setItem('showQuantifiableCol', show);
+    }
+    
+    // Initialize from localStorage (default to true)
+    const storedState = localStorage.getItem('showQuantifiableCol');
+    const initialState = storedState === null ? true : storedState === 'true';
+    
+    toggleQuantifiable.checked = initialState;
+    updateQuantifiableVisibility(initialState);
+    
+    // Event listener
+    toggleQuantifiable.addEventListener('change', function() {
+        updateQuantifiableVisibility(this.checked);
+    });
+});
+</script>
+
+{% endif %} {% endblock %}

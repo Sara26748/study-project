@@ -1,0 +1,26 @@
+{% extends "base.html" %} {% block title %}Edit Requirement{% endblock %} {%
+block content %}
+<h1 class="mt-5 pt-3">Requirement bearbeiten</h1>
+<form method="POST" class="mb-4">
+  {% for col in project.columns %}
+  <div class="mb-3">
+    <label for="{{ col }}" class="form-label">{{ col }}</label>
+    <input
+      type="text"
+      class="form-control"
+      id="{{ col }}"
+      name="{{ col }}"
+      value="{{ req[col] }}"
+      required
+    />
+  </div>
+  {% endfor %}
+  <button type="submit" class="btn btn-primary">Speichern</button>
+  <a
+    href="{{ url_for('main.manage_project', project_id=project.id) }}"
+    class="btn btn-outline-primary border-0 bg-light text-primary shadow-sm d-inline-flex align-items-center"
+    style="transition: all 0.2s ease"
+    >Abbrechen</a
+  >
+</form>
+{% endblock %}

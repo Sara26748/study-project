@@ -1,0 +1,90 @@
+{% extends "base.html" %} {% block title %}Gelöschte Anforderungen - {{
+project.name }}{% endblock %} {% block content %}
+<div class="container mt-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Gelöschte Anforderungen: {{ project.name }}</h2>
+    <a
+      href="{{ url_for('main.manage_project', project_id=project.id) }}"
+      class="btn btn-primary"
+    >
+      <i class="bi bi-arrow-left"></i> Zurück zu Anforderungen
+    </a>
+  </div>
+
+  <div class="card">
+    <div class="card-header bg-danger text-white">
+      <i class="bi bi-trash"></i> Papierkorb
+    </div>
+    <div class="card-body">
+      {% if deleted_items %}
+      <div class="table-responsive">
+        <table class="table table-hover align-middle">
+          <thead class="table-light">
+            <tr>
+              <th style="width: 5%">Version</th>
+              <th style="width: 5%">ID</th>
+              <th style="width: 15%">Title</th>
+              <th style="width: 25%">Beschreibung</th>
+
+              <!-- Dynamic Columns -->
+              {% for column in custom_columns %}
+              <th style="width: 8%">{{ column }}</th>
+              {% endfor %}
+
+              <th style="width: 8%">Kategorie</th>
+              <th style="width: 8%">Status</th>
+              <th style="width: 15%">Aktionen</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for req, ver in deleted_items %}
+            <tr>
+              <td>
+                <span class="badge bg-primary">{{ ver.version_label }}</span>
+              </td>
+              <td>{{ req.id }}</td>
+              <td>{{ ver.title }}</td>
+              <td>{{ ver.description }}</td>
+
+              <!-- Dynamic Column Cells -->
+              {% for column in custom_columns %}
+              <td>{{ ver.get_custom_data().get(column, "–") }}</td>
+              {% endfor %}
+
+              <td>{{ ver.category or "–" }}</td>
+
+              <!-- Status with color -->
+              <td>
+                <span class="badge bg-{{ ver.get_status_color() }}">
+                  {{ ver.status }}
+                </span>
+              </td>
+
+              <!-- Actions -->
+              <td>
+                <form
+                  method="POST"
+                  action="{{ url_for('main.restore_requirement', req_id=req.id) }}"
+                  class="d-inline"
+                >
+                  <button type="submit" class="btn btn-sm btn-success">
+                    <i class="bi bi-arrow-counterclockwise"></i>
+                    Wiederherstellen
+                  </button>
+                </form>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <div class="alert alert-info">
+        <i class="bi bi-info-circle"></i> Keine gelöschten Anforderungen
+        vorhanden.
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

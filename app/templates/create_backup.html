@@ -1,0 +1,995 @@
+{% extends "base.html" %} {% block title %}Manage Project{% endblock %} {% block
+content %} {% if not project %}
+<h1 class="mt-5 pt-3">Neues Projekt erstellen</h1>
+<p>Hier kannst du neue Projekte erstellen.</p>
+
+<!-- Project Creation Form -->
+<form method="POST" class="mb-4">
+  <div class="row">
+    <div class="col-md-9">
+      <input
+        type="text"
+        name="project_name"
+        class="form-control"
+        placeholder="Projektname"
+        required
+      />
+    </div>
+    <div class="col-md-3">
+      <button type="submit" class="btn btn-primary">Projekt erstellen</button>
+    </div>
+  </div>
+</form>
+
+<a href="{{ url_for('main.home') }}" class="btn btn-secondary"
+  >Zurück zur Startseite</a
+>
+{% else %}
+<div class="mb-3">
+  <a href="{{ url_for('main.home') }}" class="btn btn-secondary">
+    <i class="bi bi-house"></i> Zurück zur Startseite
+  </a>
+  <a
+    href="{{ url_for('agent.agent_page', project_id=project.id) }}"
+    class="btn btn-primary"
+  >
+    <i class="bi bi-robot"></i> KI-Agent öffnen
+  </a>
+  <button
+    class="btn btn-warning"
+    type="button"
+    data-bs-toggle="modal"
+    data-bs-target="#shareProjectModal"
+  >
+    <i class="bi bi-share"></i> Projekt teilen
+  </button>
+</div>
+
+<!-- Shared Users Display -->
+{% if project.shared_with %}
+<div class="alert alert-info mb-3">
+  <strong><i class="bi bi-people"></i> Geteilt mit:</strong>
+  {% for user in project.shared_with %}
+  <span class="badge bg-info me-1">
+    {{ user.email }}
+    <form
+      method="POST"
+      action="{{ url_for('main.unshare_project', project_id=project.id, user_id=user.id) }}"
+      class="d-inline"
+      onsubmit="return confirm('Freigabe für {{ user.email }} wirklich entfernen?')"
+    >
+      <button
+        type="submit"
+        class="btn-close btn-close-white ms-1"
+        aria-label="Close"
+        style="font-size: 0.5rem"
+      ></button>
+    </form>
+  </span>
+  {% endfor %}
+</div>
+{% endif %}
+
+<h2 class="mt-4 mb-4">Anforderungen für Projekt: {{ project.name }}</h2>
+
+<!-- Dynamic Columns Section -->
+<div class="card mb-4">
+  <div class="card-header d-flex justify-content-between align-items-center">
+    <span>Aktuelle Spalten</span>
+    <div>
+      <a
+        href="{{ url_for('main.export_excel', project_id=project.id) }}"
+        class="btn btn-sm btn-success me-2"
+      >
+        <i class="bi bi-file-earmark-excel"></i> Export als Excel
+      </a>
+      <button
+        class="btn btn-sm btn-info me-2"
+        type="button"
+        data-bs-toggle="modal"
+        data-bs-target="#importExcelModal"
+      >
+        <i class="bi bi-file-earmark-arrow-up"></i> Import aus Excel
+      </button>
+      <button
+        class="btn btn-sm btn-primary"
+        type="button"
+        data-bs-toggle="collapse"
+        data-bs-target="#addColumnForm"
+      >
+        <i class="bi bi-plus-circle"></i> Spalte hinzufügen
+      </button>
+    </div>
+  </div>
+  <div class="card-body">
+    <!-- Current Columns -->
+    <div class="mb-3">
+      <span class="badge bg-secondary me-1"
+        ><i class="bi bi-lock-fill"></i> Version</span
+      >
+      <span class="badge bg-secondary me-1"
+        ><i class="bi bi-lock-fill"></i> ID</span
+      >
+      <span class="badge bg-secondary me-1"
+        ><i class="bi bi-lock-fill"></i> Title</span
+      >
+      <span class="badge bg-secondary me-1"
+        ><i class="bi bi-lock-fill"></i> Beschreibung</span
+      >
+
+      {% for column in custom_columns %}
+      <span class="badge bg-primary me-1">
+        {{ column }}
+        <form
+          method="POST"
+          action="{{ url_for('main.remove_column', project_id=project.id, column_name=column) }}"
+          class="d-inline"
+          onsubmit="return confirm('Spalte {{ column }} wirklich löschen?')"
+        >
+          <button
+            type="submit"
+            class="btn-close btn-close-white ms-1"
+            aria-label="Close"
+            style="font-size: 0.5rem"
+          ></button>
+        </form>
+      </span>
+      {% endfor %}
+
+      <span class="badge bg-secondary me-1"
+        ><i class="bi bi-lock-fill"></i> Kategorie</span
+      >
+      <span class="badge bg-secondary me-1"
+        ><i class="bi bi-lock-fill"></i> Status</span
+      >
+      <span class="badge bg-secondary me-1"
+        ><i class="bi bi-lock-fill"></i> Aktionen</span
+      >
+    </div>
+
+    <!-- Add Column Form -->
+    <div class="collapse" id="addColumnForm">
+      <form
+        method="POST"
+        action="{{ url_for('main.add_column', project_id=project.id) }}"
+        class="row g-3"
+      >
+        <div class="col-md-8">
+          <input
+            type="text"
+            class="form-control"
+            name="column_name"
+            placeholder="Neue Spalte (z.B. 'Priorität')"
+            required
+          />
+        </div>
+        <div class="col-md-4">
+          <button type="submit" class="btn btn-primary">Hinzufügen</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Filter Section -->
+<div class="card mb-3">
+  <div class="card-header d-flex justify-content-between align-items-center">
+    <span><i class="bi bi-funnel"></i> Filter</span>
+    <button
+      class="btn btn-sm btn-outline-secondary"
+      type="button"
+      data-bs-toggle="collapse"
+      data-bs-target="#filterSection"
+    >
+      <i class="bi bi-chevron-down"></i> Filter anzeigen/verbergen
+    </button>
+  </div>
+  <div class="collapse show" id="filterSection">
+    <div class="card-body">
+      <div class="row g-3">
+        <!-- Text Search -->
+        <div class="col-md-4">
+          <label for="filterText" class="form-label">Textsuche</label>
+          <input
+            type="text"
+            class="form-control form-control-sm"
+            id="filterText"
+            placeholder="Suche in Title und Beschreibung..."
+          />
+        </div>
+
+        <!-- Status Filter -->
+        <div class="col-md-2">
+          <label for="filterStatus" class="form-label">Status</label>
+          <select class="form-select form-select-sm" id="filterStatus">
+            <option value="">Alle</option>
+            <option value="Offen">Offen</option>
+            <option value="In Arbeit">In Arbeit</option>
+            <option value="Fertig">Fertig</option>
+          </select>
+        </div>
+
+        <!-- Category Filter -->
+        <div class="col-md-2">
+          <label for="filterCategory" class="form-label">Kategorie</label>
+          <select class="form-select form-select-sm" id="filterCategory">
+            <option value="">Alle</option>
+          </select>
+        </div>
+
+        <!-- Dynamic Column Filters -->
+        <div class="col-md-4" id="dynamicFiltersContainer">
+          <!-- Will be populated by JavaScript -->
+        </div>
+      </div>
+
+      <div class="row mt-3">
+        <div class="col-12">
+          <button class="btn btn-sm btn-primary" id="applyFilters">
+            <i class="bi bi-check-circle"></i> Filter anwenden
+          </button>
+          <button class="btn btn-sm btn-secondary" id="resetFilters">
+            <i class="bi bi-x-circle"></i> Filter zurücksetzen
+          </button>
+          <span class="ms-3 text-muted" id="filterResultCount"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Requirements Table -->
+<div class="card">
+  <div class="card-header">Anforderungen</div>
+  <div class="card-body">
+    <div class="table-responsive">
+      <table class="table table-hover align-middle">
+        <thead class="table-light">
+          <tr>
+            <th style="width: 5%">Version</th>
+            <th style="width: 5%">ID</th>
+            <th style="width: 15%">Title</th>
+            <th style="width: 20%">Beschreibung</th>
+
+            <!-- Dynamic Columns -->
+            {% for column in custom_columns %}
+            <th style="width: 8%">{{ column }}</th>
+            {% endfor %}
+
+            <th style="width: 8%">Kategorie</th>
+            <th style="width: 8%">Status</th>
+            <th style="width: 10%">Benutzer</th>
+            <th style="width: 20%">Aktionen</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% if req_with_versions %} {% for req, versions in req_with_versions
+          %}
+          <tr id="req-row-{{ req.id }}" data-req-id="{{ req.id }}">
+            <!-- Version Dropdown -->
+            <td>
+              <select
+                class="form-select form-select-sm version-selector"
+                data-req-id="{{ req.id }}"
+              >
+                {% for ver in versions %}
+                <option
+                  value="{{ ver.version_index }}"
+                  {%
+                  if
+                  loop.last
+                  %}selected{%
+                  endif
+                  %}
+                >
+                  {{ ver.version_label }}
+                </option>
+                {% endfor %}
+              </select>
+            </td>
+
+            <td>{{ loop.index }}</td>
+
+            <!-- Data cells that will be updated by JavaScript -->
+            <td class="title-cell">{{ versions[-1].title }}</td>
+            <td class="description-cell">{{ versions[-1].description }}</td>
+
+            <!-- Dynamic Column Cells -->
+            {% for column in custom_columns %}
+            <td class="custom-data-cell" data-column="{{ column }}">
+              {{ versions[-1].get_custom_data().get(column, "–") }}
+            </td>
+            {% endfor %}
+
+            <td class="category-cell">{{ versions[-1].category or "–" }}</td>
+
+            <!-- Status with color -->
+            <td class="status-cell">
+              <span class="badge bg-{{ versions[-1].get_status_color() }}">
+                {{ versions[-1].status }}
+              </span>
+            </td>
+
+            <!-- User Info -->
+            <td class="user-cell">
+              {% if versions[-1].created_by %}
+              <small
+                class="text-muted"
+                title="Erstellt: {{ versions[-1].created_at.strftime('%d.%m.%Y %H:%M') }}{% if versions[-1].last_modified_by %} | Geändert: {{ versions[-1].last_modified_by.email }}{% endif %}"
+              >
+                <i class="bi bi-person"></i> {{
+                versions[-1].created_by.email.split('@')[0] }}
+              </small>
+              {% else %}
+              <small class="text-muted">–</small>
+              {% endif %}
+            </td>
+
+            <!-- Actions -->
+            <td class="actions-cell">
+              <!-- Block/Unblock Button -->
+              <form
+                method="POST"
+                action="{{ url_for('main.toggle_block_requirement', version_id=versions[-1].id) }}"
+                class="d-inline"
+              >
+                <button
+                  type="submit"
+                  class="btn btn-sm {% if versions[-1].is_blocked %}btn-success{% else %}btn-warning{% endif %} mb-1"
+                  title="{% if versions[-1].is_blocked %}Diese Version ist blockiert. Klicken zum Freigeben.{% else %}Version blockieren{% endif %}"
+                >
+                  <i
+                    class="bi {% if versions[-1].is_blocked %}bi-unlock{% else %}bi-lock{% endif %}"
+                  ></i>
+                  {% if versions[-1].is_blocked %}Freigeben{% else
+                  %}Blockieren{% endif %}
+                </button>
+              </form>
+
+              <!-- Edit Button -->
+              <button
+                class="btn btn-sm btn-outline-primary mb-1 edit-requirement-btn"
+                data-req-id="{{ req.id }}"
+                data-version-id="{{ versions[-1].id }}"
+                {%
+                if
+                versions[-1].is_blocked
+                %}disabled
+                title="Diese Version ist blockiert"
+                {%
+                endif
+                %}
+              >
+                <i class="bi bi-pencil"></i> Bearbeiten
+              </button>
+
+              <!-- Regenerate with AI -->
+              <form
+                method="POST"
+                action="{{ url_for('main.regenerate_requirement', req_id=req.id) }}"
+                class="d-inline"
+              >
+                <button
+                  type="submit"
+                  class="btn btn-sm btn-outline-success mb-1"
+                  {%
+                  if
+                  versions[-1].is_blocked
+                  %}disabled
+                  title="Diese Version ist blockiert"
+                  {%
+                  endif
+                  %}
+                >
+                  <i class="bi bi-stars"></i> Neu generieren
+                </button>
+              </form>
+
+              <!-- Delete Button -->
+              <form
+                method="POST"
+                action="{{ url_for('main.delete_requirement_version', version_id=versions[-1].id) }}"
+                class="d-inline delete-version-form"
+                data-req-id="{{ req.id }}"
+              >
+                <button
+                  type="submit"
+                  class="btn btn-sm btn-outline-danger mb-1"
+                  onclick="return confirm('Möchten Sie Version {{ versions[-1].version_label }} wirklich löschen?')"
+                  {%
+                  if
+                  versions[-1].is_blocked
+                  %}disabled
+                  title="Diese Version ist blockiert"
+                  {%
+                  endif
+                  %}
+                >
+                  <i class="bi bi-trash"></i> Löschen
+                </button>
+              </form>
+
+              <!-- Store all versions data for JavaScript -->
+              <div class="d-none" id="versions-data-{{ req.id }}">
+                {% for ver in versions %}
+                <div
+                  class="version-data"
+                  data-version-index="{{ ver.version_index }}"
+                  data-version-id="{{ ver.id }}"
+                  data-title="{{ ver.title }}"
+                  data-description="{{ ver.description }}"
+                  data-category="{{ ver.category or '' }}"
+                  data-status="{{ ver.status }}"
+                  data-status-color="{{ ver.get_status_color() }}"
+                  data-custom-data="{{ ver.get_custom_data()|tojson }}"
+                ></div>
+                {% endfor %}
+              </div>
+            </td>
+          </tr>
+          {% endfor %} {% else %}
+          <tr>
+            <td colspan="{{ 8 + custom_columns|length }}" class="text-center">
+              Noch keine Anforderungen für dieses Projekt vorhanden. Nutzen Sie
+              den
+              <a href="{{ url_for('agent.agent_page', project_id=project.id) }}"
+                >KI-Agenten</a
+              >, um welche zu erstellen.
+            </td>
+          </tr>
+          {% endif %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Modal for sharing project -->
+<div
+  class="modal fade"
+  id="shareProjectModal"
+  tabindex="-1"
+  aria-labelledby="shareProjectModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="shareProjectModalLabel">Projekt teilen</h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+      <form
+        method="POST"
+        action="{{ url_for('main.share_project', project_id=project.id) }}"
+      >
+        <div class="modal-body">
+          <div class="mb-3">
+            <label for="shareEmail" class="form-label"
+              >E-Mail-Adresse des Benutzers</label
+            >
+            <input
+              type="email"
+              class="form-control"
+              id="shareEmail"
+              name="email"
+              placeholder="benutzer@example.com"
+              required
+            />
+            <div class="form-text">
+              Geben Sie die E-Mail-Adresse eines registrierten Benutzers ein,
+              mit dem Sie dieses Projekt teilen möchten.
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button
+            type="button"
+            class="btn btn-secondary"
+            data-bs-dismiss="modal"
+          >
+            Abbrechen
+          </button>
+          <button type="submit" class="btn btn-primary">
+            <i class="bi bi-share"></i> Teilen
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Modal for importing Excel -->
+<div
+  class="modal fade"
+  id="importExcelModal"
+  tabindex="-1"
+  aria-labelledby="importExcelModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="importExcelModalLabel">
+          Excel-Datei importieren
+        </h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+      <form
+        method="POST"
+        action="{{ url_for('main.import_excel', project_id=project.id) }}"
+        enctype="multipart/form-data"
+      >
+        <div class="modal-body">
+          <div class="mb-3">
+            <label for="excelFile" class="form-label"
+              >Excel-Datei auswählen</label
+            >
+            <input
+              type="file"
+              class="form-control"
+              id="excelFile"
+              name="excel_file"
+              accept=".xlsx,.xls"
+              required
+            />
+            <div class="form-text">
+              Die Excel-Datei muss mindestens die Spalten "Title" und
+              "Beschreibung" enthalten. Optionale Spalten: Kategorie, Status,
+              und alle dynamischen Spalten des Projekts.
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button
+            type="button"
+            class="btn btn-secondary"
+            data-bs-dismiss="modal"
+          >
+            Abbrechen
+          </button>
+          <button type="submit" class="btn btn-primary">
+            <i class="bi bi-upload"></i> Importieren
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Modal for editing requirement -->
+<div
+  class="modal fade"
+  id="editRequirementModal"
+  tabindex="-1"
+  aria-labelledby="editRequirementModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="editRequirementModalLabel">
+          Anforderung bearbeiten
+        </h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+      <form id="editRequirementForm" method="POST">
+        <div class="modal-body">
+          <input type="hidden" id="editVersionId" name="version_id" value="" />
+          <input
+            type="hidden"
+            id="editSaveType"
+            name="save_type"
+            value="intermediate"
+          />
+
+          <div class="mb-3">
+            <label for="editTitle" class="form-label"
+              >Title <span class="text-danger">*</span></label
+            >
+            <input
+              type="text"
+              class="form-control"
+              id="editTitle"
+              name="title"
+              required
+            />
+          </div>
+
+          <div class="mb-3">
+            <label for="editDescription" class="form-label"
+              >Beschreibung <span class="text-danger">*</span></label
+            >
+            <textarea
+              class="form-control"
+              id="editDescription"
+              name="description"
+              rows="4"
+              required
+            ></textarea>
+          </div>
+
+          <div class="mb-3">
+            <label for="editCategory" class="form-label">Kategorie</label>
+            <input
+              type="text"
+              class="form-control"
+              id="editCategory"
+              name="category"
+            />
+          </div>
+
+          <!-- Dynamic Columns Container (populated by JavaScript) -->
+          <div id="dynamicColumnsContainer"></div>
+        </div>
+        <div class="modal-footer">
+          <button
+            type="button"
+            class="btn btn-secondary"
+            data-bs-dismiss="modal"
+          >
+            Abbrechen
+          </button>
+          <button
+            type="submit"
+            class="btn btn-warning"
+            onclick="document.getElementById('editSaveType').value='intermediate'"
+          >
+            <i class="bi bi-save"></i> Zwischenspeichern (In Arbeit)
+          </button>
+          <button
+            type="submit"
+            class="btn btn-success"
+            onclick="document.getElementById('editSaveType').value='final'"
+          >
+            <i class="bi bi-check-circle"></i> Speichern (Fertig)
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- JavaScript for version switching and editing -->
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    // Version selector change event
+    const versionSelectors = document.querySelectorAll(".version-selector");
+    versionSelectors.forEach((selector) => {
+      selector.addEventListener("change", function () {
+        const reqId = this.getAttribute("data-req-id");
+        const versionIndex = this.value;
+        updateRowWithVersionData(reqId, versionIndex);
+      });
+    });
+
+    // Edit requirement button click
+    const editButtons = document.querySelectorAll(".edit-requirement-btn");
+    editButtons.forEach((button) => {
+      button.addEventListener("click", function () {
+        const reqId = this.getAttribute("data-req-id");
+        const versionId = this.getAttribute("data-version-id");
+        openEditModal(reqId, versionId);
+      });
+    });
+
+    // Edit form submission
+    document
+      .getElementById("editRequirementForm")
+      .addEventListener("submit", function (e) {
+        const versionId = document.getElementById("editVersionId").value;
+        this.action = `/requirement_version/${versionId}/update`;
+      });
+
+    // Function to update row with selected version data
+    function updateRowWithVersionData(reqId, versionIndex) {
+      const row = document.getElementById(`req-row-${reqId}`);
+      const versionsData = document.getElementById(`versions-data-${reqId}`);
+      const versionElements = versionsData.querySelectorAll(".version-data");
+
+      // Find the selected version data
+      let selectedVersion = null;
+      versionElements.forEach((el) => {
+        if (el.getAttribute("data-version-index") === versionIndex) {
+          selectedVersion = el;
+        }
+      });
+
+      if (selectedVersion) {
+        const versionId = selectedVersion.getAttribute("data-version-id");
+        const versionLabel = selectedVersion.getAttribute("data-version-label");
+
+        // Update the row with the selected version data
+        row.querySelector(".title-cell").textContent =
+          selectedVersion.getAttribute("data-title");
+        row.querySelector(".description-cell").textContent =
+          selectedVersion.getAttribute("data-description");
+        row.querySelector(".category-cell").textContent =
+          selectedVersion.getAttribute("data-category") || "–";
+
+        // Update status with color
+        const statusCell = row.querySelector(".status-cell");
+        const status = selectedVersion.getAttribute("data-status");
+        const statusColor = selectedVersion.getAttribute("data-status-color");
+        statusCell.innerHTML = `<span class="badge bg-${statusColor}">${status}</span>`;
+
+        // Update custom data cells
+        const customData = JSON.parse(
+          selectedVersion.getAttribute("data-custom-data")
+        );
+        const customDataCells = row.querySelectorAll(".custom-data-cell");
+        customDataCells.forEach((cell) => {
+          const column = cell.getAttribute("data-column");
+          cell.textContent = customData[column] || "–";
+        });
+
+        // Update version ID in edit button
+        const editButton = row.querySelector(".edit-requirement-btn");
+        editButton.setAttribute("data-version-id", versionId);
+
+        // Update delete form action and confirmation message
+        const deleteForm = row.querySelector(".delete-version-form");
+        if (deleteForm) {
+          deleteForm.action = `/requirement_version/${versionId}/delete`;
+          const deleteButton = deleteForm.querySelector("button");
+          deleteButton.setAttribute(
+            "onclick",
+            `return confirm('Möchten Sie Version ${versionLabel} wirklich löschen?')`
+          );
+        }
+      }
+    }
+
+    // Initialize filters
+    initializeFilters();
+
+    // Function to initialize filter dropdowns
+    function initializeFilters() {
+      // Populate category filter
+      const categories = new Set();
+      document.querySelectorAll('.category-cell').forEach(cell => {
+        const category = cell.textContent.trim();
+        if (category && category !== '–') {
+          categories.add(category);
+        }
+      });
+
+      const categoryFilter = document.getElementById('filterCategory');
+      categories.forEach(category => {
+        const option = document.createElement('option');
+        option.value = category;
+        option.textContent = category;
+        categoryFilter.appendChild(option);
+      });
+
+      // Create dynamic column filters
+      const customColumns = {{ custom_columns|tojson|safe }};
+      const dynamicFiltersContainer = document.getElementById('dynamicFiltersContainer');
+
+      customColumns.forEach(column => {
+        const values = new Set();
+        document.querySelectorAll(`.custom-data-cell[data-column="${column}"]`).forEach(cell => {
+          const value = cell.textContent.trim();
+          if (value && value !== '–') {
+            values.add(value);
+          }
+        });
+
+        if (values.size > 0) {
+          const filterDiv = document.createElement('div');
+          filterDiv.className = 'mb-2';
+
+          const label = document.createElement('label');
+          label.className = 'form-label';
+          label.textContent = column;
+          label.style.fontSize = '0.875rem';
+
+          const select = document.createElement('select');
+          select.className = 'form-select form-select-sm';
+          select.setAttribute('data-filter-column', column);
+
+          const allOption = document.createElement('option');
+          allOption.value = '';
+          allOption.textContent = 'Alle';
+          select.appendChild(allOption);
+
+          values.forEach(value => {
+            const option = document.createElement('option');
+            option.value = value;
+            option.textContent = value;
+            select.appendChild(option);
+          });
+
+          filterDiv.appendChild(label);
+          filterDiv.appendChild(select);
+          dynamicFiltersContainer.appendChild(filterDiv);
+        }
+      });
+    }
+
+    // Apply filters
+    document.getElementById('applyFilters').addEventListener('click', function() {
+      applyFilters();
+    });
+
+    // Reset filters
+    document.getElementById('resetFilters').addEventListener('click', function() {
+      document.getElementById('filterText').value = '';
+      document.getElementById('filterStatus').value = '';
+      document.getElementById('filterCategory').value = '';
+      document.querySelectorAll('[data-filter-column]').forEach(select => {
+        select.value = '';
+      });
+      applyFilters();
+    });
+
+    // Apply filters on Enter key in text search
+    document.getElementById('filterText').addEventListener('keyup', function(e) {
+      if (e.key === 'Enter') {
+        applyFilters();
+      }
+    });
+
+    // Function to apply filters
+    function applyFilters() {
+      const textFilter = document.getElementById('filterText').value.toLowerCase();
+      const statusFilter = document.getElementById('filterStatus').value;
+      const categoryFilter = document.getElementById('filterCategory').value;
+
+      // Get dynamic column filters
+      const dynamicFilters = {};
+      document.querySelectorAll('[data-filter-column]').forEach(select => {
+        const column = select.getAttribute('data-filter-column');
+        const value = select.value;
+        if (value) {
+          dynamicFilters[column] = value;
+        }
+      });
+
+      let visibleCount = 0;
+      let totalCount = 0;
+
+      // Filter each row
+      document.querySelectorAll('tbody tr[data-req-id]').forEach(row => {
+        totalCount++;
+        let visible = true;
+
+        // Text filter
+        if (textFilter) {
+          const title = row.querySelector('.title-cell').textContent.toLowerCase();
+          const description = row.querySelector('.description-cell').textContent.toLowerCase();
+          if (!title.includes(textFilter) && !description.includes(textFilter)) {
+            visible = false;
+          }
+        }
+
+        // Status filter
+        if (statusFilter && visible) {
+          const status = row.querySelector('.status-cell').textContent.trim();
+          if (status !== statusFilter) {
+            visible = false;
+          }
+        }
+
+        // Category filter
+        if (categoryFilter && visible) {
+          const category = row.querySelector('.category-cell').textContent.trim();
+          if (category !== categoryFilter) {
+            visible = false;
+          }
+        }
+
+        // Dynamic column filters
+        if (visible && Object.keys(dynamicFilters).length > 0) {
+          for (const [column, value] of Object.entries(dynamicFilters)) {
+            const cell = row.querySelector(`.custom-data-cell[data-column="${column}"]`);
+            if (cell) {
+              const cellValue = cell.textContent.trim();
+              if (cellValue !== value) {
+                visible = false;
+                break;
+              }
+            }
+          }
+        }
+
+        // Show/hide row
+        if (visible) {
+          row.style.display = '';
+          visibleCount++;
+        } else {
+          row.style.display = 'none';
+        }
+      });
+
+      // Update result count
+      const resultText = `${visibleCount} von ${totalCount} Anforderungen angezeigt`;
+      document.getElementById('filterResultCount').textContent = resultText;
+    }
+
+    // Function to open edit modal
+    function openEditModal(reqId, versionId) {
+      // Set the version ID in the modal
+      document.getElementById("editVersionId").value = versionId;
+
+      // Find the version data
+      const versionsData = document.getElementById(`versions-data-${reqId}`);
+      const versionElements = versionsData.querySelectorAll(".version-data");
+
+      let selectedVersion = null;
+      versionElements.forEach((el) => {
+        if (el.getAttribute("data-version-id") === versionId) {
+          selectedVersion = el;
+        }
+      });
+
+      if (selectedVersion) {
+        // Set basic fields
+        document.getElementById("editTitle").value =
+          selectedVersion.getAttribute("data-title");
+        document.getElementById("editDescription").value =
+          selectedVersion.getAttribute("data-description");
+        document.getElementById("editCategory").value =
+          selectedVersion.getAttribute("data-category");
+
+        // Get custom data
+        const customData = JSON.parse(
+          selectedVersion.getAttribute("data-custom-data")
+        );
+
+        // Dynamically create custom column fields
+        const dynamicContainer = document.getElementById(
+          "dynamicColumnsContainer"
+        );
+        dynamicContainer.innerHTML = ""; // Clear previous fields
+
+        // Get current custom columns from server-side data
+        const customColumns = {{ custom_columns|tojson|safe }};
+
+        // Create input fields for each custom column
+        customColumns.forEach((column) => {
+          const fieldDiv = document.createElement("div");
+          fieldDiv.className = "mb-3";
+
+          const label = document.createElement("label");
+          label.className = "form-label";
+          label.textContent = column;
+          label.setAttribute("for", `editCustom${column}`);
+
+          const input = document.createElement("input");
+          input.type = "text";
+          input.className = "form-control";
+          input.id = `editCustom${column}`;
+          input.name = `custom_${column}`;
+          input.setAttribute("data-column", column);
+          input.value = customData[column] || "";
+
+          fieldDiv.appendChild(label);
+          fieldDiv.appendChild(input);
+          dynamicContainer.appendChild(fieldDiv);
+        });
+
+        // Show the modal
+        const modal = new bootstrap.Modal(
+          document.getElementById("editRequirementModal")
+        );
+        modal.show();
+      }
+    }
+  });
+</script>
+{% endif %} {% endblock %}
