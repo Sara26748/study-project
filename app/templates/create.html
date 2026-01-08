@@ -323,6 +323,11 @@ document.addEventListener('DOMContentLoaded', function() {
             {% endfor %}
             <th class="py-3" style="width: 10%">Kategorie</th>
             <th class="py-3" style="width: 10%">Status</th>
+            <th class="py-3 text-center" style="width: 8%">
+              <span title="Funktional: Diese Anforderung ist funktional (Checkbox zum Umschalten)">
+                Funktional
+              </span>
+            </th>
             <th class="py-3 text-center quantifiable-col" style="width: 8%">
               <span title="Quantifizierbar: Diese Anforderung kann quantitativ gemessen werden (z.B. Performance-Werte, Zeitlimits, etc.)">
                 Quantifizierbar
@@ -390,6 +395,14 @@ document.addEventListener('DOMContentLoaded', function() {
               <span class="badge rounded-pill bg-{{ versions[-1].get_status_color() }}"
                 >{{ versions[-1].status }}</span
               >
+            </td>
+            <td class="text-center" onclick="event.stopPropagation();">
+              <form method="POST" action="{{ url_for('main.toggle_funktional', req_id=req.id) }}" class="d-inline toggle-funktional-form">
+                <input type="hidden" name="funktional" value="{{ '0' if req.funktional else '1' }}">
+                <button type="submit" class="btn btn-sm btn-link p-0 border-0" title="{% if req.funktional %}Funktional - Klicken zum Deaktivieren{% else %}Nicht funktional - Klicken zum Aktivieren{% endif %}">
+                  <i class="bi {% if req.funktional %}bi-check-circle-fill text-success{% else %}bi-circle text-muted{% endif %}" style="font-size: 1.3rem;"></i>
+                </button>
+              </form>
             </td>
             <td class="quantifiable-cell text-center quantifiable-col" onclick="event.stopPropagation();">
               {% set custom_data = versions[-1].get_custom_data() %}

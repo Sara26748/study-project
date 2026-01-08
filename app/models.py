@@ -85,6 +85,8 @@ class Requirement(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     # Soft delete flag
     is_deleted = db.Column(db.Boolean, default=False)
+    # Neue Spalte: Funktional
+    funktional = db.Column(db.Boolean, default=False)
 
     versions = db.relationship(
         "RequirementVersion",

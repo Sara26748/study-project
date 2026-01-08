@@ -1456,3 +1456,15 @@ def get_version_info(version_id):
 def hello():
     return "Hello from Blueprint!"
 
+@bp.route("/requirement/<int:req_id>/toggle_funktional", methods=["POST"])
+@login_required
+def toggle_funktional(req_id):
+    req = Requirement.query.get_or_404(req_id)
+    check_requirement_access(req)
+    # Toggle Wert setzen
+    new_value = request.form.get("funktional")
+    req.funktional = bool(int(new_value))
+    db.session.commit()
+    flash(f"Funktionalität für Anforderung #{req.id} wurde {'aktiviert' if req.funktional else 'deaktiviert'}.", "success")
+    return redirect(request.referrer or url_for('main.manage_project', project_id=req.project_id))
+
