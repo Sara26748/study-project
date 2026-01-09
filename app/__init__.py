@@ -2,9 +2,11 @@ import os
 from flask import Flask, Blueprint
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
+from flask_migrate import Migrate
 
 bp = Blueprint("main", __name__)
 db = SQLAlchemy()
+migrate = Migrate()
 login_manager = LoginManager()
 
 def create_app():
@@ -15,13 +17,13 @@ def create_app():
     app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{os.path.join(app.instance_path, "db.db")}'
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     db.init_app(app)
+    migrate.init_app(app, db)
 
     login_manager.init_app(app)
     login_manager.login_view = 'auth.login'
 
     from . import models
-    with app.app_context():
-        db.create_all()
+    # db.create_all() nicht mehr automatisch, da Migrationen verwendet werden
 
     from .routes import bp
     from .auth import auth_bp
