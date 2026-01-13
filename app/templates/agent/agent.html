@@ -465,9 +465,9 @@ endblock %} {% block content %}
                   <i class="bi bi-chat-left-text"></i>
                 </div>
                 <div>
-                  <h3 class="config-card-title">Was soll die KI tun?</h3>
+                  <h3 class="config-card-title">Beschreibung ergänzen (optional)?</h3>
                   <p class="config-card-subtitle">
-                    Beschreiben Sie Ihr Vorhaben
+                    Zusätzliche Beschreibung für die Anforderungen
                   </p>
                 </div>
               </div>
@@ -526,27 +526,7 @@ endblock %} {% block content %}
                   </p>
                 </div>
               </div>
-                            <!-- Output Language -->
-              <div class="mb-4">
-                <label class="form-label fw-semibold mb-2">
-                  <i class="bi bi-translate me-1 text-primary"></i>Ausgabe-Sprache
-                </label>
-                <select
-                  class="form-select"
-                  id="output_language"
-                  name="output_language"
-                  style="max-width: 240px"
-                >
-                  <option value="Deutsch" selected>Deutsch</option>
-                  <option value="Englisch">Englisch</option>
-                  <option value="Arabisch">Arabisch</option>
-                  <option value="Französisch">Französisch</option>
-                </select>
-                <small class="text-muted mt-2 d-block">
-                  <i class="bi bi-info-circle me-1 text-primary"></i>
-                  Die KI formuliert alle Anforderungen in der gewählten Sprache.
-                </small>
-              </div>
+
 
 
               <!-- Mode Selection -->
@@ -618,6 +598,28 @@ endblock %} {% block content %}
                   <i class="bi bi-info-circle me-1 text-primary"></i>
                   Bei "Automatisch" entscheidet die KI basierend auf dem Kontext
                   (3-10 Requirements)
+                </small>
+              </div>
+
+              <!-- Output Language -->
+              <div class="mb-4">
+                <label class="form-label fw-semibold mb-2">
+                  <i class="bi bi-translate me-1 text-primary"></i>Ausgabe-Sprache
+                </label>
+                <select
+                  class="form-select"
+                  id="output_language"
+                  name="output_language"
+                  style="max-width: 240px"
+                >
+                  <option value="Deutsch" selected>Deutsch</option>
+                  <option value="Englisch">Englisch</option>
+                  <option value="Arabisch">Arabisch</option>
+                  <option value="Französisch">Französisch</option>
+                </select>
+                <small class="text-muted mt-2 d-block">
+                  <i class="bi bi-info-circle me-1 text-primary"></i>
+                  Die KI formuliert alle Anforderungen in der gewählten Sprache.
                 </small>
               </div>
 

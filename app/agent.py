@@ -6,6 +6,8 @@ from .models import Project, Requirement, RequirementVersion, version_label
 from .services.ai_client import generate_requirements
 
 agent_bp = Blueprint('agent', __name__, template_folder='templates/agent')
+output_language = None
+
 
 def check_project_access(project):
     """Check if current user has access to the project (owner or shared)."""
@@ -60,6 +62,7 @@ def generate(project_id):
     product_system = ""
     ai_model = None
     num_requirements = None
+    output_language = None
     improve_only = False
     extend_existing = False
 
@@ -76,6 +79,7 @@ def generate(project_id):
             ai_model = data.get('ai_model', '').strip() or None
             improve_only = data.get('improve_only', False)
             extend_existing = data.get('extend_existing', False)
+            output_language = data.get('output_language', '').strip() or None
             
             # Handle num_requirements
             num_req_mode = data.get('num_requirements_mode', 'auto')
@@ -93,7 +97,8 @@ def generate(project_id):
         ai_model = request.form.get('ai_model', '').strip() or None
         improve_only = request.form.get('improve_only', 'false') == 'true'
         extend_existing = request.form.get('extend_existing', 'false') == 'true'
-        
+        output_language = request.form.get('output_language', '').strip() or None
+
         # Handle num_requirements
         num_req_mode = request.form.get('num_requirements_mode', 'auto')
         if num_req_mode == 'manual':
@@ -101,7 +106,7 @@ def generate(project_id):
                 num_requirements = int(request.form.get('num_requirements_value', 5))
             except (ValueError, TypeError):
                 num_requirements = 5
-        
+
         keys = request.form.getlist('key[]')
         values = request.form.getlist('value[]')
         for k, v in zip(keys, values):
@@ -270,15 +275,16 @@ def generate(project_id):
 
     try:
         requirements_data = generate_requirements(
-            full_description, 
-            inputs_dict, 
+            full_description,
+            inputs_dict,
             columns,
             ai_model=ai_model,
             num_requirements=num_requirements,
             product_system=product_system,
             has_excel_context=has_excel,
             improve_only=improve_only,
-            extend_existing=extend_existing
+            extend_existing=extend_existing,
+            output_language=output_language
         )
         
         saved_count = 0

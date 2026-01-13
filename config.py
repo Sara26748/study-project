@@ -23,7 +23,7 @@ Regeln:
 - Wenn Informationen fehlen, triff sinnvolle, konservative Annahmen.
 """
 
-def get_system_prompt(columns=None, num_requirements=None, product_system=None, has_excel_context=False, improve_only=False, extend_existing=False):
+def get_system_prompt(columns=None, num_requirements=None, product_system=None, has_excel_context=False, improve_only=False, extend_existing=False, output_language=None):
     """
     Get system prompt, optionally customized for dynamic columns.
     
@@ -80,7 +80,11 @@ def get_system_prompt(columns=None, num_requirements=None, product_system=None, 
         product_context = ""
         if product_system and product_system.strip():
             product_context = f"\n- Alle Anforderungen beziehen sich auf das Produktsystem: {product_system.strip()}"
-        
+
+        language_instruction = ""
+        if output_language and output_language.strip():
+            language_instruction = f"\n- Formuliere alle Inhalte ausschließlich auf {output_language.strip()}."
+
         # Build Excel context instruction
         excel_instruction = ""
         if has_excel_context:
@@ -149,9 +153,9 @@ Das Projekt verwendet folgende Spalten: {', '.join(columns)}
 
 Antworte ausschließlich mit gültigem JSON in folgender Struktur:
 {{
-  "requirements": [
-    {json_structure}
-  ]
+    "requirements": [
+        {json_structure}
+    ]
 }}
 
 Regeln:
@@ -159,8 +163,10 @@ Regeln:
 - Verwende kurze, prägnante Titel.
 - Fülle ALLE angegebenen Spalten mit sinnvollen Werten.
 - Wenn Informationen fehlen, triff sinnvolle, konservative Annahmen.
-- WICHTIG: Antworte NUR und AUSSCHLIESSLICH mit dem JSON-Objekt. Kein einleitender Text, keine Erklärungen.{count_instruction}{product_context}{excel_instruction}{improve_instruction}{extend_instruction}
+- WICHTIG: Antworte NUR und AUSSCHLIESSLICH mit dem JSON-Objekt. Kein einleitender Text, keine Erklärungen.{count_instruction}{product_context}{language_instruction}{excel_instruction}{improve_instruction}{extend_instruction}
 """
         return custom_prompt
-    
+
+    if output_language and output_language.strip():
+        return f"{base_prompt.strip()}\n\nAntworte ausschließlich auf {output_language.strip()}."
     return base_prompt
