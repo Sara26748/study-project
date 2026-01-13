@@ -60,6 +60,7 @@ def generate(project_id):
     product_system = ""
     ai_model = None
     num_requirements = None
+    output_language = None
     improve_only = False
     extend_existing = False
 
@@ -76,6 +77,7 @@ def generate(project_id):
             ai_model = data.get('ai_model', '').strip() or None
             improve_only = data.get('improve_only', False)
             extend_existing = data.get('extend_existing', False)
+            output_language = data.get('output_language', '').strip() or None
             
             # Handle num_requirements
             num_req_mode = data.get('num_requirements_mode', 'auto')
@@ -93,6 +95,7 @@ def generate(project_id):
         ai_model = request.form.get('ai_model', '').strip() or None
         improve_only = request.form.get('improve_only', 'false') == 'true'
         extend_existing = request.form.get('extend_existing', 'false') == 'true'
+        output_language = request.form.get('output_language', '').strip() or None
         
         # Handle num_requirements
         num_req_mode = request.form.get('num_requirements_mode', 'auto')
@@ -278,7 +281,8 @@ def generate(project_id):
             product_system=product_system,
             has_excel_context=has_excel,
             improve_only=improve_only,
-            extend_existing=extend_existing
+            extend_existing=extend_existing,
+            output_language=output_language
         )
         
         saved_count = 0

@@ -9,7 +9,7 @@ from openai import OpenAI
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 import config
 
-def generate_requirements(user_description: str | None, inputs: dict, columns: list = None, ai_model: str = None, num_requirements: int = None, product_system: str = None, has_excel_context: bool = False, improve_only: bool = False, extend_existing: bool = False) -> list[dict]:
+def generate_requirements(user_description: str | None, inputs: dict, columns: list = None, ai_model: str = None, num_requirements: int = None, product_system: str = None, has_excel_context: bool = False, improve_only: bool = False, extend_existing: bool = False, output_language: str | None = None) -> list[dict]:
     """
     Calls OpenAI API to generate requirements based on user description and inputs.
 
@@ -23,6 +23,7 @@ def generate_requirements(user_description: str | None, inputs: dict, columns: l
         has_excel_context (bool): Whether Excel context is present in user_description.
         improve_only (bool): Whether to only improve existing requirements.
         extend_existing (bool): Whether to extend existing requirements.
+        output_language (str | None): Optional language for generated requirements.
 
     Returns:
         list[dict]: List of requirement dicts with dynamic columns based on project.
@@ -34,7 +35,7 @@ def generate_requirements(user_description: str | None, inputs: dict, columns: l
     # Get configuration
     api_key = config.OPENAI_API_KEY
     model = ai_model or config.OPENAI_MODEL or "gpt-4o-mini"
-    system_prompt = config.get_system_prompt(columns, num_requirements, product_system, has_excel_context, improve_only, extend_existing)
+    system_prompt = config.get_system_prompt(columns, num_requirements, product_system, has_excel_context, improve_only, extend_existing, output_language)
 
     # ... rest of the function stays the same
 
