@@ -599,6 +599,28 @@ endblock %} {% block content %}
                 </small>
               </div>
 
+              <!-- Output Language -->
+              <div class="mb-4">
+                <label class="form-label fw-semibold mb-2">
+                  <i class="bi bi-translate me-1 text-primary"></i>Ausgabe-Sprache
+                </label>
+                <select
+                  class="form-select"
+                  id="output_language"
+                  name="output_language"
+                  style="max-width: 240px"
+                >
+                  <option value="Deutsch" selected>Deutsch</option>
+                  <option value="Englisch">Englisch</option>
+                  <option value="Arabisch">Arabisch</option>
+                  <option value="Französisch">Französisch</option>
+                </select>
+                <small class="text-muted mt-2 d-block">
+                  <i class="bi bi-info-circle me-1 text-primary"></i>
+                  Die KI formuliert alle Anforderungen in der gewählten Sprache.
+                </small>
+              </div>
+
               <!-- Table Columns Schema -->
               <div class="mb-3">
                 <label class="form-label fw-semibold mb-2">
