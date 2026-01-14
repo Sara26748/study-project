@@ -1457,14 +1457,35 @@ def hello():
     return "Hello from Blueprint!"
 
 @bp.route("/requirement/<int:req_id>/toggle_funktional", methods=["POST"])
+
+@bp.route("/requirement/<int:req_id>/toggle_funktional", methods=["POST"])
 @login_required
 def toggle_funktional(req_id):
+    from .models import RequirementVersionHistory
+
     req = Requirement.query.get_or_404(req_id)
     check_requirement_access(req)
     # Toggle Wert setzen
     new_value = request.form.get("funktional")
+    old_value = req.funktional
     req.funktional = bool(int(new_value))
+    latest_version = req.get_latest_version()
+    if latest_version and old_value != req.funktional:
+        latest_version.last_modified_by_id = current_user.id
+        history_entry = RequirementVersionHistory(
+            version_id=latest_version.id,
+            changed_by_id=current_user.id,
+            change_type='modified',
+            changes=json.dumps({
+                'funktional': f"{'Ja' if old_value else 'Nein'} → {'Ja' if req.funktional else 'Nein'}"
+            })
+        )
+        db.session.add(history_entry)
     db.session.commit()
-    flash(f"Funktionalität für Anforderung #{req.id} wurde {'aktiviert' if req.funktional else 'deaktiviert'}.", "success")
+    flash(
+        f"Funktionalität für Anforderung #{req.id} wurde "
+        f"{'aktiviert' if req.funktional else 'deaktiviert' }.",
+        "success"
+    )
     return redirect(request.referrer or url_for('main.manage_project', project_id=req.project_id))
 
