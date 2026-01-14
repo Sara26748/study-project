@@ -74,7 +74,14 @@ def get_system_prompt(columns=None, num_requirements=None, product_system=None, 
         elif num_requirements_mode == "exact" and num_requirements_value and num_requirements_value > 0:
             count_instruction = f"\n- Generiere EXAKT {num_requirements_value} Requirements."
         elif num_requirements_mode == "min" and num_requirements_value and num_requirements_value > 0:
-            count_instruction = f"\n- Generiere MINDESTENS {num_requirements_value} Requirements."
+            count_instruction = (
+                f"\n- Generiere MINDESTENS {num_requirements_value} Requirements."
+                "\n- Bestimme zuerst die Komplexität des Produkts (einfach / mittel / komplex / sehr komplex)."
+                "\n- Leite daraus eine angemessene Anzahl an Anforderungen ab."
+                "\n- Falls eine Mindestanzahl angegeben ist, darf die Anzahl nicht darunter liegen, soll aber überschritten werden, wenn es die Komplexität erfordert."
+                "\n- Setze eine harte Obergrenze: Erzeuge maximal 30 Anforderungen."
+                "\n- Wenn für ein sehr komplexes Produkt mehr nötig wären, priorisiere die wichtigsten Anforderungen und fasse ähnliche Anforderungen zusammen, statt mehr als 30 zu erzeugen."
+            )
         elif num_requirements_mode == "max" and num_requirements_value and num_requirements_value > 0:
             count_instruction = f"\n- Generiere HÖCHSTENS {num_requirements_value} Requirements."
         elif num_requirements and num_requirements > 0:

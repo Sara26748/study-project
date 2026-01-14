@@ -302,16 +302,19 @@ def _validate_and_normalize_requirements(requirements: list, columns: list = Non
     if not normalized:
         raise RuntimeError("No valid requirements found in response.")
     
-    # Limit results based on mode/value
+    # Limit results based on mode/value with hard cap
+    max_cap = 30
     if num_requirements_mode == "max" and num_requirements_value and num_requirements_value > 0:
-        return normalized[:num_requirements_value]
+        return normalized[:min(num_requirements_value, max_cap)]
     if num_requirements_mode == "exact" and num_requirements_value and num_requirements_value > 0:
-        return normalized[:num_requirements_value]
+        return normalized[:min(num_requirements_value, max_cap)]
     if num_requirements and num_requirements > 0:
-        return normalized[:num_requirements]
+        return normalized[:min(num_requirements, max_cap)]
     if num_requirements_mode == "auto" or not num_requirements_mode:
-        return normalized[:10]
-    return normalized
+        return normalized[:min(10, max_cap)]
+    if num_requirements_mode == "min":
+        return normalized[:max_cap]
+    return normalized[:max_cap]
 
 
 def detect_conflicts(requirements_list: list[dict]) -> list[dict]:
