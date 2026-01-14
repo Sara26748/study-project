@@ -23,7 +23,7 @@ Regeln:
 - Wenn Informationen fehlen, triff sinnvolle, konservative Annahmen.
 """
 
-def get_system_prompt(columns=None, num_requirements=None, product_system=None, has_excel_context=False, improve_only=False, extend_existing=False, output_language=None):
+def get_system_prompt(columns=None, num_requirements=None, product_system=None, has_excel_context=False, improve_only=False, extend_existing=False, output_language=None, num_requirements_mode=None, num_requirements_value=None):
     """
     Get system prompt, optionally customized for dynamic columns.
     
@@ -70,7 +70,13 @@ def get_system_prompt(columns=None, num_requirements=None, product_system=None, 
         # Build requirement count instruction
         count_instruction = ""
         if improve_only:
-             count_instruction = "\n- WICHTIG: Die Anzahl der Anforderungen muss EXAKT der Anzahl der eingelesenen Anforderungen entsprechen. Füge KEINE neuen hinzu."
+            count_instruction = "\n- WICHTIG: Die Anzahl der Anforderungen muss EXAKT der Anzahl der eingelesenen Anforderungen entsprechen. Füge KEINE neuen hinzu."
+        elif num_requirements_mode == "exact" and num_requirements_value and num_requirements_value > 0:
+            count_instruction = f"\n- Generiere EXAKT {num_requirements_value} Requirements."
+        elif num_requirements_mode == "min" and num_requirements_value and num_requirements_value > 0:
+            count_instruction = f"\n- Generiere MINDESTENS {num_requirements_value} Requirements."
+        elif num_requirements_mode == "max" and num_requirements_value and num_requirements_value > 0:
+            count_instruction = f"\n- Generiere HÖCHSTENS {num_requirements_value} Requirements."
         elif num_requirements and num_requirements > 0:
             count_instruction = f"\n- Generiere EXAKT {num_requirements} Requirements."
         else:

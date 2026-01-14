@@ -62,6 +62,8 @@ def generate(project_id):
     product_system = ""
     ai_model = None
     num_requirements = None
+    num_requirements_mode = None
+    num_requirements_value = None
     output_language = None
     improve_only = False
     extend_existing = False
@@ -71,7 +73,7 @@ def generate(project_id):
             data = request.get_json()
             if not data:
                 return jsonify({'ok': False, 'error': 'Keine Daten empfangen.'}), 400
-            
+
             user_description = data.get('user_description', '').strip() or None
             inputs_array = data.get('inputs', [])
             inputs_dict = {item.get('key'): item.get('value') for item in inputs_array if item.get('key')}
@@ -80,14 +82,19 @@ def generate(project_id):
             improve_only = data.get('improve_only', False)
             extend_existing = data.get('extend_existing', False)
             output_language = data.get('output_language', '').strip() or None
-            
-            # Handle num_requirements
+
+            # Handle num_requirements_mode and num_requirements_value
             num_req_mode = data.get('num_requirements_mode', 'auto')
             if num_req_mode == 'manual':
+                num_req_mode = 'exact'
+            if num_req_mode in {'exact', 'min', 'max'}:
                 try:
-                    num_requirements = int(data.get('num_requirements_value', 5))
+                    num_requirements_value = int(data.get('num_requirements_value', 5))
                 except (ValueError, TypeError):
-                    num_requirements = 5
+                    num_requirements_value = None
+            num_requirements_mode = num_req_mode
+            if num_req_mode == 'exact' and num_requirements_value:
+                num_requirements = num_requirements_value
         except Exception:
             return jsonify({'ok': False, 'error': 'Ungültiges JSON-Format.'}), 400
     else:
@@ -99,20 +106,24 @@ def generate(project_id):
         extend_existing = request.form.get('extend_existing', 'false') == 'true'
         output_language = request.form.get('output_language', '').strip() or None
 
-        # Handle num_requirements
+        # Handle num_requirements_mode and num_requirements_value
         num_req_mode = request.form.get('num_requirements_mode', 'auto')
         if num_req_mode == 'manual':
+            num_req_mode = 'exact'
+        if num_req_mode in {'exact', 'min', 'max'}:
             try:
-                num_requirements = int(request.form.get('num_requirements_value', 5))
+                num_requirements_value = int(request.form.get('num_requirements_value', 5))
             except (ValueError, TypeError):
-                num_requirements = 5
+                num_requirements_value = None
+        num_requirements_mode = num_req_mode
+        if num_req_mode == 'exact' and num_requirements_value:
+            num_requirements = num_requirements_value
 
         keys = request.form.getlist('key[]')
         values = request.form.getlist('value[]')
         for k, v in zip(keys, values):
             if k and k.strip():
                 inputs_dict[k.strip()] = v.strip()
-        
         # Handle Excel file (only if not improving existing, or as supplemental context)
         if 'excel_file' in request.files:
             file = request.files['excel_file']
@@ -280,13 +291,14 @@ def generate(project_id):
             columns,
             ai_model=ai_model,
             num_requirements=num_requirements,
+            num_requirements_mode=num_requirements_mode,
+            num_requirements_value=num_requirements_value,
             product_system=product_system,
             has_excel_context=has_excel,
             improve_only=improve_only,
             extend_existing=extend_existing,
             output_language=output_language
         )
-        
         saved_count = 0
         for item in requirements_data:
             title = item.get("title", "").strip()
@@ -296,7 +308,6 @@ def generate(project_id):
             description = item.get("description", "").strip()
             category = item.get("category", "") or ""
             status = item.get("status", "") or "Offen"
-            
             req = None
             # Check for ID first (especially for improve_only mode)
             req_id_val = item.get("id")
