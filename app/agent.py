@@ -14,6 +14,28 @@ def check_project_access(project):
     if project.user_id != current_user.id and current_user not in project.shared_with:
         abort(403)
 
+def has_quantifiable_signal(title: str, description: str) -> bool:
+    """Heuristic to detect quantifiable requirements from text signals."""
+    text = " ".join([title or "", description or ""]).lower()
+    if not text.strip():
+        return False
+
+    comparator_pattern = r"(<=|>=|<|>|=)"
+    number_pattern = r"\d+(?:[.,]\d+)?"
+    unit_pattern = (
+        r"(ms|s|sec|sek|seconds|minutes|min|h|hz|khz|mhz|ghz|kb|mb|gb|tb|"
+        r"bps|kbps|mbps|gbps|mb/s|gb/s|%|°c|c|w|kw|v|a|mah|rpm|fps|km/h|m/s)"
+    )
+    keyword_pattern = r"(max|maximum|min|minimum|höchstens|mindestens|weniger als|mehr als)"
+
+    if re.search(rf"{comparator_pattern}\s*{number_pattern}", text):
+        return True
+    if re.search(rf"{number_pattern}\s*{unit_pattern}", text):
+        return True
+    if re.search(rf"{keyword_pattern}\s*{number_pattern}", text):
+        return True
+    return False
+
 def normalize_key(title: str) -> str:
     """Creates a stable, lowercase key from a title string."""
     if not title:
@@ -368,6 +390,11 @@ def generate(project_id):
             else:
                 custom_data['is_quantifiable'] = 'false'
             
+
+            # Heuristic: If is_quantifiable is 'false' but signals are present, set to 'true'
+            if custom_data.get('is_quantifiable') == 'false' and has_quantifiable_signal(title, description):
+                custom_data['is_quantifiable'] = 'true'
+
             new_version.set_custom_data(custom_data)
             
             db.session.add(new_version)
