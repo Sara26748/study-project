@@ -431,3 +431,75 @@ def generate_test_cases(title: str, description: str) -> str:
         return response.choices[0].message.content.strip()
     except Exception as e:
         return f"Fehler bei der Generierung: {str(e)}"
+
+def analyze_requirement(title: str, description: str, status: str) -> dict:
+    """
+    Analyze a single requirement and return a structured assessment.
+
+    Args:
+        title (str): Requirement title.
+        description (str): Requirement description.
+        status (str): Current requirement status.
+
+    Returns:
+        dict: Analysis result as structured JSON-compatible dict.
+    """
+    api_key = config.OPENAI_API_KEY
+    model = config.OPENAI_MODEL or "gpt-4o-mini"
+
+    if not api_key:
+        raise ValueError("OPENAI_API_KEY not set")
+
+    client = OpenAI(api_key=api_key)
+
+    system_prompt = """
+    Du bist ein erfahrener Requirements Engineer mit Kenntnissen in SysML v1 und Best Practices des Systems Engineering.
+    Deine Aufgabe ist es, eine einzelne Anforderung zu analysieren und eine unterstützende Bewertung zu liefern.
+    Triff keine finalen Entscheidungen. Die Bewertung dient nur als Orientierung.
+
+    Regeln:
+    - Verändere nicht den Inhalt der Anforderung.
+    - Erstelle keine neuen Anforderungen.
+    - Bewertung statt Entscheidung.
+    - Orientiere dich methodisch an SysML v1 (z.B. Constraints in Anforderungen).
+
+    Antworte ausschließlich mit gültigem JSON in der folgenden Struktur:
+    {
+      "functional_assessment": {
+        "classification": "klar funktional | teilweise funktional | eher nicht funktional",
+        "completeness": "kurze Einschätzung zur Vollständigkeit",
+        "clarity": "kurze Einschätzung zur Verständlichkeit",
+        "correctness": "kurze Einschätzung zur fachlichen Korrektheit",
+        "summary": "kurze, nachvollziehbare Gesamteinschätzung"
+      },
+      "quantifiable_assessment": {
+        "has_metric": true|false,
+        "metric": "erkannte Messgröße oder leer",
+        "constraint": "SysML-Constraint-Form (z.B. \"responseTime <= 3 s\") oder leer",
+        "is_quantifiable": true|false
+      }
+    }
+    """
+
+    user_message = (
+        "Bitte analysiere die folgende Anforderung.\n\n"
+        f"Titel: {title}\n"
+        f"Beschreibung: {description}\n"
+        f"Status: {status}\n"
+    )
+
+    try:
+        response = client.chat.completions.create(
+            model=model,
+            messages=[
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": user_message}
+            ],
+            temperature=0.2,
+            max_tokens=900,
+            response_format={"type": "json_object"}
+        )
+        response_text = response.choices[0].message.content.strip()
+        return json.loads(response_text)
+    except Exception as e:
+        return {"error": f"Fehler bei der Analyse: {str(e)}"}

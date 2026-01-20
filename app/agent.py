@@ -384,6 +384,27 @@ def generate(project_id):
             )
             db.session.add(history_entry)
             
+            # Setze funktional automatisch beim Generieren vor RequirementVersion-Erstellung.
+            funktional_value = None
+            raw_funktional = item.get("funktional", None)
+            if isinstance(raw_funktional, bool):
+                funktional_value = raw_funktional
+            elif isinstance(raw_funktional, str):
+                if raw_funktional.strip().lower() in ["true", "1", "yes", "ja"]:
+                    funktional_value = True
+                elif raw_funktional.strip().lower() in ["false", "0", "no", "nein"]:
+                    funktional_value = False
+
+            if funktional_value is None and category:
+                category_lower = category.strip().lower()
+                if "nicht" in category_lower and "funktional" in category_lower:
+                    funktional_value = False
+                elif "funktional" in category_lower:
+                    funktional_value = True
+
+            if funktional_value is not None:
+                req.funktional = funktional_value
+
             saved_count += 1
 
         db.session.commit()
