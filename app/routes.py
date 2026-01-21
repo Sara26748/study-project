@@ -490,8 +490,6 @@ def update_requirement_version(version_id):
     title = request.form.get('title', '').strip()
     description = request.form.get('description', '').strip()
     category = request.form.get('category', '').strip()
-    status = request.form.get('status', '').strip()
-    save_type = request.form.get('save_type', 'intermediate')  # 'intermediate' or 'final'
     
     # Validate required fields
     if not title or not description:
@@ -507,25 +505,11 @@ def update_requirement_version(version_id):
     if (version.category or '') != category:
         changes['category'] = f"{version.category or '–'} → {category or '–'}"
     
-    old_status = version.status
-    # Update status - use form value if provided, otherwise use save_type logic
-    if status and status in ['Offen', 'In Arbeit', 'Fertig']:
-        new_status = status
-    elif save_type == 'intermediate':
-        new_status = 'In Arbeit'
-    elif save_type == 'final':
-        new_status = 'Fertig'
-    else:
-        new_status = old_status
-    
-    if old_status != new_status:
-        changes['status'] = f"{old_status} → {new_status}"
     
     # Update fields
     version.title = title
     version.description = description
     version.category = category
-    version.status = new_status
     
     # Track who modified this version
     version.last_modified_by_id = current_user.id
@@ -553,6 +537,16 @@ def update_requirement_version(version_id):
     
     # Save all custom data including is_quantifiable
     version.set_custom_data(custom_data)
+
+    # Always move to "In Arbeit" when any change is made
+    old_status = version.status
+    if changes:
+        new_status = 'In Arbeit'
+        if old_status != new_status:
+            changes['status'] = f"{old_status} → {new_status}"
+        version.status = new_status
+    else:
+        version.status = old_status
     
     # Create history entry if there are changes
     if changes:
@@ -601,6 +595,8 @@ def toggle_quantifiable(version_id):
     
     version.set_custom_data(custom_data)
     version.last_modified_by_id = current_user.id
+    # Status auf 'In Arbeit' setzen
+    version.status = 'In Arbeit'
     
     # Create history entry
     history_entry = RequirementVersionHistory(
@@ -1472,6 +1468,8 @@ def toggle_funktional(req_id):
     latest_version = req.get_latest_version()
     if latest_version and old_value != req.funktional:
         latest_version.last_modified_by_id = current_user.id
+        # Status auf 'In Arbeit' setzen
+        latest_version.status = 'In Arbeit'
         history_entry = RequirementVersionHistory(
             version_id=latest_version.id,
             changed_by_id=current_user.id,
