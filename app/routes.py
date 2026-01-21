@@ -1487,3 +1487,33 @@ def toggle_funktional(req_id):
     )
     return redirect(request.referrer or url_for('main.manage_project', project_id=req.project_id))
 
+@bp.route("/requirement_version/<int:version_id>/analyze", methods=['POST'])
+@login_required
+def analyze_requirement_route(version_id):
+    from .services.ai_client import analyze_requirement
+
+    version = RequirementVersion.query.get_or_404(version_id)
+    try:
+        check_version_access(version)
+    except:
+        return jsonify({'error': 'Zugriff verweigert'}), 403
+
+    analysis = analyze_requirement(version.title, version.description, version.status)
+    quantifiable = (
+        analysis.get("quantifiable_assessment", {}).get("is_quantifiable") is True
+    )
+
+    status_value = (version.status or "").strip().lower()
+    if status_value in {"fertig", "abgeschlossen"}:
+        status_color = "GRÜN"
+    elif status_value in {"in arbeit", "in bearbeitung"}:
+        status_color = "GELB"
+    else:
+        status_color = "ROT"
+
+    analysis["status_context"] = {
+        "status": version.status,
+        "ampel": status_color if quantifiable else "NICHT_ANWENDBAR"
+    }
+    return jsonify({'result': analysis})
+

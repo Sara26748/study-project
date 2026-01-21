@@ -142,6 +142,26 @@
           {% endif %}
         </div>
       </div>
+
+      <!-- KI-Analyse-Karte (unterhalb der Details-Karte einfügen) -->
+      <div class="card shadow-sm mt-4">
+        <div class="card-header bg-light d-flex align-items-center justify-content-between">
+          <h5 class="mb-0">
+            <i class="bi bi-clipboard-check me-2"></i>KI-Bewertung (Einzelanforderung)
+          </h5>
+          <button class="btn btn-sm btn-outline-primary" id="analyzeRequirementBtn">
+            <i class="bi bi-stars me-1"></i>Jetzt analysieren
+          </button>
+        </div>
+        <div class="card-body">
+          <div id="analysisLoading" class="text-muted" style="display: none;">
+            <i class="bi bi-hourglass-split me-2"></i>Analyse läuft...
+          </div>
+          <div id="analysisResult" class="text-secondary small">
+            Keine Analyse vorhanden. Klicke auf "Jetzt analysieren", um eine Bewertung zu erhalten.
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- History Tab -->
@@ -336,8 +356,8 @@
 </div>
 
 <script>
-      const versionId = {{ version.id }};
-      const projectId = {{ req.project_id }};
+      const versionId = "{{ version.id }}";
+      const projectId = "{{ req.project_id }}";
 
 
       // Load comments on page load and when comments tab is shown
@@ -591,6 +611,88 @@
     if (!suggBox) return;
     if (!suggBox.contains(e.target) && e.target !== textarea) hideSuggestions();
   });
+
+  const analysisBtn = document.getElementById('analyzeRequirementBtn');
+const analysisLoading = document.getElementById('analysisLoading');
+const analysisResult = document.getElementById('analysisResult');
+
+function formatAmpel(ampel) {
+  if (!ampel) return '<span class="badge bg-secondary">Unbekannt</span>';
+  if (ampel === 'GRÜN') return '<span class="badge bg-success">GRÜN</span>';
+  if (ampel === 'GELB') return '<span class="badge bg-warning text-dark">GELB</span>';
+  if (ampel === 'ROT') return '<span class="badge bg-danger">ROT</span>';
+  return '<span class="badge bg-secondary">Nicht anwendbar</span>';
+}
+
+function escapeHtml(text) {
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+}
+
+function renderAnalysis(data) {
+  if (!data || data.error) {
+    const errorMessage = data && data.error ? data.error : 'Unbekannter Fehler';
+    return `<div class="alert alert-danger mb-0">Fehler bei der Analyse: ${escapeHtml(errorMessage)}</div>`;
+  }
+
+  const functional = data.functional_assessment || {};
+  const quant = data.quantifiable_assessment || {};
+  const statusContext = data.status_context || {};
+
+  const metricText = quant.metric ? `<code>${escapeHtml(quant.metric)}</code>` : 'Keine Messgröße erkannt';
+  const constraintText = quant.constraint ? `<code>${escapeHtml(quant.constraint)}</code>` : 'Kein Constraint angegeben';
+  const quantBadge = quant.is_quantifiable ? '<span class="badge bg-success">Ja</span>' : '<span class="badge bg-secondary">Nein</span>';
+  const ampelBadge = formatAmpel(statusContext.ampel);
+
+  return `
+    <div class="mb-3">
+      <h6 class="mb-2">Funktionale Bewertung</h6>
+      <ul class="mb-0">
+        <li><strong>Einstufung:</strong> ${escapeHtml(functional.classification || '–')}</li>
+        <li><strong>Vollständigkeit:</strong> ${escapeHtml(functional.completeness || '–')}</li>
+        <li><strong>Verständlichkeit:</strong> ${escapeHtml(functional.clarity || '–')}</li>
+        <li><strong>Fachliche Korrektheit:</strong> ${escapeHtml(functional.correctness || '–')}</li>
+        <li><strong>Gesamtbewertung:</strong> ${escapeHtml(functional.summary || '–')}</li>
+      </ul>
+    </div>
+    <div class="mb-3">
+      <h6 class="mb-2">Quantifizierbare Bewertung</h6>
+      <ul class="mb-0">
+        <li><strong>Quantifizierbar:</strong> ${quantBadge}</li>
+        <li><strong>Messgröße:</strong> ${metricText}</li>
+        <li><strong>SysML-Constraint:</strong> ${constraintText}</li>
+      </ul>
+    </div>
+    <div>
+      <h6 class="mb-2">Status & Ampellogik</h6>
+      <ul class="mb-0">
+        <li><strong>Status:</strong> ${escapeHtml(statusContext.status || '–')}</li>
+        <li><strong>Ampel:</strong> ${ampelBadge}</li>
+      </ul>
+    </div>
+  `;
+}
+
+if (analysisBtn && analysisLoading && analysisResult) {
+  analysisBtn.addEventListener('click', function() {
+    analysisLoading.style.display = 'block';
+    analysisResult.innerHTML = '';
+
+    fetch(`/requirement_version/${versionId}/analyze`, {
+      method: 'POST'
+    })
+    .then(function(response) { return response.json(); })
+    .then(function(data) {
+      analysisLoading.style.display = 'none';
+      analysisResult.innerHTML = renderAnalysis(data.result || data);
+    })
+    .catch(function() {
+      analysisLoading.style.display = 'none';
+      analysisResult.innerHTML = '<div class=\"alert alert-danger mb-0\">Fehler bei der Analyse.</div>';
+    });
+  });
+}
 </script>
 
 <style>
