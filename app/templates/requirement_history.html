@@ -685,11 +685,32 @@ if (analysisBtn && analysisLoading && analysisResult) {
     .then(function(response) { return response.json(); })
     .then(function(data) {
       analysisLoading.style.display = 'none';
-      analysisResult.innerHTML = renderAnalysis(data.result || data);
+      const result = data.result || data;
+      analysisResult.innerHTML = renderAnalysis(result);
+
+      // --- Live update quantifiable status in requirements table ---
+      // Find the corresponding row in the table (if open in another tab)
+      // This works if the table is present in the DOM (e.g. via iframe or SPA)
+      // Otherwise, reload on next visit will show the correct value
+      const quantifiable = result.quantifiable_assessment?.is_quantifiable === true;
+      // Try to find the row by versionId or requirementId
+      // If you use requirementId as row id, adjust accordingly
+      const row = document.getElementById('req-row-' + '{{ req.id }}');
+      if (row) {
+        const quantCell = row.querySelector('.quantifiable-cell');
+        if (quantCell) {
+          const icon = quantCell.querySelector('i');
+          if (icon) {
+            icon.className = quantifiable
+              ? 'bi bi-check-circle-fill text-success'
+              : 'bi bi-circle text-muted';
+          }
+        }
+      }
     })
     .catch(function() {
       analysisLoading.style.display = 'none';
-      analysisResult.innerHTML = '<div class=\"alert alert-danger mb-0\">Fehler bei der Analyse.</div>';
+      analysisResult.innerHTML = '<div class="alert alert-danger mb-0">Fehler bei der Analyse.</div>';
     });
   });
 }
