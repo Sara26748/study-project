@@ -570,8 +570,7 @@ endblock %} {% block content %}
               <!-- Number of Requirements -->
               <div class="mb-4">
                 <label class="form-label fw-semibold mb-2">
-                  <i class="bi bi-hash me-1 text-primary"></i>Anzahl der
-                  Anforderungen
+                  <i class="bi bi-hash me-1 text-primary"></i>Anzahl der Anforderungen
                 </label>
                 <div class="number-input-group">
                   <select
@@ -580,8 +579,10 @@ endblock %} {% block content %}
                     name="num_requirements_mode"
                     style="max-width: 200px"
                   >
-                    <option value="auto" selected>Automatisch</option>
-                    <option value="manual">Manuell festlegen</option>
+                    <option value="exact">Genau</option>
+                    <option value="min">Mindestens</option>
+                    <option value="max">Höchstens</option>
+                    <option value="auto" selected>Keine Angabe</option>
                   </select>
                   <input
                     type="number"
@@ -596,8 +597,11 @@ endblock %} {% block content %}
                 </div>
                 <small class="text-muted mt-2 d-block">
                   <i class="bi bi-info-circle me-1 text-primary"></i>
-                  Bei "Automatisch" entscheidet die KI basierend auf dem Kontext
-                  (3-10 Requirements)
+                  Bei "Keine Angabe" entscheidet die KI basierend auf dem Kontext
+                  (3-10 Requirements). Bei "Genau", "Mindestens" oder "Höchstens"
+                  wird die Zahl berücksichtigt.
+                </small>
+              </div>
                 </small>
               </div>
 

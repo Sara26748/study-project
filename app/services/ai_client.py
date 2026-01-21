@@ -9,7 +9,7 @@ from openai import OpenAI
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 import config
 
-def generate_requirements(user_description: str | None, inputs: dict, columns: list = None, ai_model: str = None, num_requirements: int = None, product_system: str = None, has_excel_context: bool = False, improve_only: bool = False, extend_existing: bool = False, output_language: str | None = None) -> list[dict]:
+def generate_requirements(user_description: str | None, inputs: dict, columns: list = None, ai_model: str = None, num_requirements: int = None, num_requirements_mode: str | None = None, num_requirements_value: int | None = None, product_system: str = None, has_excel_context: bool = False, improve_only: bool = False, extend_existing: bool = False, output_language: str | None = None) -> list[dict]:
     """
     Calls OpenAI API to generate requirements based on user description and inputs.
 
@@ -34,7 +34,17 @@ def generate_requirements(user_description: str | None, inputs: dict, columns: l
     # Get configuration
     api_key = config.OPENAI_API_KEY
     model = ai_model or config.OPENAI_MODEL or "gpt-4o-mini"
-    system_prompt = config.get_system_prompt(columns, num_requirements, product_system, has_excel_context, improve_only, extend_existing, output_language)
+    system_prompt = config.get_system_prompt(
+        columns,
+        num_requirements,
+        product_system,
+        has_excel_context,
+        improve_only,
+        extend_existing,
+        output_language,
+        num_requirements_mode,
+        num_requirements_value
+    )
 
     # ... rest of the function stays the same
 
@@ -140,7 +150,13 @@ Antworte NUR mit diesem JSON, ohne zusätzlichen Text davor oder danach."""
         response_text = response.choices[0].message.content.strip()
 
         # Parse JSON response
-        requirements = _parse_json_response(response_text, columns, num_requirements)
+        requirements = _parse_json_response(
+            response_text,
+            columns,
+            num_requirements,
+            num_requirements_mode,
+            num_requirements_value
+        )
         
         return requirements
 
@@ -148,7 +164,7 @@ Antworte NUR mit diesem JSON, ohne zusätzlichen Text davor oder danach."""
         raise RuntimeError(f"OpenAI request failed: {str(e)}")
 
 
-def _parse_json_response(response_text: str, columns: list = None, num_requirements: int = None) -> list[dict]:
+def _parse_json_response(response_text: str, columns: list = None, num_requirements: int = None, num_requirements_mode: str | None = None, num_requirements_value: int | None = None) -> list[dict]:
     """
     Robustly parse JSON response from OpenAI, with fallback to regex extraction.
 
@@ -167,7 +183,13 @@ def _parse_json_response(response_text: str, columns: list = None, num_requireme
     try:
         data = json.loads(response_text)
         if isinstance(data, dict) and "requirements" in data:
-            return _validate_and_normalize_requirements(data["requirements"], columns, num_requirements)
+            return _validate_and_normalize_requirements(
+                data["requirements"],
+                columns,
+                num_requirements,
+                num_requirements_mode,
+                num_requirements_value
+            )
     except json.JSONDecodeError:
         pass
 
@@ -183,7 +205,13 @@ def _parse_json_response(response_text: str, columns: list = None, num_requireme
         try:
             data = json.loads(match)
             if isinstance(data, dict) and "requirements" in data:
-                return _validate_and_normalize_requirements(data["requirements"], columns, num_requirements)
+                return _validate_and_normalize_requirements(
+                    data["requirements"],
+                    columns,
+                    num_requirements,
+                    num_requirements_mode,
+                    num_requirements_value
+                )
         except json.JSONDecodeError:
             continue
 
@@ -195,14 +223,20 @@ def _parse_json_response(response_text: str, columns: list = None, num_requireme
         try:
             data = json.loads(match)
             if isinstance(data, list):
-                return _validate_and_normalize_requirements(data, columns, num_requirements)
+                return _validate_and_normalize_requirements(
+                    data,
+                    columns,
+                    num_requirements,
+                    num_requirements_mode,
+                    num_requirements_value
+                )
         except json.JSONDecodeError:
             continue
 
     raise RuntimeError("Invalid JSON response from model: Could not parse requirements structure.")
 
 
-def _validate_and_normalize_requirements(requirements: list, columns: list = None, num_requirements: int = None) -> list[dict]:
+def _validate_and_normalize_requirements(requirements: list, columns: list = None, num_requirements: int = None, num_requirements_mode: str | None = None, num_requirements_value: int | None = None) -> list[dict]:
     """
     Validate and normalize requirements list with support for dynamic columns.
 
@@ -268,9 +302,19 @@ def _validate_and_normalize_requirements(requirements: list, columns: list = Non
     if not normalized:
         raise RuntimeError("No valid requirements found in response.")
     
-    # Limit to specified number or default to 10
-    limit = num_requirements if num_requirements and num_requirements > 0 else 10
-    return normalized[:limit]
+    # Limit results based on mode/value with hard cap
+    max_cap = 30
+    if num_requirements_mode == "max" and num_requirements_value and num_requirements_value > 0:
+        return normalized[:min(num_requirements_value, max_cap)]
+    if num_requirements_mode == "exact" and num_requirements_value and num_requirements_value > 0:
+        return normalized[:min(num_requirements_value, max_cap)]
+    if num_requirements and num_requirements > 0:
+        return normalized[:min(num_requirements, max_cap)]
+    if num_requirements_mode == "auto" or not num_requirements_mode:
+        return normalized[:min(10, max_cap)]
+    if num_requirements_mode == "min":
+        return normalized[:max_cap]
+    return normalized[:max_cap]
 
 
 def detect_conflicts(requirements_list: list[dict]) -> list[dict]:

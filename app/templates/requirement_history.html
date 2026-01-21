@@ -101,16 +101,24 @@
             <p class="text-secondary">{{ version.description }}</p>
           </div>
           <div class="row">
-            <div class="col-md-6">
+            <div class="col-md-4">
               <strong>Kategorie:</strong>
               <p>{{ version.category or "–" }}</p>
             </div>
-            <div class="col-md-6">
+            <div class="col-md-4">
+              <strong>Funktional:</strong>
+              <p>
+                <i
+                  class="bi {% if req.funktional %}bi-check-circle-fill text-success{% else %}bi-circle text-muted{% endif %}"
+                ></i>
+                {% if req.funktional %}Ja{% else %}Nein{% endif %}
+              </p>
+            </div>
+            <div class="col-md-4">
               <strong>Quantifizierbar:</strong>
               <p>
-                {% set custom_data = version.get_custom_data() %} {% set
-                is_quantifiable = custom_data.get('is_quantifiable', 'false') ==
-                'true' %}
+                {% set custom_data = version.get_custom_data() %}
+                {% set is_quantifiable = custom_data.get('is_quantifiable', 'false') == 'true' %}
                 <i
                   class="bi {% if is_quantifiable %}bi-check-circle-fill text-success{% else %}bi-circle text-muted{% endif %}"
                 ></i>
