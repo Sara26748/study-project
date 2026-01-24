@@ -24,16 +24,23 @@ def has_quantifiable_signal(title: str, description: str) -> bool:
     number_pattern = r"\d+(?:[.,]\d+)?"
     unit_pattern = (
         r"(ms|s|sec|sek|seconds|minutes|min|h|hz|khz|mhz|ghz|kb|mb|gb|tb|"
-        r"bps|kbps|mbps|gbps|mb/s|gb/s|%|°c|c|w|kw|v|a|mah|rpm|fps|km/h|m/s)"
+        r"bps|kbps|mbps|gbps|mb/s|gb/s|%|°c|c|w|kw|v|a|mah|rpm|fps|km/h|m/s|liter|l|g|kg|km|m|mm)"
     )
     keyword_pattern = r"(max|maximum|min|minimum|höchstens|mindestens|weniger als|mehr als)"
 
+    # Standardmuster
     if re.search(rf"{comparator_pattern}\s*{number_pattern}", text):
         return True
     if re.search(rf"{number_pattern}\s*{unit_pattern}", text):
         return True
     if re.search(rf"{keyword_pattern}\s*{number_pattern}", text):
         return True
+
+    # Erweiterung: Muster wie '6 Liter pro 100 km', '5 l/100km', 'g/km', etc.
+    extended_pattern = r"(\d+(?:[.,]\d+)?\s*(liter|l|g|kg|km|m|mm)\s*(pro|/|je)\s*\d+(?:[.,]\d+)?\s*(km|m|h|min|sek|s|stunde|tag|jahr|monate|wochen))"
+    if re.search(extended_pattern, text):
+        return True
+
     return False
 
 def normalize_key(title: str) -> str:
