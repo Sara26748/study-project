@@ -333,11 +333,11 @@ endblock %} {% block content %}
         <i class="bi bi-arrow-left me-2"></i> Zurück
       </a>
       <h1 class="fw-bold">
-        <i class="bi bi-robot me-2 text-primary"></i>KI-Cockpit
+        <i class="bi bi-robot me-2 text-primary"></i>: Requirements Engineering mit KI-Agent
       </h1>
       <p class="text-muted">
-        Generiere professionelle Anforderungen für
-        <strong>{{ project.name }}</strong>
+        Generiere professionelle Anforderungen für das Projekt: 
+        <strong>{{ project.name if project and project.name else 'Unbenanntes Projekt' }}</strong>
       </p>
     </div>
   </div>
