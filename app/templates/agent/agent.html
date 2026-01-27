@@ -333,11 +333,11 @@ endblock %} {% block content %}
         <i class="bi bi-arrow-left me-2"></i> Zurück
       </a>
       <h1 class="fw-bold">
-        <i class="bi bi-robot me-2 text-primary"></i>KI-Requirements Engineering mit KI-Agent
+        <i class="bi bi-robot me-2 text-primary"></i>: Requirements Engineering mit KI-Agent
       </h1>
       <p class="text-muted">
-        Generiere professionelle Anforderungen für
-        <strong>{{ project.name }}</strong>
+        Generiere professionelle Anforderungen für das Projekt: 
+        <strong>{{ project.name if project and project.name else 'Unbenanntes Projekt' }}</strong>
       </p>
     </div>
   </div>
@@ -400,9 +400,9 @@ endblock %} {% block content %}
                   <i class="bi bi-box-seam"></i>
                 </div>
                 <div>
-                  <h3 class="config-card-title">Produktsystem (Optional)</h3>
+                  <h3 class="config-card-title">Produkt/System</h3>
                   <p class="config-card-subtitle">
-                    Definieren Sie das Zielsystem für die Anforderungen
+                    Nennen Sie das zu betrachtende Produkt/System
                   </p>
                 </div>
               </div>
@@ -411,12 +411,14 @@ endblock %} {% block content %}
                 class="form-control"
                 id="product_system"
                 name="product_system"
-                placeholder="z.B. Montagesystem A, Cloud-Plattform XY..."
               />
+
+              <!--
               <small class="text-muted mt-2 d-block">
-                <i class="bi bi-info-circle me-1 text-primary"></i>
+                <i class="bi bi-info7-circle me-1 text-primary"></i>
                 Alle generierten Anforderungen beziehen sich auf dieses System
               </small>
+              -->
             </div>
 
             <!-- Context (Excel) -->
@@ -427,10 +429,10 @@ endblock %} {% block content %}
                 </div>
                 <div>
                   <h3 class="config-card-title">
-                    Kontext hochladen (Optional)
+                    Kontext (Optional)
                   </h3>
                   <p class="config-card-subtitle">
-                    Bestehende Anforderungen zur Verbesserung
+                    Bestehende Anforderungslisten und/oder weiterführende Informationen zur Produktbeschreibung (z.B. Pflichten-/Lastenheft) hochladen & Bestehende Anforderungen überarbeiten oder erweitern
                   </p>
                 </div>
               </div>
@@ -465,9 +467,14 @@ endblock %} {% block content %}
                   <i class="bi bi-chat-left-text"></i>
                 </div>
                 <div>
-                  <h3 class="config-card-title">Beschreibung ergänzen (optional)?</h3>
+                  <h3 class="config-card-title">Produkt-/Systembeschreibung </h3>
                   <p class="config-card-subtitle">
-                    Zusätzliche Beschreibung für die Anforderungen
+                    Beschreiben Sie Ihr Produkt/System für:
+                    <ul class="mb-0 ps-3">
+                      <li>Neugenerierung (innovativ & kreativ)</li>
+                      <li>Erweiterung (geänderte oder neue, ergänzende Anforderungen)</li>
+                      <li>Überprüfung/Verbesserung der Anforderungsqualität, z.B. widerspruchsfrei, qualitativ hochwertige Formulierungen, quantifizierbare/messbare Anforderungen</li>
+                    </ul>
                   </p>
                 </div>
               </div>
@@ -478,6 +485,8 @@ endblock %} {% block content %}
                 rows="5"
                 placeholder="Beschreibe dein Vorhaben detailliert..."
               ></textarea>
+
+              <!--
 
               <div class="mt-3">
                 <small class="text-muted d-block mb-2"
@@ -509,6 +518,7 @@ endblock %} {% block content %}
                   ⚛️ Atomare Anforderungen
                 </span>
               </div>
+              -->
             </div>
 
             <!-- Configuration -->
@@ -681,10 +691,12 @@ endblock %} {% block content %}
                   <i class="bi bi-cpu"></i>
                 </div>
                 <div>
-                  <h3 class="config-card-title">KI-Modell wählen</h3>
+                  <h3 class="config-card-title">Gewünschtes LLM auswählen</h3>
+                  <!--
                   <p class="config-card-subtitle">
-                    Wählen Sie das passende Modell für Ihre Aufgabe
+                    Wählen Sie das passende LLM für Ihre Aufgabe
                   </p>
+                  -->
                 </div>
               </div>
 
