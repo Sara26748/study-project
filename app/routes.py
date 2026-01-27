@@ -9,6 +9,86 @@ from .services.ai_client import generate_requirements
 
 bp = Blueprint('main', __name__)
 
+# Route: Manuelle Anforderung erstellen
+@bp.route("/project/<int:project_id>/manual_requirement", methods=["POST"])
+@login_required
+def create_manual_requirement(project_id):
+    project = Project.query.get_or_404(project_id)
+    check_project_access(project)
+
+    title = request.form.get("title", "").strip()
+    description = request.form.get("description", "").strip()
+    category = request.form.get("category", "").strip()
+    status = request.form.get("status", "Offen").strip()
+    is_quantifiable = request.form.get("is_quantifiable") == "on"
+    funktional = request.form.get("funktional") == "on"
+
+    if not title or not description:
+        flash("Name und Beschreibung sind erforderlich.", "danger")
+        return redirect(url_for('main.manage_project', project_id=project_id))
+
+    # Key für Duplikatserkennung
+    from .agent import normalize_key
+    key = normalize_key(title)
+    req = Requirement.query.filter_by(project_id=project_id, key=key).first()
+    if not req:
+        req = Requirement(project_id=project_id, key=key, funktional=funktional)
+        db.session.add(req)
+        db.session.flush()
+        version_index = 1
+        version_label = 'A'
+    else:
+        # Update funktional, falls geändert
+        if req.funktional != funktional:
+            req.funktional = funktional
+        last_version = req.versions[-1] if req.versions else None
+        version_index = last_version.version_index + 1 if last_version else 1
+        version_label = chr(ord('A') + (version_index - 1))
+
+    new_version = RequirementVersion(
+        requirement_id=req.id,
+        version_index=version_index,
+        version_label=version_label,
+        title=title,
+        description=description,
+        category=category,
+        status=status,
+        created_by_id=current_user.id
+    )
+    # Custom Data
+    custom_data = {}
+    if is_quantifiable:
+        custom_data['is_quantifiable'] = 'true'
+    else:
+        custom_data['is_quantifiable'] = 'false'
+    # Dynamische Spalten
+    for col in project.get_custom_columns():
+        val = request.form.get(f'custom_{col}', '').strip()
+        if val:
+            custom_data[col] = val
+    if custom_data:
+        new_version.set_custom_data(custom_data)
+    db.session.add(new_version)
+    db.session.flush()
+    # History
+    from .models import RequirementVersionHistory
+    import json
+    history_entry = RequirementVersionHistory(
+        version_id=new_version.id,
+        changed_by_id=current_user.id,
+        change_type='created',
+        changes=json.dumps({'action': 'Manuell erstellt', 'version': version_label})
+    )
+    db.session.add(history_entry)
+    db.session.commit()
+    # Notification
+    try:
+        notify_requirement_created(new_version, current_user)
+    except Exception:
+        pass
+    flash(f"Anforderung '{title}' wurde erfolgreich erstellt.", "success")
+    return redirect(url_for('main.manage_project', project_id=project_id))
+
 def check_project_access(project):
     """Check if current user has access to the project (owner or shared)."""
     if project.user_id != current_user.id and current_user not in project.shared_with:
