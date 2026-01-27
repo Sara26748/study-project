@@ -436,26 +436,60 @@ endblock %} {% block content %}
                   </p>
                 </div>
               </div>
-              <div class="drop-zone" id="drop-zone">
-                <input
-                  class="drop-zone-input"
-                  type="file"
-                  id="excel_file"
-                  name="excel_file"
-                  accept=".xlsx, .xls"
-                />
-                <div class="drop-zone-content mt-2">
-                  <i class="bi bi-cloud-upload"></i>
-                  <p>Excel-Datei hier ablegen oder klicken</p>
-                  <small class="text-muted"
-                    >Unterstützt .xlsx und .xls Dateien</small
-                  >
+              <div class="context-upload" id="context-upload">
+                <div class="mb-3">
+                  <label for="context_file_type" class="form-label">Dateityp auswählen</label>
+                  <select id="context_file_type" name="context_file_type" class="form-select">
+                    <option value="excel" selected>EXCEL</option>
+                    <option value="pdf">PDF</option>
+                    <option value="both">EXCEL & PDF</option>
+                  </select>
                 </div>
-                <div id="file-name-display" class="d-none mt-3">
-                  <span class="file-info"
-                    ><i class="bi bi-check-circle-fill me-2"></i>
-                    <span id="file-name-text"></span
-                  ></span>
+
+                <div class="drop-zone-wrapper" id="excel-drop-wrapper">
+                  <div class="drop-zone" id="excel-drop-zone">
+                    <input
+                      class="drop-zone-input"
+                      type="file"
+                      id="excel_file"
+                      name="excel_file"
+                      accept=".xlsx, .xls"
+                    />
+                    <div class="drop-zone-content mt-2">
+                      <i class="bi bi-cloud-upload"></i>
+                      <p>Excel-Datei hier ablegen oder klicken</p>
+                      <small class="text-muted">Unterstützt .xlsx und .xls Dateien</small>
+                    </div>
+                    <div id="excel-file-name-display" class="d-none mt-3">
+                      <span class="file-info">
+                        <i class="bi bi-check-circle-fill me-2"></i>
+                        <span id="excel-file-name-text"></span>
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="drop-zone-wrapper d-none" id="pdf-drop-wrapper">
+                  <div class="drop-zone" id="pdf-drop-zone">
+                    <input
+                      class="drop-zone-input"
+                      type="file"
+                      id="pdf_file"
+                      name="pdf_file"
+                      accept=".pdf"
+                    />
+                    <div class="drop-zone-content mt-2">
+                      <i class="bi bi-cloud-upload"></i>
+                      <p>PDF-Datei hier ablegen oder klicken</p>
+                      <small class="text-muted">Unterstützt .pdf Dateien</small>
+                    </div>
+                    <div id="pdf-file-name-display" class="d-none mt-3">
+                      <span class="file-info">
+                        <i class="bi bi-check-circle-fill me-2"></i>
+                        <span id="pdf-file-name-text"></span>
+                      </span>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -845,11 +879,104 @@ endblock %} {% block content %}
   // Custom columns management
   const customColumns = [];
 
-  // Drag & Drop Handling
-  const dropZone = document.getElementById("drop-zone");
-  const fileInput = document.getElementById("excel_file");
-  const fileNameDisplay = document.getElementById("file-name-display");
-  const fileNameText = document.getElementById("file-name-text");
+  // Drag & Drop Handling for context uploads (Excel/PDF)
+  const contextTypeSelect = document.getElementById("context_file_type");
+  const excelDropWrapper = document.getElementById("excel-drop-wrapper");
+  const excelDropZone = document.getElementById("excel-drop-zone");
+  const excelInput = document.getElementById("excel_file");
+  const excelFileNameDisplay = document.getElementById("excel-file-name-display");
+  const excelFileNameText = document.getElementById("excel-file-name-text");
+
+  const pdfDropWrapper = document.getElementById("pdf-drop-wrapper");
+  const pdfDropZone = document.getElementById("pdf-drop-zone");
+  const pdfInput = document.getElementById("pdf_file");
+  const pdfFileNameDisplay = document.getElementById("pdf-file-name-display");
+  const pdfFileNameText = document.getElementById("pdf-file-name-text");
+
+  function preventDefaults(e) {
+    e.preventDefault();
+    e.stopPropagation();
+  }
+
+  function setupDropZone({ dropZone, fileInput, fileNameDisplay, fileNameText }) {
+    ["dragenter", "dragover", "dragleave", "drop"].forEach((eventName) => {
+      dropZone.addEventListener(eventName, preventDefaults, false);
+    });
+
+    ["dragenter", "dragover"].forEach((eventName) => {
+      dropZone.addEventListener(eventName, () => {
+        dropZone.classList.add("dragover");
+      });
+    });
+
+    ["dragleave", "drop"].forEach((eventName) => {
+      dropZone.addEventListener(eventName, () => {
+        dropZone.classList.remove("dragover");
+      });
+    });
+
+    dropZone.addEventListener(
+      "drop",
+      (e) => {
+        const dt = e.dataTransfer;
+        fileInput.files = dt.files;
+        updateFileDisplay(fileInput, fileNameDisplay, fileNameText, dropZone);
+      },
+      false
+    );
+
+    fileInput.addEventListener("change", () => {
+      updateFileDisplay(fileInput, fileNameDisplay, fileNameText, dropZone);
+    });
+  }
+
+  function updateFileDisplay(fileInput, fileNameDisplay, fileNameText, dropZone) {
+    if (fileInput.files.length > 0) {
+      fileNameText.textContent = fileInput.files[0].name;
+      fileNameDisplay.classList.remove("d-none");
+      dropZone.querySelector(".drop-zone-content").classList.add("d-none");
+      fileNameDisplay.classList.add("text-center", "w-100");
+    }
+  }
+
+  function resetDropZone(fileInput, fileNameDisplay, dropZone) {
+    fileInput.value = "";
+    fileNameDisplay.classList.add("d-none");
+    dropZone.querySelector(".drop-zone-content").classList.remove("d-none");
+  }
+
+  function updateContextVisibility() {
+    const selection = contextTypeSelect.value;
+    const showExcel = selection === "excel" || selection === "both";
+    const showPdf = selection === "pdf" || selection === "both";
+
+    excelDropWrapper.classList.toggle("d-none", !showExcel);
+    pdfDropWrapper.classList.toggle("d-none", !showPdf);
+
+    if (!showExcel) {
+      resetDropZone(excelInput, excelFileNameDisplay, excelDropZone);
+    }
+    if (!showPdf) {
+      resetDropZone(pdfInput, pdfFileNameDisplay, pdfDropZone);
+    }
+  }
+
+  setupDropZone({
+    dropZone: excelDropZone,
+    fileInput: excelInput,
+    fileNameDisplay: excelFileNameDisplay,
+    fileNameText: excelFileNameText,
+  });
+
+  setupDropZone({
+    dropZone: pdfDropZone,
+    fileInput: pdfInput,
+    fileNameDisplay: pdfFileNameDisplay,
+    fileNameText: pdfFileNameText,
+  });
+
+  contextTypeSelect.addEventListener("change", updateContextVisibility);
+  updateContextVisibility();
 
   // Loading Elements
   const loadingState = document.getElementById("loading-state");
