@@ -1062,15 +1062,25 @@ endblock %} {% block content %}
     });
   });
 
+  function getContextFile() {
+    if (pdfInput.files.length > 0) {
+      return pdfInput.files[0];
+    }
+    if (excelInput.files.length > 0) {
+      return excelInput.files[0];
+    }
+    return null;
+  }
+
   function simulateProgress() {
     agentForm.classList.add("d-none");
     loadingState.classList.remove("d-none");
 
     // Update Step 1 text if file is present
-    const files = fileInput.files;
+    const contextFile = getContextFile();
     const step1Text = document.getElementById("step-1");
-    if (files.length > 0) {
-      step1Text.innerHTML = `<i class="bi bi-circle me-2"></i> Analysiere Datei: <strong>${files[0].name}</strong>`;
+    if (contextFile) {
+      step1Text.innerHTML = `<i class="bi bi-circle me-2"></i> Analysiere Datei: <strong>${contextFile.name}</strong>`;
     } else {
       step1Text.innerHTML = `<i class="bi bi-circle me-2"></i> Analysiere Beschreibung...`;
     }
@@ -1100,52 +1110,6 @@ endblock %} {% block content %}
     icon.classList.add("bi-check-circle-fill", "text-primary");
   }
 
-  ["dragenter", "dragover", "dragleave", "drop"].forEach((eventName) => {
-    dropZone.addEventListener(eventName, preventDefaults, false);
-  });
-
-  function preventDefaults(e) {
-    e.preventDefault();
-    e.stopPropagation();
-  }
-
-  ["dragenter", "dragover"].forEach((eventName) => {
-    dropZone.addEventListener(eventName, highlight, false);
-  });
-
-  ["dragleave", "drop"].forEach((eventName) => {
-    dropZone.addEventListener(eventName, unhighlight, false);
-  });
-
-  function highlight(e) {
-    dropZone.classList.add("dragover");
-  }
-
-  function unhighlight(e) {
-    dropZone.classList.remove("dragover");
-  }
-
-  dropZone.addEventListener("drop", handleDrop, false);
-
-  function handleDrop(e) {
-    const dt = e.dataTransfer;
-    const files = dt.files;
-    fileInput.files = files;
-    updateFileDisplay();
-  }
-
-  fileInput.addEventListener("change", updateFileDisplay);
-
-  function updateFileDisplay() {
-    if (fileInput.files.length > 0) {
-      fileNameText.textContent = fileInput.files[0].name;
-      fileNameDisplay.classList.remove("d-none");
-      // Hide icon/text to make it cleaner
-      dropZone.querySelector(".drop-zone-content").classList.add("d-none");
-      // Re-center info
-      fileNameDisplay.classList.add("text-center", "w-100");
-    }
-  }
 
   // Quick Start Badges
   document.querySelectorAll(".quick-start-badge").forEach((badge) => {
