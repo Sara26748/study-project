@@ -1194,7 +1194,30 @@ endblock %} {% block content %}
         method: "POST",
         body: formData,
       })
-        .then((response) => response.json())
+        .then(async (response) => {
+          const contentType = response.headers.get("content-type") || "";
+          const rawText = await response.text();
+          if (!response.ok) {
+            let errorMessage = `HTTP ${response.status}`;
+            if (contentType.includes("application/json")) {
+              try {
+                const errorJson = JSON.parse(rawText || "{}");
+                if (errorJson && errorJson.error) {
+                  errorMessage = errorJson.error;
+                }
+              } catch (e) {
+                // Ignore JSON parsing errors and fall back to raw text
+              }
+            } else if (rawText && rawText.trim()) {
+              errorMessage = rawText.trim();
+            }
+            throw new Error(errorMessage);
+          }
+          if (contentType.includes("application/json")) {
+            return JSON.parse(rawText || "{}");
+          }
+          throw new Error("Antwortformat ist kein JSON.");
+        })
         .then((result) => {
           messageDiv.classList.remove("d-none");
 

@@ -6,7 +6,7 @@ OPENAI_MODEL = os.getenv('OPENAI_MODEL', 'gpt-4o-mini')
 SYSTEM_PROMPT_PATH = os.getenv('SYSTEM_PROMPT_PATH')
 SYSTEM_PROMPT = os.getenv('SYSTEM_PROMPT')
 
-def get_system_prompt(columns=None, num_requirements=None, product_system=None, has_excel_context=False, improve_only=False, extend_existing=False, output_language=None, num_requirements_mode=None, num_requirements_value=None):
+def get_system_prompt(columns=None, num_requirements=None, product_system=None, has_excel_context=False, has_pdf_context=False, improve_only=False, extend_existing=False, output_language=None, num_requirements_mode=None, num_requirements_value=None):
     """
     Get system prompt, optionally customized for dynamic columns.
     """
@@ -15,24 +15,17 @@ Du bist ein erfahrener Requirements Engineer.
 Erzeuge klare, testbare, präzise Software-Anforderungen im JSON-Format.
 Antworte ausschließlich mit gültigem JSON in folgender Struktur:
 {
-  "requirements": [
-    {"title": "...", "description": "...", "category": "...", "status": "Offen"}
-  ]
+    "requirements": [
+        {"title": "...", "description": "...", "category": "...", "status": "Offen"}
+    ]
 }
 Regeln:
 - Maximiere Klarheit und Testbarkeit (Akzeptanzkriterien implizit in description).
 - Verwende kurze, prägnante Titel.
-- 'status' ist immer 'Offen'.
+- Fülle alle Felder sinnvoll.
 - Wenn Informationen fehlen, triff sinnvolle, konservative Annahmen.
 """
-
-    if SYSTEM_PROMPT_PATH and os.path.exists(SYSTEM_PROMPT_PATH):
-        with open(SYSTEM_PROMPT_PATH, 'r', encoding='utf-8') as f:
-            base_prompt = f.read().strip()
-    elif SYSTEM_PROMPT:
-        base_prompt = SYSTEM_PROMPT
-    else:
-        base_prompt = DEFAULT_SYSTEM_PROMPT
+    base_prompt = DEFAULT_SYSTEM_PROMPT
 
     # Set up all variables for prompt construction
     json_fields = []
@@ -40,6 +33,7 @@ Regeln:
     product_context = ""
     language_instruction = ""
     excel_instruction = ""
+    pdf_instruction = ""
     improve_instruction = ""
     extend_instruction = ""
 
@@ -95,6 +89,15 @@ Regeln:
             "\n- Die Gesamtzahl der Requirements sollte die bestehenden aus Excel + die neuen explizit angeforderten + weitere passende Anforderungen umfassen."
         )
 
+    # PDF context instruction
+    if 'has_pdf_context' in locals() and has_pdf_context:
+        pdf_instruction = (
+            "\nWICHTIG - PDF-Kontext vorhanden:"
+            "\n- Im User-Input findest du Auszüge aus einem Pflichtenheft (markiert mit '--- KONTEXT AUS PDF (PFLICHTENHEFT) ---')."
+            "\n- Nutze den PDF-Text als zusätzliche Quelle für Anforderungen und Kontext."
+            "\n- Falls keine Excel-Anforderungen vorhanden sind, extrahiere Anforderungen direkt aus dem PDF-Kontext."
+        )
+
     # Improve only instruction
     if improve_only:
         improve_instruction = (
@@ -143,7 +146,6 @@ Regeln:
         custom_prompt = f"""
 Du bist ein erfahrener Requirements Engineer.
 Erzeuge klare, testbare, präzise Software-Anforderungen im JSON-Format.
-
 Das Projekt verwendet folgende Spalten: {', '.join(columns)}
 
 Antworte ausschließlich mit gültigem JSON in folgender Struktur:
@@ -158,28 +160,11 @@ Regeln:
 - Verwende kurze, prägnante Titel.
 - Fülle ALLE angegebenen Spalten mit sinnvollen Werten.
 - Wenn Informationen fehlen, triff sinnvolle, konservative Annahmen.
-- WICHTIG: Antworte NUR und AUSSCHLIESSLICH mit dem JSON-Objekt. Kein einleitender Text, keine Erklärungen.{count_instruction}{product_context}{language_instruction}{excel_instruction}{improve_instruction}{extend_instruction}
+- WICHTIG: Antworte NUR und AUSSCHLIESSLICH mit dem JSON-Objekt. Kein einleitender Text, keine Erklärungen.{count_instruction}{product_context}{language_instruction}{excel_instruction}{pdf_instruction}{improve_instruction}{extend_instruction}
 """
         return custom_prompt
 
     # Fallback: use base prompt
-    if output_language and output_language.strip():
-        return f"{base_prompt.strip()}\n\nAntworte ausschließlich auf {output_language.strip()}."
-    return base_prompt
-    """
-    Get system prompt, optionally customized for dynamic columns.
-    
-    Args:
-        columns (list): Optional list of column names for the project
-        num_requirements (int): Optional number of requirements to generate
-        product_system (str): Optional product system name for context
-        has_excel_context (bool): Whether Excel context is provided
-        improve_only (bool): Whether to only improve existing requirements
-        extend_existing (bool): Whether to extend existing requirements (add new ones)
-    
-    Returns:
-        str: System prompt text
-    """
     if SYSTEM_PROMPT_PATH and os.path.exists(SYSTEM_PROMPT_PATH):
         with open(SYSTEM_PROMPT_PATH, 'r', encoding='utf-8') as f:
             base_prompt = f.read().strip()
@@ -187,43 +172,5 @@ Regeln:
         base_prompt = SYSTEM_PROMPT
     else:
         base_prompt = DEFAULT_SYSTEM_PROMPT
-    
-    # If columns are provided, customize the prompt
-    if columns and isinstance(columns, list):
-        # Build JSON structure based on columns
-        json_fields = []
-        for col in columns:
-            col_lower = col.lower()
-            if col_lower in ['titel', 'title']:
-                json_fields.append(f'"{col}": "Kurzer, prägnanter Titel"')
-            elif col_lower in ['beschreibung', 'description']:
-                json_fields.append(f'"{col}": "Detaillierte Beschreibung mit Akzeptanzkriterien"')
-            elif col_lower in ['kategorie', 'category']:
-                json_fields.append(f'"{col}": "Kategorie (z.B. Funktional, Nicht-Funktional, etc.)"')
-            elif col_lower in ['status']:
-                json_fields.append(f'"{col}": "Offen"')
-            elif col_lower in ['id']:
-                json_fields.append(f'"{col}": "ID der ursprünglichen Anforderung (Zwingend beibehalten)"')
-            else:
-                json_fields.append(f'"{col}": ""')
 
-        count_instruction = ""
-        if num_requirements_mode == "exact" and num_requirements_value and num_requirements_value > 0:
-            count_instruction = f"\n- Generiere EXAKT {num_requirements_value} Requirements."
-        elif num_requirements_mode == "min" and num_requirements_value and num_requirements_value > 0:
-            count_instruction = (
-                f"\n- Generiere MINDESTENS {num_requirements_value} Requirements."
-                "\n- Bestimme zuerst die Komplexität des Produkts (einfach / mittel / komplex / sehr komplex)."
-                "\n- Leite daraus eine angemessene Anzahl an Anforderungen ab."
-                "\n- Falls eine Mindestanzahl angegeben ist, darf die Anzahl nicht darunter liegen, soll aber überschritten werden, wenn es die Komplexität erfordert."
-                "\n- Setze eine harte Obergrenze: Erzeuge maximal 30 Anforderungen."
-                "\n- Wenn für ein sehr komplexes Produkt mehr nötig wären, priorisiere die wichtigsten Anforderungen und fasse ähnliche Anforderungen zusammen, statt mehr als 30 zu erzeugen."
-            )
-        elif num_requirements_mode == "max" and num_requirements_value and num_requirements_value > 0:
-            count_instruction = f"\n- Generiere MAXIMAL {num_requirements_value} Requirements."
-        if product_system and product_system.strip():
-            product_context = f"\n- Alle Anforderungen beziehen sich auf das Produktsystem: {product_system.strip()}"
-
-        language_instruction = ""
-        if output_language and output_language.strip():
-            language_instruction = f"\n- Formuliere alle Inhalte ausschließlich auf {output_language.strip()}."
+    return base_prompt

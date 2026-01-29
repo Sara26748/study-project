@@ -9,7 +9,7 @@ from openai import OpenAI
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 import config
 
-def generate_requirements(user_description: str | None, inputs: dict, columns: list = None, ai_model: str = None, num_requirements: int = None, num_requirements_mode: str | None = None, num_requirements_value: int | None = None, product_system: str = None, has_excel_context: bool = False, improve_only: bool = False, extend_existing: bool = False, output_language: str | None = None) -> list[dict]:
+def generate_requirements(user_description: str | None, inputs: dict, columns: list = None, ai_model: str = None, num_requirements: int = None, num_requirements_mode: str | None = None, num_requirements_value: int | None = None, product_system: str = None, has_excel_context: bool = False, has_pdf_context: bool = False, improve_only: bool = False, extend_existing: bool = False, output_language: str | None = None) -> list[dict]:
     """
     Calls OpenAI API to generate requirements based on user description and inputs.
 
@@ -36,9 +36,10 @@ def generate_requirements(user_description: str | None, inputs: dict, columns: l
     model = ai_model or config.OPENAI_MODEL or "gpt-4o-mini"
     system_prompt = config.get_system_prompt(
         columns,
-        num_requirements,
-        product_system,
-        has_excel_context,
+    num_requirements,
+    product_system,
+    has_excel_context,
+    has_pdf_context,
         improve_only,
         extend_existing,
         output_language,

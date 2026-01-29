@@ -1,4 +1,5 @@
 import re
+from pypdf.errors import PdfReadError
 from flask import Blueprint, render_template, request, jsonify, redirect, url_for, abort
 from flask_login import login_required, current_user
 from . import db
@@ -88,6 +89,7 @@ def generate(project_id):
     user_description = ""
     inputs_dict = {}
     excel_context = ""
+    pdf_context = ""
     product_system = ""
     ai_model = None
     num_requirements = None
@@ -96,6 +98,7 @@ def generate(project_id):
     output_language = None
     improve_only = False
     extend_existing = False
+    has_pdf = False
 
     if request.content_type and 'application/json' in request.content_type:
         try:
@@ -173,25 +176,62 @@ def generate(project_id):
                             excel_context += " | ".join(headers) + "\n"
                             count += 1
                             continue
-                            
                         if count > 50:
-                            excel_context += "... (weitere Zeilen aus Platzgründen ausgelassen)\n"
+                            excel_context += "... (weitere Zeilen aus Platzgrnden ausgelassen)\n"
                             break
-                        
                         row_vals = [str(cell) if cell is not None else "" for cell in row]
                         excel_context += " | ".join(row_vals) + "\n"
                         count += 1
-                        
                     excel_context += "--- ENDE EXCEL-KONTEXT ---\n"
                     if not improve_only:
-                        excel_context += "\nWICHTIG: Die oben aufgeführten Anforderungen aus der Excel-Datei sind BESTEHENDE Anforderungen. Du sollst:\n"
+                        excel_context += "\nWICHTIG: Die oben aufgefhrten Anforderungen aus der Excel-Datei sind BESTEHENDE Anforderungen. Du sollst:\n"
                         excel_context += "1. Diese bestehenden Anforderungen verbessern, aktualisieren und in deine Ausgabe aufnehmen\n"
-                        excel_context += "2. Zusätzlich neue Anforderungen erstellen, die der User explizit anfordert (siehe Beschreibung oben)\n"
+                        excel_context += "2. Zusätzlich neue Anforderungen erstellen, die der User explizit anfordert (siehe Beschreibung oben)\n"
                         excel_context += "3. Weitere passende Anforderungen generieren, die zum Gesamtkontext passen\n"
-                        excel_context += "Die bestehenden Anforderungen aus Excel dürfen NICHT ignoriert werden!"
+                        excel_context += "Die bestehenden Anforderungen aus Excel drfen NICHT ignoriert werden!"
                 except Exception as e:
                     print(f"Fehler beim Lesen der Excel-Datei: {e}")
                     # We continue without the excel content if it fails
+        # Handle PDF file (as supplemental context)
+        if 'pdf_file' in request.files:
+            pdf_file = request.files['pdf_file']
+            if pdf_file and pdf_file.filename != '':
+                if not pdf_file.filename.lower().endswith('.pdf'):
+                    return jsonify({'ok': False, 'error': 'Bitte lade eine gültige PDF-Datei hoch.'}), 400
+                try:
+                    from io import BytesIO
+                    from pypdf import PdfReader
+                    pdf_bytes = pdf_file.read()
+                    if not pdf_bytes:
+                        return jsonify({'ok': False, 'error': 'Die PDF-Datei ist leer oder konnte nicht gelesen werden.'}), 400
+                    reader = PdfReader(BytesIO(pdf_bytes))
+                    if reader.is_encrypted:
+                        try:
+                            reader.decrypt("")
+                        except Exception:
+                            return jsonify({'ok': False, 'error': 'Die PDF-Datei ist verschlüsselt und kann nicht gelesen werden.'}), 400
+                    extracted_pages = []
+                    for page in reader.pages:
+                        page_text = page.extract_text() or ""
+                        if page_text.strip():
+                            extracted_pages.append(page_text.strip())
+                    pdf_text = "\n\n".join(extracted_pages).strip()
+                    if not pdf_text:
+                        return jsonify({'ok': False, 'error': 'Die PDF-Datei konnte nicht gelesen werden (kein Text gefunden).'}), 400
+                    max_chars = 15000
+                    if len(pdf_text) > max_chars:
+                        pdf_text = pdf_text[:max_chars].rstrip()
+                        pdf_text += "\n... (PDF-Text aus Platzgründen gekürzt)"
+                    pdf_context = "\n\n--- KONTEXT AUS PDF (PFLICHTENHEFT) ---\n"
+                    pdf_context += pdf_text
+                    pdf_context += "\n--- ENDE PDF-KONTEXT ---\n"
+                    has_pdf = True
+                except PdfReadError as e:
+                    print(f"Fehler beim Lesen der PDF-Datei: {e}")
+                    return jsonify({'ok': False, 'error': 'Die PDF-Datei ist beschädigt oder hat ein nicht unterstütztes Format.'}), 400
+                except Exception as e:
+                    print(f"Fehler beim Lesen der PDF-Datei: {e}")
+                    return jsonify({'ok': False, 'error': 'Die PDF-Datei konnte nicht gelesen werden.'}), 400
 
     # Auto-detect custom columns from Excel headers if any were found
     if 'headers' in locals() and headers:
@@ -233,6 +273,8 @@ def generate(project_id):
     if excel_context:
         full_description += excel_context
         has_excel = True
+    if pdf_context:
+        full_description += pdf_context
 
     # Get project's custom columns
     custom_columns = project.get_custom_columns()
@@ -324,6 +366,7 @@ def generate(project_id):
             num_requirements_value=num_requirements_value,
             product_system=product_system,
             has_excel_context=has_excel,
+            has_pdf_context=has_pdf,
             improve_only=improve_only,
             extend_existing=extend_existing,
             output_language=output_language
