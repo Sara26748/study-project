@@ -15,14 +15,14 @@ Du bist ein erfahrener Requirements Engineer.
 Erzeuge klare, testbare, präzise Software-Anforderungen im JSON-Format.
 Antworte ausschließlich mit gültigem JSON in folgender Struktur:
 {
-  "requirements": [
-    {"title": "...", "description": "...", "category": "...", "status": "Offen"}
-  ]
+    "requirements": [
+        {"title": "...", "description": "...", "category": "...", "status": "Entwurf"}
+    ]
 }
 Regeln:
 - Maximiere Klarheit und Testbarkeit (Akzeptanzkriterien implizit in description).
 - Verwende kurze, prägnante Titel.
-- 'status' ist immer 'Offen'.
+- 'status' ist immer 'Entwurf'.
 - Wenn Informationen fehlen, triff sinnvolle, konservative Annahmen.
 """
 
@@ -54,7 +54,7 @@ Regeln:
             elif col_lower in ['kategorie', 'category']:
                 json_fields.append(f'"{col}": "Kategorie (z.B. Funktional, Nicht-Funktional, etc.)"')
             elif col_lower in ['status']:
-                json_fields.append(f'"{col}": "Offen"')
+                json_fields.append(f'"{col}": "Entwurf"')
             elif col_lower in ['id']:
                 json_fields.append(f'"{col}": "ID der ursprünglichen Anforderung (Zwingend beibehalten)"')
             else:
@@ -201,7 +201,7 @@ Regeln:
             elif col_lower in ['kategorie', 'category']:
                 json_fields.append(f'"{col}": "Kategorie (z.B. Funktional, Nicht-Funktional, etc.)"')
             elif col_lower in ['status']:
-                json_fields.append(f'"{col}": "Offen"')
+                json_fields.append(f'"{col}": "Entwurf"')
             elif col_lower in ['id']:
                 json_fields.append(f'"{col}": "ID der ursprünglichen Anforderung (Zwingend beibehalten)"')
             else:

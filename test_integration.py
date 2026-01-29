@@ -61,7 +61,7 @@ def test_openai_integration():
                 assert 'title' in req, "Missing title"
                 assert 'description' in req, "Missing description"
                 assert 'status' in req, "Missing status"
-                assert req['status'] == 'Offen', f"Status should be 'Offen', got '{req['status']}'"
+                assert req['status'] == 'Entwurf', f"Status should be 'Entwurf', got '{req['status']}'"
             
             print("  ✅ All requirements have correct structure")
             print()
@@ -152,7 +152,7 @@ def test_openai_integration():
         print("  ✅ Key-value pairs only: WORKS")
         print("  ✅ Combined input: WORKS")
         print("  ✅ Empty input: WORKS")
-        print("  ✅ All requirements have status='Offen'")
+        print("  ✅ All requirements have status='Entwurf'")
         print("  ✅ JSON parsing working correctly")
         print()
         
