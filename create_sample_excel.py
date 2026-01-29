@@ -21,21 +21,21 @@ data = [
         "Benutzeranmeldung", 
         "Der Benutzer muss sich mit E-Mail und Passwort anmelden können.", 
         "Funktional", 
-        "Offen", 
+        "Entwurf", 
         "Hoch"
     ],
     [
         "Temperaturregelung", 
         "Das System muss die Raumtemperatur automatisch basierend auf Zeitplänen regeln.", 
         "Funktional", 
-        "In Arbeit", 
+        "In Bearbeitung", 
         "Mittel"
     ],
     [
         "Datenverschlüsselung", 
         "Alle Benutzerdaten müssen verschlüsselt gespeichert werden (AES-256).", 
         "Sicherheit", 
-        "Offen", 
+        "Entwurf", 
         "Kritisch"
     ],
     [
