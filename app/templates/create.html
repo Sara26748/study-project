@@ -32,7 +32,23 @@ content %} {% if not project %}
         <a href="{{ url_for('main.home') }}" class="text-decoration-none text-primary small mb-1 d-inline-flex align-items-center fw-medium" style="transition: color 0.2s ease;" onmouseover="this.style.color='#0a58ca'" onmouseout="this.style.color='#0d6efd'">
             <i class="bi bi-arrow-left me-1"></i> Zurück zur Übersicht
         </a>
-        <h2 class="fw-bold m-0">Projektname: {{ project.name }}</h2>
+        <div class="d-flex align-items-center gap-2">
+          <h2 class="fw-bold m-0">Projektname: {{ project.name }}</h2>
+          <button class="btn btn-outline-info d-flex align-items-center ms-2" data-bs-toggle="modal" data-bs-target="#shareProjectModal" style="color: #0a3d62; border-color: #0dcaf0; background: #eaf6fb; transition: background 0.2s, color 0.2s;">
+            <i class="bi bi-share me-2" style="color: #0a3d62;"></i>
+            <span style="color: #0a3d62;">Projekt teilen</span>
+          </button>
+          <style>
+          .btn-outline-info[data-bs-toggle="modal"]:hover, .btn-outline-info[data-bs-toggle="modal"]:focus {
+            background: #0dcaf0 !important;
+            color: #fff !important;
+          }
+          .btn-outline-info[data-bs-toggle="modal"]:hover i,
+          .btn-outline-info[data-bs-toggle="modal"]:hover span {
+            color: #fff !important;
+          }
+          </style>
+        </div>
         {% if project.shared_with %}
         <div class="mt-2">
             {% for user in project.shared_with %}
@@ -51,25 +67,23 @@ content %} {% if not project %}
     
     <div class="d-flex gap-2">
         <!-- Tools directly accessible -->
-        <a href="{{ url_for('main.kanban_view', project_id=project.id) }}" class="btn btn-white border shadow-sm text-secondary" title="Kanban Board">
+        <!--a href="{{ url_for('main.kanban_view', project_id=project.id) }}" class="btn btn-white border shadow-sm text-secondary" title="Kanban Board">
             <i class="bi bi-kanban"></i> 
         </a>
         <button class="btn btn-white border shadow-sm text-warning" id="check-conflicts-btn" title="Widersprüche prüfen">
             <i class="bi bi-exclamation-triangle"></i>
         </button>
-        <button class="btn btn-white border shadow-sm text-info" data-bs-toggle="modal" data-bs-target="#shareProjectModal" title="Projekt teilen">
-            <i class="bi bi-share"></i>
+         Projekt teilen Button wurde nach oben verschoben -->
+
+        <!-- Button: Neue Anforderung hinzufügen (scrollt nach unten) -->
+        <button id="scrollToManualBtn" class="btn d-flex align-items-center shadow-sm px-4 fw-bold text-white border-0" type="button" style="background: linear-gradient(90deg, #6c757d 0%, #adb5bd 100%); border-radius: 2rem; letter-spacing: 0.5px; font-size: 1rem; transition: transform 0.15s;">
+          <span class="me-2 d-flex align-items-center">
+            <i class="bi bi-plus-circle-fill" style="font-size: 1.3rem; animation: pulseAdd 1.2s infinite alternate;"></i>
+          </span>
+          Neue Anforderung hinzufügen
         </button>
 
-        <!-- Button: Manuelle Anforderung erstellen -->
-        <button class="btn btn-success d-flex align-items-center shadow-sm px-4" data-bs-toggle="modal" data-bs-target="#manualRequirementModal">
-            <i class="bi bi-plus-circle me-2"></i> Manuelle Anforderung
-        </button>
-
-        <!-- Main CTA -->
-        <a href="{{ url_for('agent.agent_page', project_id=project.id) }}" class="btn btn-primary d-flex align-items-center shadow-sm px-4">
-            <i class="bi bi-stars me-2"></i> KI-Agent
-        </a>
+        
         
         <!-- Data Menu Removed - moved to toolbar -->
     </div>
@@ -310,10 +324,39 @@ document.addEventListener('DOMContentLoaded', function() {
 </div>
 
 <!-- Main Requirements Table -->
-<div class="card shadow-sm border-0">
-  <div class="card-header bg-white py-3 border-0">
-    <h5 class="mb-0 fw-bold text-secondary">Anforderungsliste</h5>
-  </div>
+<div class="card-header bg-white py-3 border-0 d-flex align-items-center justify-content-between">
+    <div class="d-flex align-items-center gap-2">
+      <h5 class="mb-0 fw-bold text-secondary">Anforderungsliste</h5>
+      <a href="{{ url_for('main.kanban_view', project_id=project.id) }}" class="btn d-flex align-items-center ms-2 gap-2" title="Kanban Board" style="border: 1.5px solid #dee2e6; background: #f8f9fa; color: #6c757d; transition: background 0.2s, color 0.2s;">
+        <i class="bi bi-kanban" style="color: #6c757d;"></i>
+        <span style="color: #6c757d;">Kanban Board</span>
+      </a>
+      <button class="btn d-flex align-items-center ms-2 gap-2" id="check-conflicts-btn" title="Widersprüche prüfen" style="border: 1.5px solid #ffe066; background: #fffbe6; color: #ffc107; transition: background 0.2s, color 0.2s;">
+        <i class="bi bi-exclamation-triangle" style="color: #ffc107;"></i>
+        <span style="color: #ffc107;">Widersprüche prüfen</span>
+      </button>
+      <style>
+      #check-conflicts-btn:hover {
+        background: #ffc107 !important;
+        color: #fff !important;
+        border-color: #ffc107 !important;
+      }
+      #check-conflicts-btn:hover i,
+      #check-conflicts-btn:hover span {
+        color: #fff !important;
+      }
+      a[title="Kanban Board"]:hover {
+        background: #6c757d !important;
+        color: #fff !important;
+        border-color: #6c757d !important;
+      }
+      a[title="Kanban Board"]:hover i,
+      a[title="Kanban Board"]:hover span {
+        color: #fff !important;
+      }
+      </style>
+    </div>
+</div>
   <div class="card-body p-0">
     <!-- Entfernt table-responsive, damit die Tabelle die volle Höhe einnimmt und die Seite scrollbar bleibt -->
       <table class="table table-hover align-middle mb-0">
@@ -433,14 +476,58 @@ document.addEventListener('DOMContentLoaded', function() {
                             <i class="bi bi-three-dots-vertical"></i>
                         </button>
                         <ul class="dropdown-menu dropdown-menu-end shadow border-0">
-                            <li>
-                                <button class="dropdown-item edit-requirement-btn" 
+                            <li class="px-3 pt-3 pb-1">
+                                <button class="btn btn-outline-primary status-btn-vertical action-btn w-100 edit-requirement-btn" 
                                     type="button"
                                     data-req-id="{{ req.id }}" 
                                     data-version-id="{{ versions[-1].id }}"
+                                    style="margin-bottom:0.25rem;"
                                     {% if versions[-1].is_blocked %}disabled{% endif %}>
                                     <i class="bi bi-pencil me-2"></i> Bearbeiten
                                 </button>
+                                <form method="POST" action="{{ url_for('main.update_status', version_id=versions[-1].id) }}">
+                                  <button type="submit" class="btn btn-outline-danger status-btn-vertical action-btn w-100" style="margin-bottom:0.25rem;">
+                                    <i class="bi bi-circle me-2"></i> Entwurf
+                                  </button>
+                                  <input type="hidden" name="status" value="Entwurf">
+                                </form>
+                                <form method="POST" action="{{ url_for('main.update_status', version_id=versions[-1].id) }}">
+                                  <button type="submit" class="btn btn-outline-warning status-btn-vertical action-btn w-100" style="margin-bottom:0.25rem;">
+                                    <i class="bi bi-hourglass-split me-2"></i> In Bearbeitung
+                                  </button>
+                                  <input type="hidden" name="status" value="In Bearbeitung">
+                                </form>
+                                <form method="POST" action="{{ url_for('main.update_status', version_id=versions[-1].id) }}">
+                                  <button type="submit" class="btn btn-outline-success status-btn-vertical action-btn w-100" style="margin-bottom:0.25rem;">
+                                    <i class="bi bi-check2-circle me-2"></i> Freigabe
+                                  </button>
+                                  <input type="hidden" name="status" value="Freigabe">
+                                </form>
+                                <form method="POST" action="{{ url_for('main.update_status', version_id=versions[-1].id) }}">
+                                  <button type="submit" class="btn btn-outline-dark status-btn-vertical action-btn w-100 verworfen-btn" style="margin-bottom:0.25rem; background: #fff; color: #23272b; border: 1.5px solid #23272b;">
+                                    <i class="bi bi-x-circle me-2"></i> Verworfen
+                                  </button>
+                                  <input type="hidden" name="status" value="Verworfen">
+                                </form>
+                                <form method="POST" action="{{ url_for('main.delete_requirement_version', version_id=versions[-1].id) }}" class="delete-version-form">
+                                  <button type="submit" class="btn btn-outline-danger status-btn-vertical action-btn w-100" style="margin-bottom:0.25rem;" onclick="return confirm('Wirklich löschen?')">
+                                    <i class="bi bi-trash me-2"></i> Löschen
+                                  </button>
+                                </form>
+                                <style>
+                                .verworfen-btn {
+                                  background: #fff !important;
+                                  color: #23272b !important;
+                                  border-color: #23272b !important;
+                                  transition: background 0.2s, color 0.2s;
+                                }
+                                .verworfen-btn:hover, .verworfen-btn:focus {
+                                  background: #343a40 !important;
+                                  color: #fff !important;
+                                  border-color: #23272b !important;
+                                }
+                                </style>
+                            </li>
                             </li>
                             <li>
                                  <button class="dropdown-item generate-test-btn" data-version-id="{{ versions[-1].id }}">
@@ -458,16 +545,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                </form>
                             </li>
                             
-                            <li><hr class="dropdown-divider"></li>
-                            
-                            <!-- Delete -->
-                            <li>
-                                <form method="POST" action="{{ url_for('main.delete_requirement_version', version_id=versions[-1].id) }}" class="delete-version-form">
-                                    <button type="submit" class="dropdown-item text-danger" onclick="return confirm('Wirklich löschen?')">
-                                        <i class="bi bi-trash me-2"></i> Löschen
-                                    </button>
-                                </form>
-                            </li>
+                            <!-- Delete removed from here, now under Verworfen in status menu -->
                         </ul>
                     </div>
                 </div>
@@ -505,6 +583,42 @@ document.addEventListener('DOMContentLoaded', function() {
           {% endif %}
         </tbody>
       </table>
+
+      <!-- Bereich unter der Tabelle mit zwei Buttons -->
+      <div class="d-flex flex-column flex-md-row gap-3 justify-content-center align-items-center my-5" id="bottom-action-buttons">
+        <button class="btn btn-lg px-5 py-3 fw-bold text-white shadow-lg border-0 d-flex align-items-center justify-content-center" type="button" id="generate-syslm-btn" style="background: linear-gradient(90deg, #4f8cff 0%, #38c6ff 100%); border-radius: 2rem; letter-spacing: 0.5px; font-size: 1.25rem; transition: transform 0.15s;">
+          <span class="me-2 d-flex align-items-center">
+            <i class="bi bi-lightning-charge-fill" style="font-size: 1.7rem; animation: pulse 1.2s infinite alternate;"></i>
+          </span>
+          Generiere SysLM v2 code
+        </button>
+        <style>
+        @keyframes pulse {
+          0% { color: #fff700; filter: drop-shadow(0 0 6px #fff700); }
+          100% { color: #ffffff; filter: drop-shadow(0 0 16px #38c6ff); }
+        }
+        #generate-syslm-btn:hover {
+          transform: scale(1.04) translateY(-2px);
+          box-shadow: 0 8px 32px 0 rgba(80,180,255,0.25);
+        }
+        </style>
+        <button class="btn btn-lg px-5 py-3 fw-bold text-white shadow-lg border-0 d-flex align-items-center justify-content-center" type="button" id="manual-add-btn" data-bs-toggle="modal" data-bs-target="#manualRequirementModal" style="background: linear-gradient(90deg, #6c757d 0%, #adb5bd 100%); border-radius: 2rem; letter-spacing: 0.5px; font-size: 1.25rem; transition: transform 0.15s;">
+          <span class="me-2 d-flex align-items-center">
+            <i class="bi bi-plus-circle-fill" style="font-size: 1.7rem; animation: pulseAdd 1.2s infinite alternate;"></i>
+          </span>
+          Neue Anforderung hinzufügen
+        </button>
+        <style>
+        @keyframes pulseAdd {
+          0% { color: #dee2e6; filter: drop-shadow(0 0 6px #dee2e6); }
+          100% { color: #ffffff; filter: drop-shadow(0 0 16px #adb5bd); }
+        }
+        #manual-add-btn:hover {
+          transform: scale(1.04) translateY(-2px);
+          box-shadow: 0 8px 32px 0 rgba(108,117,125,0.18);
+        }
+        </style>
+      </div>
     <!-- ...existing code... -->
   </div>
 </div>
@@ -724,7 +838,7 @@ document.addEventListener('DOMContentLoaded', function() {
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title">Manuelle Anforderung erstellen</h5>
+        <h5 class="modal-title">Neue Anforderung hinzufügen</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
       <form id="manualRequirementForm" method="POST" action="{{ url_for('main.create_manual_requirement', project_id=project.id) }}">
@@ -772,6 +886,18 @@ document.addEventListener('DOMContentLoaded', function() {
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Abbrechen</button>
           <button type="submit" class="btn btn-success">Erstellen</button>
+        <script>
+        // Scroll-Button oben: Scrollt zum Bereich unter der Tabelle
+        document.addEventListener('DOMContentLoaded', function() {
+          var scrollBtn = document.getElementById('scrollToManualBtn');
+          var bottomBtns = document.getElementById('bottom-action-buttons');
+          if(scrollBtn && bottomBtns) {
+            scrollBtn.addEventListener('click', function() {
+              bottomBtns.scrollIntoView({behavior: 'smooth'});
+            });
+          }
+        });
+        </script>
         </div>
       </form>
     </div>
