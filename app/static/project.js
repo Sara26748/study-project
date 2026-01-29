@@ -35,7 +35,7 @@ function attachEventListeners() {
             "Edit button clicked - reqId:",
             reqId,
             "versionId:",
-            versionId
+            versionId,
           );
           if (reqId && versionId && typeof openEditModal === "function") {
             openEditModal(reqId, versionId);
@@ -257,7 +257,7 @@ function initializeFilters() {
   // Create dynamic column filters - show ALL custom columns, even if empty
   const customColumns = window.PROJECT_CUSTOM_COLUMNS || [];
   const dynamicFiltersContainer = document.getElementById(
-    "dynamicFiltersContainer"
+    "dynamicFiltersContainer",
   );
 
   if (dynamicFiltersContainer) {
@@ -362,7 +362,7 @@ function applyFilters() {
     if (visible && Object.keys(dynamicFilters).length > 0) {
       for (const [column, value] of Object.entries(dynamicFilters)) {
         const cell = row.querySelector(
-          `.custom-data-cell[data-column="${column}"]`
+          `.custom-data-cell[data-column="${column}"]`,
         );
         if (cell) {
           const cellValue = cell.textContent.trim();
@@ -418,7 +418,7 @@ function openEditModal(reqId, versionId) {
     const status = selectedVersion.getAttribute("data-status");
     const editStatus = document.getElementById("editStatus");
     if (editStatus) {
-      editStatus.value = status || "Offen";
+      editStatus.value = status || "Entwurf";
     }
 
     // Set quantifiable checkbox
@@ -474,7 +474,7 @@ function openEditModal(reqId, versionId) {
     });
 
     const modal = new bootstrap.Modal(
-      document.getElementById("editRequirementModal")
+      document.getElementById("editRequirementModal"),
     );
     modal.show();
   }
@@ -541,14 +541,14 @@ function pollRequirementsStatus() {
         // The Edit button has data-version-id
 
         const editBtn = row.querySelector(
-          `.edit-requirement-btn[data-version-id="${item.version_id}"]`
+          `.edit-requirement-btn[data-version-id="${item.version_id}"]`,
         );
         const deleteBtn = row.querySelector(`.delete-version-form button`);
         const blockBtn = row.querySelector(
-          `form[action*="/toggle_block"] button`
+          `form[action*="/toggle_block"] button`,
         ); // Approximation
         const toggleForm = row.querySelector(
-          `form[action*="/requirement_version/${item.version_id}/toggle_block"]`
+          `form[action*="/requirement_version/${item.version_id}/toggle_block"]`,
         );
 
         if (editBtn) {

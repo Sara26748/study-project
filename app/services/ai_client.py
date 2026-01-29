@@ -90,7 +90,7 @@ def generate_requirements(user_description: str | None, inputs: dict, columns: l
             elif col_lower in ['kategorie', 'category']:
                 json_fields.append(f'      "{col}": "Kategorie (z.B. Funktional, Nicht-Funktional, etc.)"')
             elif col_lower in ['status']:
-                json_fields.append(f'      "{col}": "Offen"')
+                json_fields.append(f'      "{col}": "Entwurf"')
             else:
                 json_fields.append(f'      "{col}": "Passender Wert für {col}"')
         
@@ -122,7 +122,7 @@ Das JSON-Format muss exakt dieser Struktur folgen:
       "title": "Kurzer, prägnanter Titel",
       "description": "Detaillierte Beschreibung mit Akzeptanzkriterien",
       "category": "Kategorie (z.B. Funktional, Nicht-Funktional, etc.)",
-      "status": "Offen",
+    "status": "Entwurf",
       "is_quantifiable": true oder false
     }
   ]
@@ -287,11 +287,11 @@ def _validate_and_normalize_requirements(requirements: list, columns: list = Non
             
             # Set defaults for optional fields
             category = req.get("category", "").strip()
-            status = req.get("status", "Offen").strip()
+            status = req.get("status", "Entwurf").strip()
             
-            # Ensure status is "Offen" as per requirements
-            if status != "Offen":
-                status = "Offen"
+            # Ensure status is "Entwurf" als Standard
+            if status != "Entwurf":
+                status = "Entwurf"
             
             normalized.append({
                 "title": title,

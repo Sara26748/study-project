@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="de">
   <head>
     <meta charset="UTF-8" />
@@ -40,11 +40,20 @@
   </head>
   <body>
     <!-- Modern Light Header -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom shadow-sm fixed-top" style="height: 64px;">
+    <nav
+      class="navbar navbar-expand-lg navbar-light bg-white border-bottom shadow-sm fixed-top"
+      style="height: 64px"
+    >
       <div class="container-fluid px-3">
         <!-- Logo + App Name (Left) -->
-        <a class="navbar-brand d-flex align-items-center text-decoration-none me-4" href="{{ url_for('main.home') if current_user.is_authenticated else url_for('auth.login') }}">
-          <div class="d-flex align-items-center justify-content-center rounded bg-primary text-white me-2" style="width: 36px; height: 36px;">
+        <a
+          class="navbar-brand d-flex align-items-center text-decoration-none me-4"
+          href="{{ url_for('main.home') if current_user.is_authenticated else url_for('auth.login') }}"
+        >
+          <div
+            class="d-flex align-items-center justify-content-center rounded bg-primary text-white me-2"
+            style="width: 36px; height: 36px"
+          >
             <i class="bi bi-clipboard-check fs-5"></i>
           </div>
           <span class="fw-bold text-dark">Requirements Tool</span>
@@ -61,35 +70,70 @@
               id="notificationDropdown"
               data-bs-toggle="dropdown"
               aria-expanded="false"
-              style="background: none; color: #495057; transition: all 0.2s ease;"
-              onmouseover="this.style.backgroundColor='#f8f9fa'; this.style.color='#0d6efd'"
-              onmouseout="this.style.backgroundColor='transparent'; this.style.color='#495057'"
-              onfocus="this.style.outline='2px solid #0d6efd'; this.style.outlineOffset='2px'; this.style.borderRadius='50%'"
-              onblur="this.style.outline='none'"
+              style="
+                background: none;
+                color: #495057;
+                transition: all 0.2s ease;
+              "
+              onmouseover="
+                this.style.backgroundColor = '#f8f9fa';
+                this.style.color = '#0d6efd';
+              "
+              onmouseout="
+                this.style.backgroundColor = 'transparent';
+                this.style.color = '#495057';
+              "
+              onfocus="
+                this.style.outline = '2px solid #0d6efd';
+                this.style.outlineOffset = '2px';
+                this.style.borderRadius = '50%';
+              "
+              onblur="this.style.outline = 'none'"
             >
               <i class="bi bi-bell fs-5"></i>
-              <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" id="notificationBadge" style="display: none; font-size: 0.65rem;">
+              <span
+                class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+                id="notificationBadge"
+                style="display: none; font-size: 0.65rem"
+              >
                 0
               </span>
             </button>
-            <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0" style="min-width: 360px; max-height: 500px; overflow-y: auto;" aria-labelledby="notificationDropdown" id="notificationDropdownMenu">
+            <ul
+              class="dropdown-menu dropdown-menu-end shadow-lg border-0"
+              style="min-width: 360px; max-height: 500px; overflow-y: auto"
+              aria-labelledby="notificationDropdown"
+              id="notificationDropdownMenu"
+            >
               <li>
-                <h6 class="dropdown-header d-flex justify-content-between align-items-center">
+                <h6
+                  class="dropdown-header d-flex justify-content-between align-items-center"
+                >
                   <span>Benachrichtigungen</span>
-                  <button class="btn btn-link text-decoration-none p-0 small" id="markAllReadBtn" style="color: #0d6efd;">
+                  <button
+                    class="btn btn-link text-decoration-none p-0 small"
+                    id="markAllReadBtn"
+                    style="color: #0d6efd"
+                  >
                     Alle als gelesen markieren
                   </button>
                 </h6>
               </li>
-              <li><hr class="dropdown-divider my-1"></li>
+              <li><hr class="dropdown-divider my-1" /></li>
               <li>
                 <div id="notificationsList" class="px-2">
-                  <div class="text-center text-muted py-4 small">Lade Benachrichtigungen...</div>
+                  <div class="text-center text-muted py-4 small">
+                    Lade Benachrichtigungen...
+                  </div>
                 </div>
               </li>
-              <li><hr class="dropdown-divider my-1"></li>
+              <li><hr class="dropdown-divider my-1" /></li>
               <li>
-                <a class="dropdown-item text-center small text-primary" href="#" id="viewAllNotifications">
+                <a
+                  class="dropdown-item text-center small text-primary"
+                  href="#"
+                  id="viewAllNotifications"
+                >
                   Alle anzeigen
                 </a>
               </li>
@@ -104,58 +148,100 @@
               id="userDropdown"
               data-bs-toggle="dropdown"
               aria-expanded="false"
-              style="background: none; transition: transform 0.2s ease;"
-              onmouseover="this.style.transform='scale(1.05)'"
-              onmouseout="this.style.transform='scale(1)'"
-              onfocus="this.style.outline='2px solid #0d6efd'; this.style.outlineOffset='2px'; this.style.borderRadius='50%'"
-              onblur="this.style.outline='none'"
+              style="background: none; transition: transform 0.2s ease"
+              onmouseover="this.style.transform = 'scale(1.05)'"
+              onmouseout="this.style.transform = 'scale(1)'"
+              onfocus="
+                this.style.outline = '2px solid #0d6efd';
+                this.style.outlineOffset = '2px';
+                this.style.borderRadius = '50%';
+              "
+              onblur="this.style.outline = 'none'"
             >
-              <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; font-size: 1rem; font-weight: 600; cursor: pointer;">
+              <div
+                class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center"
+                style="
+                  width: 40px;
+                  height: 40px;
+                  font-size: 1rem;
+                  font-weight: 600;
+                  cursor: pointer;
+                "
+              >
                 {{ current_user.email[0].upper() }}
               </div>
             </button>
-            <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0" style="min-width: 240px; margin-top: 8px;" aria-labelledby="userDropdown">
+            <ul
+              class="dropdown-menu dropdown-menu-end shadow-sm border-0"
+              style="min-width: 240px; margin-top: 8px"
+              aria-labelledby="userDropdown"
+            >
               <!-- User Info Header -->
               <li>
                 <div class="px-3 py-2 border-bottom">
                   <div class="d-flex align-items-center mb-1">
-                    <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center me-2" style="width: 36px; height: 36px; font-size: 0.9rem; font-weight: 600;">
+                    <div
+                      class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center me-2"
+                      style="
+                        width: 36px;
+                        height: 36px;
+                        font-size: 0.9rem;
+                        font-weight: 600;
+                      "
+                    >
                       {{ current_user.email[0].upper() }}
                     </div>
                     <div class="flex-grow-1">
-                      <div class="fw-medium text-dark">{{ current_user.email.split('@')[0] }}</div>
-                      <div class="small text-muted">{{ current_user.email }}</div>
+                      <div class="fw-medium text-dark">
+                        {{ current_user.email.split('@')[0] }}
+                      </div>
+                      <div class="small text-muted">
+                        {{ current_user.email }}
+                      </div>
                     </div>
                   </div>
                 </div>
               </li>
-              
+
               <!-- Navigation Items -->
-              <li><hr class="dropdown-divider my-1"></li>
-              
+              <li><hr class="dropdown-divider my-1" /></li>
+
               <li>
-                <a class="dropdown-item d-flex align-items-center {% if request.endpoint == 'main.home' %}active bg-primary bg-opacity-10 text-primary{% endif %}" href="{{ url_for('main.home') }}">
+                <a
+                  class="dropdown-item d-flex align-items-center {% if request.endpoint == 'main.home' %}active bg-primary bg-opacity-10 text-primary{% endif %}"
+                  href="{{ url_for('main.home') }}"
+                >
                   <i class="bi bi-house-door me-2"></i>Startseite
                 </a>
               </li>
-              
+
               <li>
-                <a class="dropdown-item d-flex align-items-center {% if request.endpoint == 'main.create' %}active bg-primary bg-opacity-10 text-primary{% endif %}" href="{{ url_for('main.create') }}">
+                <a
+                  class="dropdown-item d-flex align-items-center {% if request.endpoint == 'main.create' %}active bg-primary bg-opacity-10 text-primary{% endif %}"
+                  href="{{ url_for('main.create') }}"
+                >
                   <i class="bi bi-folder-plus me-2"></i>Projekt erstellen
                 </a>
               </li>
-              
+
               <li>
-                <a class="dropdown-item d-flex align-items-center" href="{{ url_for('main.deleted_requirements_overview') }}">
-                  <i class="bi bi-trash me-2 text-muted"></i>Gelöschte Anforderungen
+                <a
+                  class="dropdown-item d-flex align-items-center"
+                  href="{{ url_for('main.deleted_requirements_overview') }}"
+                >
+                  <i class="bi bi-trash me-2 text-muted"></i>Gelöschte
+                  Anforderungen
                 </a>
               </li>
-              
-              <li><hr class="dropdown-divider my-1"></li>
-              
+
+              <li><hr class="dropdown-divider my-1" /></li>
+
               <!-- Logout -->
               <li>
-                <a class="dropdown-item d-flex align-items-center text-danger" href="{{ url_for('auth.logout') }}">
+                <a
+                  class="dropdown-item d-flex align-items-center text-danger"
+                  href="{{ url_for('auth.logout') }}"
+                >
                   <i class="bi bi-box-arrow-right me-2"></i>Abmelden
                 </a>
               </li>
@@ -164,10 +250,18 @@
           {% else %}
           <!-- Not Authenticated: Login/Register Links -->
           <div class="d-flex align-items-center gap-2">
-            <a class="btn btn-link text-decoration-none text-dark" href="{{ url_for('auth.login') }}" style="padding: 0.375rem 0.75rem;">
+            <a
+              class="btn btn-link text-decoration-none text-dark"
+              href="{{ url_for('auth.login') }}"
+              style="padding: 0.375rem 0.75rem"
+            >
               Anmelden
             </a>
-            <a class="btn btn-primary" href="{{ url_for('auth.register') }}" style="padding: 0.375rem 0.75rem;">
+            <a
+              class="btn btn-primary"
+              href="{{ url_for('auth.register') }}"
+              style="padding: 0.375rem 0.75rem"
+            >
               Registrieren
             </a>
           </div>
@@ -176,7 +270,69 @@
       </div>
     </nav>
 
-    <main class="container mt-5" style="padding-top: 88px !important;">
+    <!-- Language Dropdown (below navbar, above dashboard) -->
+    <div class="container-fluid" style="margin-top: 64px">
+      <div class="row">
+        <div class="col-12 col-md-6 col-lg-4 mt-2 mb-1">
+          <div class="dropdown">
+            <button
+              class="btn dropdown-toggle d-flex align-items-center fw-bold text-white shadow border-0"
+              type="button"
+              id="languageDropdown"
+              data-bs-toggle="dropdown"
+              aria-expanded="false"
+              style="
+                font-size: 1.1rem;
+                background: linear-gradient(90deg, #4f8cff 0%, #38c6ff 100%);
+                border-radius: 2rem;
+                letter-spacing: 0.5px;
+                transition:
+                  background 0.2s,
+                  color 0.2s,
+                  transform 0.15s;
+                padding: 0.5rem 1.5rem;
+                box-shadow: 0 4px 16px 0 rgba(80, 180, 255, 0.1);
+              "
+            >
+              <span class="me-2 d-flex align-items-center">
+                <i class="bi bi-translate" style="font-size: 1.3rem"></i>
+              </span>
+              Sprache
+            </button>
+            <ul class="dropdown-menu" aria-labelledby="languageDropdown">
+              <li><a class="dropdown-item" href="#">Deutsch</a></li>
+              <li><a class="dropdown-item" href="#">English</a></li>
+              <li><a class="dropdown-item" href="#">Français</a></li>
+              <li><a class="dropdown-item" href="#">Español</a></li>
+            </ul>
+            <style>
+              #languageDropdown:hover,
+              #languageDropdown:focus {
+                background: #38c6ff !important;
+                color: #fff !important;
+                transform: scale(1.04) translateY(-2px);
+                box-shadow: 0 8px 32px 0 rgba(80, 180, 255, 0.18);
+              }
+              #languageDropdown .bi-translate {
+                animation: pulseLang 1.2s infinite alternate;
+              }
+              @keyframes pulseLang {
+                0% {
+                  color: #fff700;
+                  filter: drop-shadow(0 0 6px #fff700);
+                }
+                100% {
+                  color: #ffffff;
+                  filter: drop-shadow(0 0 16px #38c6ff);
+                }
+              }
+            </style>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <main class="container mt-5" style="padding-top: 24px !important">
       <!-- Flash Messages -->
       {% with messages = get_flashed_messages(with_categories=true) %} {% if
       messages %}
@@ -257,7 +413,7 @@
         message,
         callback,
         buttonText = "Bestätigen",
-        buttonClass = "btn-danger"
+        buttonClass = "btn-danger",
       ) {
         document.getElementById("confirmModalBody").textContent = message;
         const confirmButton = document.getElementById("confirmModalButton");
@@ -266,7 +422,7 @@
         confirmCallback = callback;
 
         const modal = new bootstrap.Modal(
-          document.getElementById("confirmModal")
+          document.getElementById("confirmModal"),
         );
         modal.show();
       }
@@ -279,7 +435,7 @@
             confirmCallback = null;
           }
           bootstrap.Modal.getInstance(
-            document.getElementById("confirmModal")
+            document.getElementById("confirmModal"),
           ).hide();
         });
 
@@ -301,104 +457,118 @@
 
       // Notification functions
       function loadNotifications() {
-        fetch('/notifications/unread_count')
-          .then(response => response.json())
-          .then(data => {
-            const badge = document.getElementById('notificationBadge');
+        fetch("/notifications/unread_count")
+          .then((response) => response.json())
+          .then((data) => {
+            const badge = document.getElementById("notificationBadge");
             if (data.unread_count > 0) {
-              badge.textContent = data.unread_count > 99 ? '99+' : data.unread_count;
-              badge.style.display = 'block';
+              badge.textContent =
+                data.unread_count > 99 ? "99+" : data.unread_count;
+              badge.style.display = "block";
             } else {
-              badge.style.display = 'none';
+              badge.style.display = "none";
             }
           })
-          .catch(error => console.error('Error loading notification count:', error));
+          .catch((error) =>
+            console.error("Error loading notification count:", error),
+          );
 
-        fetch('/notifications?per_page=10')
-          .then(response => response.json())
-          .then(data => {
-            const list = document.getElementById('notificationsList');
+        fetch("/notifications?per_page=10")
+          .then((response) => response.json())
+          .then((data) => {
+            const list = document.getElementById("notificationsList");
             if (data.notifications.length === 0) {
-              list.innerHTML = '<div class="text-center text-muted py-4 small">Keine Benachrichtigungen</div>';
+              list.innerHTML =
+                '<div class="text-center text-muted py-4 small">Keine Benachrichtigungen</div>';
             } else {
-              list.innerHTML = data.notifications.map(notif => {
-                const timeAgo = getTimeAgo(notif.created_at);
-                const readClass = notif.is_read ? '' : 'bg-light';
-                const icon = getNotificationIcon(notif.type);
-                const metadata = notif.metadata || {};
-                return `
-                  <div class="dropdown-item-text px-3 py-2 ${readClass}" style="cursor: pointer; border-left: ${notif.is_read ? 'none' : '3px solid #0d6efd'};" onclick="handleNotificationClick(${notif.id}, '${notif.related_type}', ${notif.related_id || 'null'}, ${metadata.requirement_version_id || 'null'}, ${metadata.project_id || 'null'})">
+              list.innerHTML = data.notifications
+                .map((notif) => {
+                  const timeAgo = getTimeAgo(notif.created_at);
+                  const readClass = notif.is_read ? "" : "bg-light";
+                  const icon = getNotificationIcon(notif.type);
+                  const metadata = notif.metadata || {};
+                  return `
+                  <div class="dropdown-item-text px-3 py-2 ${readClass}" style="cursor: pointer; border-left: ${notif.is_read ? "none" : "3px solid #0d6efd"};" onclick="handleNotificationClick(${notif.id}, '${notif.related_type}', ${notif.related_id || "null"}, ${metadata.requirement_version_id || "null"}, ${metadata.project_id || "null"})">
                     <div class="d-flex align-items-start">
                       <i class="${icon} me-2 mt-1" style="color: #0d6efd;"></i>
                       <div class="flex-grow-1">
                         <div class="fw-semibold small">${escapeHtml(notif.title)}</div>
-                        ${notif.message ? `<div class="text-muted small mt-1">${escapeHtml(notif.message)}</div>` : ''}
+                        ${notif.message ? `<div class="text-muted small mt-1">${escapeHtml(notif.message)}</div>` : ""}
                         <div class="text-muted" style="font-size: 0.75rem;">${timeAgo}</div>
                       </div>
                     </div>
                   </div>
                 `;
-              }).join('');
+                })
+                .join("");
             }
           })
-          .catch(error => console.error('Error loading notifications:', error));
+          .catch((error) =>
+            console.error("Error loading notifications:", error),
+          );
       }
 
       function getNotificationIcon(type) {
         const icons = {
-          'comment': 'bi-chat-left-text',
-          'mention': 'bi-at',
-          'requirement_created': 'bi-plus-circle',
-          'requirement_updated': 'bi-pencil-square'
+          comment: "bi-chat-left-text",
+          mention: "bi-at",
+          requirement_created: "bi-plus-circle",
+          requirement_updated: "bi-pencil-square",
         };
-        return icons[type] || 'bi-bell';
+        return icons[type] || "bi-bell";
       }
 
       function getTimeAgo(dateString) {
         // Parse ISO date string properly
-        if (!dateString) return 'gerade eben';
-        
+        if (!dateString) return "gerade eben";
+
         const date = new Date(dateString);
         const now = new Date();
-        
+
         // Check if date is valid
         if (isNaN(date.getTime())) {
-          return 'gerade eben';
+          return "gerade eben";
         }
-        
+
         const seconds = Math.floor((now - date) / 1000);
-        
+
         // Handle timezone issues - if date is in the future (due to timezone), show "gerade eben"
         // Also show "gerade eben" for anything less than 10 seconds
-        if (seconds < 0 || seconds < 10) return 'gerade eben';
-        if (seconds < 60) return 'gerade eben';
+        if (seconds < 0 || seconds < 10) return "gerade eben";
+        if (seconds < 60) return "gerade eben";
         const minutes = Math.floor(seconds / 60);
         if (minutes < 60) return `vor ${minutes} Min.`;
         const hours = Math.floor(minutes / 60);
         if (hours < 24) return `vor ${hours} Std.`;
         const days = Math.floor(hours / 24);
-        if (days < 7) return `vor ${days} Tag${days > 1 ? 'en' : ''}`;
-        return date.toLocaleDateString('de-DE');
+        if (days < 7) return `vor ${days} Tag${days > 1 ? "en" : ""}`;
+        return date.toLocaleDateString("de-DE");
       }
 
       function escapeHtml(text) {
-        const div = document.createElement('div');
+        const div = document.createElement("div");
         div.textContent = text;
         return div.innerHTML;
       }
 
-      function handleNotificationClick(notifId, relatedType, relatedId, requirementVersionId, projectId) {
+      function handleNotificationClick(
+        notifId,
+        relatedType,
+        relatedId,
+        requirementVersionId,
+        projectId,
+      ) {
         // Mark as read first
-        fetch(`/notification/${notifId}/read`, { method: 'POST' })
+        fetch(`/notification/${notifId}/read`, { method: "POST" })
           .then(() => {
             loadNotifications();
-            
+
             // Navigate to related item
-            if (relatedType === 'requirement_version' && relatedId) {
+            if (relatedType === "requirement_version" && relatedId) {
               // relatedId is the version_id, we need to get the requirement_id
               fetch(`/requirement_version/${relatedId}/info`)
-                .then(response => response.json())
-                .then(data => {
+                .then((response) => response.json())
+                .then((data) => {
                   if (data.requirement_id) {
                     window.location.href = `/requirement/${data.requirement_id}/history`;
                   } else if (data.project_id) {
@@ -411,11 +581,11 @@
                     window.location.href = `/project/${projectId}`;
                   }
                 });
-            } else if (relatedType === 'comment' && requirementVersionId) {
+            } else if (relatedType === "comment" && requirementVersionId) {
               // For comments, we have requirement_version_id in metadata
               fetch(`/requirement_version/${requirementVersionId}/info`)
-                .then(response => response.json())
-                .then(data => {
+                .then((response) => response.json())
+                .then((data) => {
                   if (data.requirement_id) {
                     window.location.href = `/requirement/${data.requirement_id}/history#comments`;
                   } else if (data.project_id) {
@@ -432,26 +602,35 @@
               window.location.href = `/project/${projectId}`;
             }
           })
-          .catch(error => console.error('Error marking notification as read:', error));
+          .catch((error) =>
+            console.error("Error marking notification as read:", error),
+          );
       }
 
       // Mark all as read
-      document.getElementById('markAllReadBtn')?.addEventListener('click', function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        fetch('/notifications/mark_all_read', { method: 'POST' })
-          .then(() => loadNotifications())
-          .catch(error => console.error('Error marking all as read:', error));
-      });
+      document
+        .getElementById("markAllReadBtn")
+        ?.addEventListener("click", function (e) {
+          e.preventDefault();
+          e.stopPropagation();
+          fetch("/notifications/mark_all_read", { method: "POST" })
+            .then(() => loadNotifications())
+            .catch((error) =>
+              console.error("Error marking all as read:", error),
+            );
+        });
     </script>
     <footer class="bg-light border-top text-center py-3 mt-5">
       <p class="mb-0 text-muted small">
-        <i class="bi bi-c-circle me-1"></i><span id="currentYear"></span> Requirements Tool. Alle Rechte vorbehalten.
+        <i class="bi bi-c-circle me-1"></i
+        ><span id="currentYear"></span> Requirements Tool. Alle Rechte
+        vorbehalten.
       </p>
     </footer>
     <script>
       // Set current year dynamically
-      document.getElementById('currentYear').textContent = new Date().getFullYear();
+      document.getElementById("currentYear").textContent =
+        new Date().getFullYear();
     </script>
   </body>
 </html>

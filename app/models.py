@@ -114,7 +114,7 @@ class RequirementVersion(db.Model):
     title = db.Column(db.String(160), nullable=False)
     description = db.Column(db.String(2000), nullable=False)
     category = db.Column(db.String(80))
-    status = db.Column(db.String(30), nullable=False, default="Offen")
+    status = db.Column(db.String(30), nullable=False, default="Entwurf")
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     # JSON field to store dynamic column values
     custom_data = db.Column(db.Text, default='{}')  # Stores {column_name: value} as JSON
@@ -165,9 +165,9 @@ class RequirementVersion(db.Model):
     def get_status_color(self):
         """Get Bootstrap color class for status."""
         status_colors = {
-            'Offen': 'danger',      # Red
-            'In Arbeit': 'warning', # Yellow
-            'Fertig': 'success'     # Green
+            'Entwurf': 'danger',      # Red
+            'In Bearbeitung': 'warning', # Yellow
+            'Freigabe': 'success'     # Green
         }
         return status_colors.get(self.status, 'secondary')
     

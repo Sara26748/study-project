@@ -9,6 +9,86 @@ from .services.ai_client import generate_requirements
 
 bp = Blueprint('main', __name__)
 
+# Route: Manuelle Anforderung erstellen
+@bp.route("/project/<int:project_id>/manual_requirement", methods=["POST"])
+@login_required
+def create_manual_requirement(project_id):
+    project = Project.query.get_or_404(project_id)
+    check_project_access(project)
+
+    title = request.form.get("title", "").strip()
+    description = request.form.get("description", "").strip()
+    category = request.form.get("category", "").strip()
+    status = request.form.get("status", "Entwurf").strip()
+    is_quantifiable = request.form.get("is_quantifiable") == "on"
+    funktional = request.form.get("funktional") == "on"
+
+    if not title or not description:
+        flash("Name und Beschreibung sind erforderlich.", "danger")
+        return redirect(url_for('main.manage_project', project_id=project_id))
+
+    # Key für Duplikatserkennung
+    from .agent import normalize_key
+    key = normalize_key(title)
+    req = Requirement.query.filter_by(project_id=project_id, key=key).first()
+    if not req:
+        req = Requirement(project_id=project_id, key=key, funktional=funktional)
+        db.session.add(req)
+        db.session.flush()
+        version_index = 1
+        version_label = 'A'
+    else:
+        # Update funktional, falls geändert
+        if req.funktional != funktional:
+            req.funktional = funktional
+        last_version = req.versions[-1] if req.versions else None
+        version_index = last_version.version_index + 1 if last_version else 1
+        version_label = chr(ord('A') + (version_index - 1))
+
+    new_version = RequirementVersion(
+        requirement_id=req.id,
+        version_index=version_index,
+        version_label=version_label,
+        title=title,
+        description=description,
+        category=category,
+        status=status,
+        created_by_id=current_user.id
+    )
+    # Custom Data
+    custom_data = {}
+    if is_quantifiable:
+        custom_data['is_quantifiable'] = 'true'
+    else:
+        custom_data['is_quantifiable'] = 'false'
+    # Dynamische Spalten
+    for col in project.get_custom_columns():
+        val = request.form.get(f'custom_{col}', '').strip()
+        if val:
+            custom_data[col] = val
+    if custom_data:
+        new_version.set_custom_data(custom_data)
+    db.session.add(new_version)
+    db.session.flush()
+    # History
+    from .models import RequirementVersionHistory
+    import json
+    history_entry = RequirementVersionHistory(
+        version_id=new_version.id,
+        changed_by_id=current_user.id,
+        change_type='created',
+        changes=json.dumps({'action': 'Manuell erstellt', 'version': version_label})
+    )
+    db.session.add(history_entry)
+    db.session.commit()
+    # Notification
+    try:
+        notify_requirement_created(new_version, current_user)
+    except Exception:
+        pass
+    flash(f"Anforderung '{title}' wurde erfolgreich erstellt.", "success")
+    return redirect(url_for('main.manage_project', project_id=project_id))
+
 def check_project_access(project):
     """Check if current user has access to the project (owner or shared)."""
     if project.user_id != current_user.id and current_user not in project.shared_with:
@@ -313,7 +393,7 @@ def update_status(version_id):
     check_version_access(version)
     
     status = request.form.get('status')
-    if status in ['Offen', 'In Arbeit', 'Fertig']:
+    if status in ['Entwurf', 'In Bearbeitung', 'Freigabe']:
         version.status = status
         db.session.commit()
         
@@ -340,9 +420,9 @@ def kanban_view(project_id):
     
     # Sort into columns
     kanban_data = {
-        'Offen': [],
-        'In Arbeit': [],
-        'Fertig': []
+        'Entwurf': [],
+        'In Bearbeitung': [],
+        'Freigabe': []
     }
     
     for req in requirements:
@@ -538,10 +618,15 @@ def update_requirement_version(version_id):
     # Save all custom data including is_quantifiable
     version.set_custom_data(custom_data)
 
-    # Always move to "In Arbeit" when any change is made
+    # Status nur automatisch setzen, wenn nicht explizit geändert
     old_status = version.status
-    if changes:
-        new_status = 'In Arbeit'
+    status_from_form = request.form.get('status')
+    if status_from_form and status_from_form in ['Entwurf', 'In Bearbeitung', 'Freigabe']:
+        if old_status != status_from_form:
+            changes['status'] = f"{old_status} → {status_from_form}"
+        version.status = status_from_form
+    elif changes:
+        new_status = 'In Bearbeitung'
         if old_status != new_status:
             changes['status'] = f"{old_status} → {new_status}"
         version.status = new_status
@@ -595,8 +680,8 @@ def toggle_quantifiable(version_id):
     
     version.set_custom_data(custom_data)
     version.last_modified_by_id = current_user.id
-    # Status auf 'In Arbeit' setzen
-    version.status = 'In Arbeit'
+    # Status auf 'In Bearbeitung' setzen
+    version.status = 'In Bearbeitung'
     
     # Create history entry
     history_entry = RequirementVersionHistory(
@@ -734,7 +819,7 @@ def regenerate_requirement(req_id):
             title=result.get("title", latest_version.title),
             description=result.get("description", latest_version.description),
             category=result.get("category", latest_version.category),
-            status="Offen",  # New version starts as "Open"
+            status="Entwurf",  # New version starts as "Entwurf"
             created_by_id=current_user.id  # Track who created this version
         )
         
@@ -993,11 +1078,11 @@ def import_excel(project_id):
                 continue
             
             category = str(row[category_idx]).strip() if category_idx is not None and category_idx < len(row) and row[category_idx] else ""
-            status = str(row[status_idx]).strip() if status_idx is not None and status_idx < len(row) and row[status_idx] else "Offen"
+            status = str(row[status_idx]).strip() if status_idx is not None and status_idx < len(row) and row[status_idx] else "Entwurf"
             
             # Validate status
-            if status not in ['Offen', 'In Arbeit', 'Fertig']:
-                status = 'Offen'
+            if status not in ['Entwurf', 'In Bearbeitung', 'Freigabe']:
+                status = 'Entwurf'
             
             # Create requirement
             from .agent import normalize_key
@@ -1468,8 +1553,8 @@ def toggle_funktional(req_id):
     latest_version = req.get_latest_version()
     if latest_version and old_value != req.funktional:
         latest_version.last_modified_by_id = current_user.id
-        # Status auf 'In Arbeit' setzen
-        latest_version.status = 'In Arbeit'
+        # Status auf 'In Bearbeitung' setzen
+        latest_version.status = 'In Bearbeitung'
         history_entry = RequirementVersionHistory(
             version_id=latest_version.id,
             changed_by_id=current_user.id,
@@ -1504,9 +1589,9 @@ def analyze_requirement_route(version_id):
     )
 
     status_value = (version.status or "").strip().lower()
-    if status_value in {"fertig", "abgeschlossen"}:
+    if status_value in {"freigabe"}:
         status_color = "GRÜN"
-    elif status_value in {"in arbeit", "in bearbeitung"}:
+    elif status_value in {"in bearbeitung"}:
         status_color = "GELB"
     else:
         status_color = "ROT"
