@@ -38,7 +38,7 @@ class RequirementVersion(db.Model):
     title = db.Column(db.String(160), nullable=False)
     description = db.Column(db.String(2000), nullable=False)
     category = db.Column(db.String(80))
-    status = db.Column(db.String(30), nullable=False, default="Offen")
+    status = db.Column(db.String(30), nullable=False, default="Entwurf")
     created_at = db.Column(db.DateTime, default=db.func.current_timestamp())
     __table_args__ = (
         db.UniqueConstraint('requirement_id', 'version_index', name='uq_req_version'),

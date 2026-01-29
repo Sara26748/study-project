@@ -48,7 +48,7 @@ Regeln:
             elif col_lower in ['kategorie', 'category']:
                 json_fields.append(f'"{col}": "Kategorie (z.B. Funktional, Nicht-Funktional, etc.)"')
             elif col_lower in ['status']:
-                json_fields.append(f'"{col}": "Offen"')
+                json_fields.append(f'"{col}": "Entwurf"')
             elif col_lower in ['id']:
                 json_fields.append(f'"{col}": "ID der ursprünglichen Anforderung (Zwingend beibehalten)"')
             else:
