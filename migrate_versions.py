@@ -117,7 +117,7 @@ def run_migration():
                 elif mig_status == 'intermediate':
                     status = "Zwischengespeichert"
                 else: # created, deleted, or default
-                    status = "Offen"
+                    status = "Entwurf"
 
 
                 version = RequirementVersion(

@@ -203,9 +203,9 @@ content %} {% if not project %}
           <label for="filterStatus" class="form-label">Status</label>
           <select class="form-select form-select-sm" id="filterStatus">
             <option value="">Alle</option>
-            <option value="Offen">Offen</option>
-            <option value="In Arbeit">In Arbeit</option>
-            <option value="Fertig">Fertig</option>
+            <option value="Entwurf">Entwurf</option>
+            <option value="In Bearbeitung">In Bearbeitung</option>
+            <option value="Freigabe">Freigabe</option>
           </select>
         </div>
 
@@ -647,16 +647,18 @@ content %} {% if not project %}
           <button
             type="submit"
             class="btn btn-warning"
-            onclick="document.getElementById('editSaveType').value='intermediate'"
+            onclick="
+              document.getElementById('editSaveType').value = 'intermediate'
+            "
           >
-            <i class="bi bi-save"></i> Zwischenspeichern (In Arbeit)
+            <i class="bi bi-save"></i> Zwischenspeichern (In Bearbeitung)
           </button>
           <button
             type="submit"
             class="btn btn-success"
-            onclick="document.getElementById('editSaveType').value='final'"
+            onclick="document.getElementById('editSaveType').value = 'final'"
           >
-            <i class="bi bi-check-circle"></i> Speichern (Fertig)
+            <i class="bi bi-check-circle"></i> Speichern (Freigabe)
           </button>
         </div>
       </form>

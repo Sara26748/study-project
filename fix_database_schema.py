@@ -97,7 +97,7 @@ def fix_schema(db_path):
                     title VARCHAR(160) NOT NULL,
                     description VARCHAR(2000) NOT NULL,
                     category VARCHAR(80),
-                    status VARCHAR(30) NOT NULL DEFAULT 'Offen',
+                    status VARCHAR(30) NOT NULL DEFAULT 'Entwurf',
                     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
                     FOREIGN KEY (requirement_id) REFERENCES requirement(id) ON DELETE CASCADE,
                     UNIQUE (requirement_id, version_index)
@@ -140,7 +140,7 @@ def fix_schema(db_path):
                 title = req_data.get("Title") or req_data.get("title", "")
                 description = req_data.get("Beschreibung") or req_data.get("description", "")
                 category = req_data.get("Kategorie") or req_data.get("category", "")
-                status = "Offen"
+                status = "Entwurf"
                 
                 # Insert logical requirement
                 cursor.execute("""

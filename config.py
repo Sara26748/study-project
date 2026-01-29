@@ -16,13 +16,13 @@ Erzeuge klare, testbare, präzise Software-Anforderungen im JSON-Format.
 Antworte ausschließlich mit gültigem JSON in folgender Struktur:
 {
     "requirements": [
-        {"title": "...", "description": "...", "category": "...", "status": "Offen"}
+        {"title": "...", "description": "...", "category": "...", "status": "Entwurf"}
     ]
 }
 Regeln:
 - Maximiere Klarheit und Testbarkeit (Akzeptanzkriterien implizit in description).
 - Verwende kurze, prägnante Titel.
-- Fülle alle Felder sinnvoll.
+- 'status' ist immer 'Entwurf'.
 - Wenn Informationen fehlen, triff sinnvolle, konservative Annahmen.
 """
     base_prompt = DEFAULT_SYSTEM_PROMPT
@@ -48,7 +48,7 @@ Regeln:
             elif col_lower in ['kategorie', 'category']:
                 json_fields.append(f'"{col}": "Kategorie (z.B. Funktional, Nicht-Funktional, etc.)"')
             elif col_lower in ['status']:
-                json_fields.append(f'"{col}": "Offen"')
+                json_fields.append(f'"{col}": "Entwurf"')
             elif col_lower in ['id']:
                 json_fields.append(f'"{col}": "ID der ursprünglichen Anforderung (Zwingend beibehalten)"')
             else:
@@ -172,5 +172,24 @@ Regeln:
         base_prompt = SYSTEM_PROMPT
     else:
         base_prompt = DEFAULT_SYSTEM_PROMPT
+    
+    # If columns are provided, customize the prompt
+    if columns and isinstance(columns, list):
+        # Build JSON structure based on columns
+        json_fields = []
+        for col in columns:
+            col_lower = col.lower()
+            if col_lower in ['titel', 'title']:
+                json_fields.append(f'"{col}": "Kurzer, prägnanter Titel"')
+            elif col_lower in ['beschreibung', 'description']:
+                json_fields.append(f'"{col}": "Detaillierte Beschreibung mit Akzeptanzkriterien"')
+            elif col_lower in ['kategorie', 'category']:
+                json_fields.append(f'"{col}": "Kategorie (z.B. Funktional, Nicht-Funktional, etc.)"')
+            elif col_lower in ['status']:
+                json_fields.append(f'"{col}": "Entwurf"')
+            elif col_lower in ['id']:
+                json_fields.append(f'"{col}": "ID der ursprünglichen Anforderung (Zwingend beibehalten)"')
+            else:
+                json_fields.append(f'"{col}": ""')
 
     return base_prompt

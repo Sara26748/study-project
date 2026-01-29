@@ -67,11 +67,11 @@ def test_json_parsing_functions():
         from app.services.ai_client import _parse_json_response, _validate_and_normalize_requirements
         
         # Test valid JSON
-        valid_json = '{"requirements": [{"title": "Test", "description": "Test desc", "category": "Functional", "status": "Offen"}]}'
+        valid_json = '{"requirements": [{"title": "Test", "description": "Test desc", "category": "Functional", "status": "Entwurf"}]}'
         result = _parse_json_response(valid_json)
         assert isinstance(result, list), "Result should be a list"
         assert len(result) == 1, "Should have 1 requirement"
-        assert result[0]['status'] == 'Offen', "Status should be Offen"
+        assert result[0]['status'] == 'Entwurf', "Status should be Entwurf"
         
         # Test JSON with extra text
         json_with_text = 'Here is the JSON: {"requirements": [{"title": "Test2", "description": "Test desc2"}]} End of JSON'
