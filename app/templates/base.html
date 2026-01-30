@@ -62,8 +62,9 @@
         <!-- Right Side: Notifications + User Avatar/Dropdown -->
         <div class="d-flex align-items-center gap-3 ms-auto">
           {% if current_user.is_authenticated %}
+          
           <!-- Notification Bell -->
-          <div class="dropdown">
+          <div class="dropdown me-2">
             <button
               class="btn btn-link text-decoration-none p-2 border-0 rounded position-relative"
               type="button"
@@ -140,6 +141,20 @@
             </ul>
           </div>
 
+          <!-- Language Button rechts neben Glocke -->
+          <div class="dropdown me-2">
+            <button class="btn btn-light dropdown-toggle d-flex align-items-center fw-bold shadow border-0" type="button" id="languageDropdown" data-bs-toggle="dropdown" aria-expanded="false" style="border-radius:2rem; padding:0.5rem 1.5rem;">
+              <span class="me-2"><img src="https://flagcdn.com/de.svg" width="24" alt="Deutsch" style="border-radius:3px;"></span>
+              <span>Deutsch</span>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="languageDropdown">
+              <li><a class="dropdown-item d-flex align-items-center" href="#"><img src="https://flagcdn.com/de.svg" width="24" class="me-2" alt="Deutsch">Deutsch</a></li>
+              <li><a class="dropdown-item d-flex align-items-center" href="#"><img src="https://flagcdn.com/gb.svg" width="24" class="me-2" alt="English">English</a></li>
+              <li><a class="dropdown-item d-flex align-items-center" href="#"><img src="https://flagcdn.com/fr.svg" width="24" class="me-2" alt="Français">Français</a></li>
+              <li><a class="dropdown-item d-flex align-items-center" href="#"><img src="https://flagcdn.com/es.svg" width="24" class="me-2" alt="Español">Español</a></li>
+            </ul>
+          </div>
+fexport
           <!-- User Avatar/Dropdown with Navigation -->
           <div class="dropdown">
             <button
@@ -270,67 +285,7 @@
       </div>
     </nav>
 
-    <!-- Language Dropdown (below navbar, above dashboard) -->
-    <div class="container-fluid" style="margin-top: 64px">
-      <div class="row">
-        <div class="col-12 col-md-6 col-lg-4 mt-2 mb-1">
-          <div class="dropdown">
-            <button
-              class="btn dropdown-toggle d-flex align-items-center fw-bold text-white shadow border-0"
-              type="button"
-              id="languageDropdown"
-              data-bs-toggle="dropdown"
-              aria-expanded="false"
-              style="
-                font-size: 1.1rem;
-                background: linear-gradient(90deg, #4f8cff 0%, #38c6ff 100%);
-                border-radius: 2rem;
-                letter-spacing: 0.5px;
-                transition:
-                  background 0.2s,
-                  color 0.2s,
-                  transform 0.15s;
-                padding: 0.5rem 1.5rem;
-                box-shadow: 0 4px 16px 0 rgba(80, 180, 255, 0.1);
-              "
-            >
-              <span class="me-2 d-flex align-items-center">
-                <i class="bi bi-translate" style="font-size: 1.3rem"></i>
-              </span>
-              Sprache
-            </button>
-            <ul class="dropdown-menu" aria-labelledby="languageDropdown">
-              <li><a class="dropdown-item" href="#">Deutsch</a></li>
-              <li><a class="dropdown-item" href="#">English</a></li>
-              <li><a class="dropdown-item" href="#">Français</a></li>
-              <li><a class="dropdown-item" href="#">Español</a></li>
-            </ul>
-            <style>
-              #languageDropdown:hover,
-              #languageDropdown:focus {
-                background: #38c6ff !important;
-                color: #fff !important;
-                transform: scale(1.04) translateY(-2px);
-                box-shadow: 0 8px 32px 0 rgba(80, 180, 255, 0.18);
-              }
-              #languageDropdown .bi-translate {
-                animation: pulseLang 1.2s infinite alternate;
-              }
-              @keyframes pulseLang {
-                0% {
-                  color: #fff700;
-                  filter: drop-shadow(0 0 6px #fff700);
-                }
-                100% {
-                  color: #ffffff;
-                  filter: drop-shadow(0 0 16px #38c6ff);
-                }
-              }
-            </style>
-          </div>
-        </div>
-      </div>
-    </div>
+
 
     <main class="container mt-5" style="padding-top: 24px !important">
       <!-- Flash Messages -->
