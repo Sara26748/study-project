@@ -34,20 +34,6 @@ content %} {% if not project %}
         </a>
         <div class="d-flex align-items-center gap-2">
           <h2 class="fw-bold m-0">Projektname: {{ project.name }}</h2>
-          <button class="btn btn-outline-info d-flex align-items-center ms-2" data-bs-toggle="modal" data-bs-target="#shareProjectModal" style="color: #0a3d62; border-color: #0dcaf0; background: #eaf6fb; transition: background 0.2s, color 0.2s;">
-            <i class="bi bi-share me-2" style="color: #0a3d62;"></i>
-            <span style="color: #0a3d62;">Projekt teilen</span>
-          </button>
-          <style>
-          .btn-outline-info[data-bs-toggle="modal"]:hover, .btn-outline-info[data-bs-toggle="modal"]:focus {
-            background: #0dcaf0 !important;
-            color: #fff !important;
-          }
-          .btn-outline-info[data-bs-toggle="modal"]:hover i,
-          .btn-outline-info[data-bs-toggle="modal"]:hover span {
-            color: #fff !important;
-          }
-          </style>
         </div>
         {% if project.shared_with %}
         <div class="mt-2">
@@ -198,6 +184,15 @@ document.addEventListener('DOMContentLoaded', function() {
                 <a href="{{ url_for('main.export_excel', project_id=project.id) }}" class="btn btn-outline-success px-3 d-flex align-items-center shadow-sm" title="Liste als Excel exportieren">
                     <i class="bi bi-file-earmark-arrow-up me-2 fw-bold"></i> Export
                 </a>
+                <button
+                  class="btn btn-outline-warning btn-uniform d-flex align-items-center"
+                  type="button"
+                  data-bs-toggle="modal"
+                  data-bs-target="#shareProjectModal"
+                  title=" teilen"
+                >
+                  <i class="bi bi-share me-2"></i> teilen
+                </button>
                 <button class="btn btn-outline-primary px-3 d-flex align-items-center shadow-sm" type="button" data-bs-toggle="modal" data-bs-target="#importExcelModal" title="Excel-Datei importieren">
                     <i class="bi bi-file-earmark-arrow-down me-2 fw-bold"></i> Import
                 </button>
