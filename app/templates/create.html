@@ -180,6 +180,24 @@ document.addEventListener('DOMContentLoaded', function() {
             
             <!-- Actions -->
             <div class="col-md-5 text-end d-flex gap-2 justify-content-end align-items-center">
+                <!-- Einfügen Dropdown Button -->
+                <div class="dropdown">
+                  <button class="btn btn-outline-primary d-flex align-items-center shadow-sm dropdown-toggle" type="button" id="insertDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="bi bi-plus-lg me-2"></i> Einfügen
+                  </button>
+                  <ul class="dropdown-menu" aria-labelledby="insertDropdown">
+                    <li>
+                      <a class="dropdown-item" href="#" id="insertNewColumn">
+                        <i class="bi bi-table me-2"></i> Neue Spalte
+                      </a>
+                    </li>
+                    <li>
+                      <a class="dropdown-item" href="#" id="insertNewRequirement">
+                        <i class="bi bi-plus-circle me-2"></i> Neue Anforderung
+                      </a>
+                    </li>
+                  </ul>
+                </div>
                 <!-- Export/Import Buttons (Larger & Labeled) -->
                 <a href="{{ url_for('main.export_excel', project_id=project.id) }}" class="btn btn-outline-success px-3 d-flex align-items-center shadow-sm" title="Liste als Excel exportieren">
                     <i class="bi bi-file-earmark-arrow-up me-2 fw-bold"></i> Export
@@ -215,14 +233,35 @@ document.addEventListener('DOMContentLoaded', function() {
                 <div class="border-start mx-2" style="height: 24px;"></div>
 
                 <div class="d-inline-block">
-                    <button
-                        class="btn btn-sm btn-outline-secondary"
-                        type="button"
-                        data-bs-toggle="collapse"
-                        data-bs-target="#addColumnForm"
-                    >
-                        <i class="bi bi-plus-lg"></i> Spalte
-                    </button>
+          <button
+            class="btn btn-sm btn-outline-secondary"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#addColumnForm"
+            id="addColumnBtn"
+          >
+            <i class="bi bi-plus-lg"></i> Spalte
+          </button>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  var insertNewColumn = document.getElementById('insertNewColumn');
+  var addColumnBtn = document.getElementById('addColumnBtn');
+  if(insertNewColumn && addColumnBtn) {
+    insertNewColumn.addEventListener('click', function(e) {
+      e.preventDefault();
+      addColumnBtn.click();
+    });
+  }
+  var insertNewRequirement = document.getElementById('insertNewRequirement');
+  var scrollToManualBtn = document.getElementById('scrollToManualBtn');
+  if(insertNewRequirement && scrollToManualBtn) {
+    insertNewRequirement.addEventListener('click', function(e) {
+      e.preventDefault();
+      scrollToManualBtn.click();
+    });
+  }
+});
+</script>
                     <!-- Column Remove Dropdown -->
                      <div class="dropdown d-inline-block">
                         <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
