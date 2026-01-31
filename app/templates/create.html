@@ -185,14 +185,29 @@ document.addEventListener('DOMContentLoaded', function() {
                     <i class="bi bi-file-earmark-arrow-up me-2 fw-bold"></i> Export
                 </a>
                 <button
-                  class="btn btn-outline-warning btn-uniform d-flex align-items-center"
+                  class="btn btn-outline-warning btn-uniform d-flex align-items-center share-btn"
                   type="button"
                   data-bs-toggle="modal"
                   data-bs-target="#shareProjectModal"
-                  title=" teilen"
+                  title="teilen"
                 >
-                  <i class="bi bi-share me-2"></i> teilen
+                  <i class="bi bi-share me-2"></i> <span class="share-btn-text">teilen</span>
                 </button>
+                <style>
+                .share-btn:hover, .share-btn:focus {
+                  background: #ffc107 !important;
+                  color: #fff !important;
+                  border-color: #ffc107 !important;
+                }
+                .share-btn:hover .share-btn-text,
+                .share-btn:focus .share-btn-text {
+                  color: #fff !important;
+                }
+                .share-btn:hover i,
+                .share-btn:focus i {
+                  color: #fff !important;
+                }
+                </style>
                 <button class="btn btn-outline-primary px-3 d-flex align-items-center shadow-sm" type="button" data-bs-toggle="modal" data-bs-target="#importExcelModal" title="Excel-Datei importieren">
                     <i class="bi bi-file-earmark-arrow-down me-2 fw-bold"></i> Import
                 </button>
