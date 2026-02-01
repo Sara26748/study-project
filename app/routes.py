@@ -9,6 +9,50 @@ from .services.ai_client import generate_requirements
 
 bp = Blueprint('main', __name__)
 
+
+def _int_to_roman(num: int) -> str:
+    """Convert integer to Roman numerals (supports positive numbers)."""
+    if num <= 0:
+        return ""
+    mapping = [
+        (1000, "M"),
+        (900, "CM"),
+        (500, "D"),
+        (400, "CD"),
+        (100, "C"),
+        (90, "XC"),
+        (50, "L"),
+        (40, "XL"),
+        (10, "X"),
+        (9, "IX"),
+        (5, "V"),
+        (4, "IV"),
+        (1, "I"),
+    ]
+    result = ""
+    for value, numeral in mapping:
+        while num >= value:
+            result += numeral
+            num -= value
+    return result
+
+
+def _roman_to_int(value: str) -> int:
+    """Convert Roman numerals to integer; returns 0 if invalid/empty."""
+    if not value:
+        return 0
+    mapping = {"I": 1, "V": 5, "X": 10, "L": 50, "C": 100, "D": 500, "M": 1000}
+    total = 0
+    prev = 0
+    for ch in reversed(value.upper()):
+        current = mapping.get(ch, 0)
+        if current < prev:
+            total -= current
+        else:
+            total += current
+            prev = current
+    return total
+
 # Route: Manuelle Anforderung erstellen
 @bp.route("/project/<int:project_id>/manual_requirement", methods=["POST"])
 @login_required
@@ -53,6 +97,7 @@ def create_manual_requirement(project_id):
         description=description,
         category=category,
         status=status,
+        revision="Entwurf",
         created_by_id=current_user.id
     )
     # Custom Data
@@ -199,11 +244,14 @@ def manage_project(project_id):
     # Get custom columns for this project
     custom_columns = project.get_custom_columns()
     
+    selected_version_id = request.args.get("selected_version_id", type=int)
+
     return render_template(
         "create.html", 
         project=project, 
         req_with_versions=req_with_versions,
-        custom_columns=custom_columns
+        custom_columns=custom_columns,
+        selected_version_id=selected_version_id
     )
 
 @bp.route("/deleted_requirements")
@@ -393,7 +441,7 @@ def update_status(version_id):
     check_version_access(version)
     
     status = request.form.get('status')
-    if status in ['Entwurf', 'In Bearbeitung', 'Freigabe']:
+    if status in ['Entwurf', 'In Bearbeitung', 'Freigabe', 'Verworfen']:
         version.status = status
         db.session.commit()
         
@@ -406,7 +454,13 @@ def update_status(version_id):
              return jsonify({'success': False, 'error': 'Invalid status'}), 400
         flash("Invalid status value.", "danger")
     
-    return redirect(url_for('main.manage_project', project_id=version.requirement.project_id))
+    return redirect(
+        url_for(
+            'main.manage_project',
+            project_id=version.requirement.project_id,
+            selected_version_id=version.id,
+        )
+    )
 
 
 @bp.route("/project/<int:project_id>/kanban")
@@ -555,6 +609,109 @@ def requirement_versions_json(req_id):
     
     return jsonify(versions_data)
 
+
+# AJAX route to get all revisions (snapshots) for a requirement
+@bp.route("/requirement/<int:req_id>/revisions_json")
+@login_required
+def requirement_revisions_json(req_id):
+    """Return revision snapshots scoped to a specific version (if provided)."""
+    from .models import RequirementVersionHistory, RequirementVersion
+
+    req = Requirement.query.get_or_404(req_id)
+    check_requirement_access(req)
+
+    version_id = request.args.get("version_id", type=int)
+
+    # If no version_id provided, default to latest version to avoid mixing versions
+    if version_id is None:
+        latest = req.get_latest_version()
+        version_id = latest.id if latest else None
+
+    if not version_id:
+        return jsonify([])
+
+    version_obj = RequirementVersion.query.get_or_404(version_id)
+    if version_obj.requirement_id != req.id:
+        abort(404)
+
+    history_entries = (
+        RequirementVersionHistory.query
+        .filter(
+            RequirementVersionHistory.version_id == version_obj.id,
+            RequirementVersionHistory.change_type == 'revised'
+        )
+        .order_by(RequirementVersionHistory.created_at.asc())
+        .all()
+    )
+
+    revisions_data = []
+    baseline_added = False
+
+    for entry in history_entries:
+        try:
+            changes = entry.get_changes()
+        except Exception:
+            changes = {}
+
+        baseline_snapshot = changes.get('revision_baseline')
+        if baseline_snapshot and not baseline_added:
+            revisions_data.append({
+                'revision_label': baseline_snapshot.get('revision_label') or 'Entwurf',
+                'revision_number': baseline_snapshot.get('revision_number') or 0,
+                'version_label': baseline_snapshot.get('version_label'),
+                'title': baseline_snapshot.get('title'),
+                'description': baseline_snapshot.get('description'),
+                'category': baseline_snapshot.get('category'),
+                'status': baseline_snapshot.get('status'),
+                'status_color': baseline_snapshot.get('status_color') or 'secondary',
+                'custom_data': baseline_snapshot.get('custom_data') or {},
+                'is_quantifiable': baseline_snapshot.get('is_quantifiable', False),
+                'created_at': entry.created_at.isoformat()
+            })
+            baseline_added = True
+
+    # Add fallback baseline when no baseline snapshot exists yet
+    if not baseline_added:
+        revisions_data.append({
+            'revision_label': version_obj.revision or 'Entwurf',
+            'revision_number': _roman_to_int(version_obj.revision),
+            'version_label': version_obj.version_label,
+            'title': version_obj.title,
+            'description': version_obj.description,
+            'category': version_obj.category,
+            'status': version_obj.status,
+            'status_color': version_obj.get_status_color(),
+            'custom_data': version_obj.get_custom_data(),
+            'is_quantifiable': version_obj.get_custom_data().get('is_quantifiable') in ['true', True],
+            'created_at': version_obj.created_at.isoformat()
+        })
+
+    for entry in history_entries:
+        try:
+            changes = entry.get_changes()
+        except Exception:
+            changes = {}
+
+        snapshot = changes.get('revision_snapshot') or {}
+        if not snapshot:
+            continue
+
+        revisions_data.append({
+            'revision_label': snapshot.get('revision_label'),
+            'revision_number': snapshot.get('revision_number'),
+            'version_label': snapshot.get('version_label'),
+            'title': snapshot.get('title'),
+            'description': snapshot.get('description'),
+            'category': snapshot.get('category'),
+            'status': snapshot.get('status'),
+            'status_color': snapshot.get('status_color') or 'secondary',
+            'custom_data': snapshot.get('custom_data') or {},
+            'is_quantifiable': snapshot.get('is_quantifiable', False),
+            'created_at': entry.created_at.isoformat()
+        })
+
+    return jsonify(revisions_data)
+
 # Route to update requirement version data
 @bp.route("/requirement_version/<int:version_id>/update", methods=['POST'])
 @login_required
@@ -570,11 +727,17 @@ def update_requirement_version(version_id):
     title = request.form.get('title', '').strip()
     description = request.form.get('description', '').strip()
     category = request.form.get('category', '').strip()
-    
+
     # Validate required fields
     if not title or not description:
         flash("Title and description are required.", "danger")
-        return redirect(url_for('main.manage_project', project_id=version.requirement.project_id))
+        return redirect(
+            url_for(
+                'main.manage_project',
+                project_id=version.requirement.project_id,
+                selected_version_id=version.id,
+            )
+        )
     
     # Track changes for history
     changes = {}
@@ -621,7 +784,7 @@ def update_requirement_version(version_id):
     # Status nur automatisch setzen, wenn nicht explizit geändert
     old_status = version.status
     status_from_form = request.form.get('status')
-    if status_from_form and status_from_form in ['Entwurf', 'In Bearbeitung', 'Freigabe']:
+    if status_from_form and status_from_form in ['Entwurf', 'In Bearbeitung', 'Freigabe', 'Verworfen']:
         if old_status != status_from_form:
             changes['status'] = f"{old_status} → {status_from_form}"
         version.status = status_from_form
@@ -654,7 +817,275 @@ def update_requirement_version(version_id):
         pass
     
     flash(f"Requirement updated successfully. Status: {version.status}", "success")
-    return redirect(url_for('main.manage_project', project_id=version.requirement.project_id))
+    return redirect(
+        url_for(
+            'main.manage_project',
+            project_id=version.requirement.project_id,
+            selected_version_id=version.id,
+        )
+    )
+
+
+@bp.route("/requirement_version/<int:version_id>/revise", methods=['POST'])
+@login_required
+def revise_requirement_version(version_id):
+    """Handle revision updates with revision numbering logic."""
+    from .models import RequirementVersionHistory
+    import json
+
+    version = RequirementVersion.query.get_or_404(version_id)
+    check_version_access(version)
+
+    title = request.form.get('title', '').strip()
+    description = request.form.get('description', '').strip()
+    category = request.form.get('category', '').strip()
+    revision_number = request.form.get('revision_number', type=int)
+
+    if not title or not description:
+        flash("Title and description are required for a Revision.", "danger")
+        return redirect(
+            url_for(
+                'main.manage_project',
+                project_id=version.requirement.project_id,
+                selected_version_id=version.id,
+            )
+        )
+
+    allowed_status = ['Entwurf', 'In Bearbeitung', 'Freigabe', 'Verworfen']
+    status_from_form = request.form.get('status')
+
+    def status_color_for(value):
+        mapping = {
+            'Entwurf': 'danger',
+            'In Bearbeitung': 'warning',
+            'Freigabe': 'success',
+            'Verworfen': 'dark',
+        }
+        return mapping.get(value, 'secondary')
+
+    # Collect custom data from the form
+    project = version.requirement.project
+    custom_columns = project.get_custom_columns()
+    old_custom_data = version.get_custom_data()
+    custom_data = old_custom_data.copy()
+    for column in custom_columns:
+        value = request.form.get(f'custom_{column}', '').strip()
+        custom_data[column] = value
+
+    is_quantifiable = request.form.get('is_quantifiable') == 'on'
+    custom_data['is_quantifiable'] = 'true' if is_quantifiable else 'false'
+
+    # Load all revision history entries once (ordered)
+    history_entries = RequirementVersionHistory.query.filter_by(
+        version_id=version.id, change_type='revised'
+    ).order_by(RequirementVersionHistory.created_at.asc()).all()
+
+    def find_revision_entry(target_number):
+        for entry in history_entries:
+            try:
+                snapshot = (entry.get_changes() or {}).get('revision_snapshot') or {}
+                if snapshot.get('revision_number') is not None and int(snapshot['revision_number']) == int(target_number):
+                    return entry, snapshot
+            except Exception:
+                continue
+        return None, None
+
+    # Gather existing revision numbers to identify the latest
+    existing_numbers = []
+    for entry in history_entries:
+        try:
+            snapshot = (entry.get_changes() or {}).get('revision_snapshot') or {}
+            if snapshot.get('revision_number') is not None:
+                existing_numbers.append(int(snapshot['revision_number']))
+        except Exception:
+            continue
+    current_number = _roman_to_int(version.revision)
+    if current_number:
+        existing_numbers.append(current_number)
+    latest_number = max(existing_numbers) if existing_numbers else 0
+
+    def build_snapshot(target_status, target_revision_number):
+        return {
+            "title": title,
+            "description": description,
+            "category": category,
+            "status": target_status,
+            "status_color": status_color_for(target_status),
+            "custom_data": custom_data,
+            "is_quantifiable": is_quantifiable,
+            "version_label": version.version_label,
+            "revision_label": _int_to_roman(target_revision_number) if target_revision_number else (version.revision or 'Entwurf'),
+            "revision_number": target_revision_number if target_revision_number else _roman_to_int(version.revision),
+        }
+
+    # CASE 1: Update an existing revision (revision_number provided)
+    if revision_number is not None:
+        target_entry, existing_snapshot = find_revision_entry(revision_number)
+        if not target_entry:
+            # If the requested revision doesn't exist yet, fall back to creating a new one
+            revision_number = None
+        else:
+            prev_custom = existing_snapshot.get('custom_data') or {}
+            prev_status = existing_snapshot.get('status') or version.status
+
+            target_status = status_from_form if status_from_form in allowed_status else prev_status
+
+            # Detect changes relative to the selected revision snapshot
+            changes_detected = False
+            def changed(old_val, new_val):
+                return (old_val or "") != (new_val or "")
+
+            if changed(existing_snapshot.get('title'), title):
+                changes_detected = True
+            if changed(existing_snapshot.get('description'), description):
+                changes_detected = True
+            if changed(existing_snapshot.get('category'), category):
+                changes_detected = True
+            for column in custom_columns:
+                if changed(prev_custom.get(column, ''), custom_data.get(column, '')):
+                    changes_detected = True
+            if changed(prev_status, target_status):
+                changes_detected = True
+            if changed(
+                str(existing_snapshot.get('is_quantifiable', False)),
+                str(is_quantifiable),
+            ):
+                changes_detected = True
+
+            if not changes_detected:
+                flash("Keine Änderungen erkannt. Nimm Änderungen vor, bevor du revidierst.", "warning")
+                return redirect(
+                    url_for(
+                        'main.manage_project',
+                        project_id=version.requirement.project_id,
+                        selected_version_id=version.id,
+                    )
+                )
+
+            new_snapshot = build_snapshot(target_status, revision_number)
+            changes = target_entry.get_changes() or {}
+            changes['revision_snapshot'] = new_snapshot
+            changes['revision'] = f"Revision {_int_to_roman(revision_number)} aktualisiert"
+            target_entry.changes = json.dumps(changes)
+
+            # Only push the edited values onto the live version when editing the latest revision
+            if revision_number >= latest_number:
+                version.title = title
+                version.description = description
+                version.category = category
+                version.last_modified_by_id = current_user.id
+                version.set_custom_data(custom_data)
+                if target_status in allowed_status:
+                    version.status = target_status
+                version.revision = _int_to_roman(revision_number)
+
+            db.session.commit()
+
+            flash(
+                f"Revision {_int_to_roman(revision_number)} wurde aktualisiert.",
+                "success",
+            )
+            return redirect(
+                url_for(
+                    'main.manage_project',
+                    project_id=version.requirement.project_id,
+                    selected_version_id=version.id,
+                )
+            )
+
+    # CASE 2: Create a new revision (existing behavior)
+    # Preserve old state for baseline snapshot (before first revision)
+    old_state_snapshot = {
+        "title": version.title,
+        "description": version.description,
+        "category": version.category,
+        "status": version.status,
+        "status_color": version.get_status_color(),
+        "custom_data": version.get_custom_data(),
+        "is_quantifiable": version.get_custom_data().get('is_quantifiable') in ['true', True],
+        "version_label": version.version_label,
+        "revision_label": version.revision or 'Entwurf',
+        "revision_number": _roman_to_int(version.revision),
+    }
+
+    changes = {}
+    if version.title != title:
+        changes['title'] = f"{version.title} → {title}"
+    if version.description != description:
+        changes['description'] = "Beschreibung geändert"
+    if (version.category or '') != category:
+        changes['category'] = f"{version.category or '–'} → {category or '–'}"
+
+    for column in custom_columns:
+        old_value = old_custom_data.get(column, '')
+        new_value = custom_data.get(column, '')
+        if (old_value or '') != (new_value or ''):
+            changes[f'custom_{column}'] = f"{old_value or '–'} → {new_value or '–'}"
+
+    old_quantifiable = old_custom_data.get('is_quantifiable', 'false')
+    new_quantifiable = custom_data.get('is_quantifiable', 'false')
+    if old_quantifiable != new_quantifiable:
+        changes['is_quantifiable'] = f"{'Ja' if old_quantifiable == 'true' else 'Nein'} → {'Ja' if new_quantifiable == 'true' else 'Nein'}"
+
+    old_status = version.status
+    if status_from_form and status_from_form in allowed_status:
+        if old_status != status_from_form:
+            changes['status'] = f"{old_status} → {status_from_form}"
+        version.status = status_from_form
+    elif changes:
+        if old_status != 'In Bearbeitung':
+            changes['status'] = f"{old_status} → In Bearbeitung"
+        version.status = 'In Bearbeitung'
+
+    if not changes:
+        flash("Keine Änderungen erkannt. Nimm Änderungen vor, bevor du revidierst.", "warning")
+        return redirect(
+            url_for(
+                'main.manage_project',
+                project_id=version.requirement.project_id,
+                selected_version_id=version.id,
+            )
+        )
+
+    # Persist field updates for the latest revision path
+    version.title = title
+    version.description = description
+    version.category = category
+    version.last_modified_by_id = current_user.id
+    version.set_custom_data(custom_data)
+
+    existing_numbers_new = existing_numbers.copy()
+    next_revision_number = (max(existing_numbers_new) if existing_numbers_new else 0) + 1
+    version.revision = _int_to_roman(next_revision_number)
+
+    snapshot = build_snapshot(version.status, next_revision_number)
+
+    if next_revision_number == 1:
+        changes['revision_baseline'] = old_state_snapshot
+
+    changes['revision'] = f"Revision {version.revision} auf Version {version.version_label} gesetzt"
+    changes['revision_snapshot'] = snapshot
+    history_entry = RequirementVersionHistory(
+        version_id=version.id,
+        changed_by_id=current_user.id,
+        change_type='revised',
+        changes=json.dumps(changes)
+    )
+    db.session.add(history_entry)
+
+    db.session.commit()
+
+    flash(
+        f"Revision {version.revision} wurde auf Version {version.version_label} gesetzt.",
+        "success",
+    )
+    return redirect(
+        url_for(
+            'main.manage_project',
+            project_id=version.requirement.project_id,
+            selected_version_id=version.id,
+        )
+    )
 
 # Route to toggle quantifiable status
 @bp.route("/requirement_version/<int:version_id>/toggle_quantifiable", methods=['POST'])
@@ -693,7 +1124,13 @@ def toggle_quantifiable(version_id):
     db.session.add(history_entry)
     db.session.commit()
     
-    return redirect(url_for('main.manage_project', project_id=version.requirement.project_id))
+    return redirect(
+        url_for(
+            'main.manage_project',
+            project_id=version.requirement.project_id,
+            selected_version_id=version.id,
+        )
+    )
 
 # Route to delete a specific version of a requirement
 @bp.route("/requirement_version/<int:version_id>/delete", methods=['POST'])
@@ -820,6 +1257,7 @@ def regenerate_requirement(req_id):
             description=result.get("description", latest_version.description),
             category=result.get("category", latest_version.category),
             status="Entwurf",  # New version starts as "Entwurf"
+            revision="Entwurf",
             created_by_id=current_user.id  # Track who created this version
         )
         
@@ -920,8 +1358,15 @@ def export_excel(project_id):
     ws = wb.active
     ws.title = "Requirements"
     
-    # Define headers
-    headers = ["Version", "ID", "Title", "Beschreibung"] + custom_columns + ["Kategorie", "Status"]
+    # Define headers in requested order
+    headers = [
+        "Verantwortlicher",
+        "Revision",
+        "Version",
+        "ID",
+        "Anforderung",
+        "Beschreibung",
+    ] + custom_columns + ["Kategorie", "Status"]
     
     # Write headers
     for col_num, header in enumerate(headers, 1):
@@ -940,12 +1385,16 @@ def export_excel(project_id):
         
         custom_data = latest_version.get_custom_data()
         
-        # Prepare row data
+        # Prepare row data in requested order
+        creator = latest_version.created_by.email if latest_version.created_by else "–"
+        revision = latest_version.revision or "Entwurf"
         row_data = [
+            creator,
+            revision,
             latest_version.version_label,
             display_id,
             latest_version.title,
-            latest_version.description
+            latest_version.description,
         ]
         
         # Add custom column values
@@ -964,21 +1413,23 @@ def export_excel(project_id):
         row_num += 1
         display_id += 1
     
-    # Set column widths
-    ws.column_dimensions['A'].width = 10  # Version
-    ws.column_dimensions['B'].width = 8   # ID
-    ws.column_dimensions['C'].width = 30  # Title
-    ws.column_dimensions['D'].width = 50  # Description
-    
-    # Set widths for custom columns
-    col_letter_start = ord('E')
+    # Set column widths (readable layout)
+    ws.column_dimensions['A'].width = 24  # Verantwortlicher
+    ws.column_dimensions['B'].width = 12  # Revision
+    ws.column_dimensions['C'].width = 10  # Version
+    ws.column_dimensions['D'].width = 8   # ID
+    ws.column_dimensions['E'].width = 35  # Anforderung
+    ws.column_dimensions['F'].width = 60  # Beschreibung
+
+    # Set widths for custom columns starting at column G
+    col_letter_start = ord('G')
     for i, col in enumerate(custom_columns):
         col_letter = chr(col_letter_start + i)
-        ws.column_dimensions[col_letter].width = 20
-    
-    # Set widths for category and status
+        ws.column_dimensions[col_letter].width = 22
+
+    # Set widths for category and status after custom columns
     col_letter = chr(col_letter_start + len(custom_columns))
-    ws.column_dimensions[col_letter].width = 20  # Category
+    ws.column_dimensions[col_letter].width = 20  # Kategorie
     col_letter = chr(col_letter_start + len(custom_columns) + 1)
     ws.column_dimensions[col_letter].width = 15  # Status
     
@@ -1232,7 +1683,13 @@ def toggle_block_requirement(version_id):
         flash(f"Version {version.version_label} wurde blockiert.", "warning")
     
     db.session.commit()
-    return redirect(url_for('main.manage_project', project_id=project.id))
+    return redirect(
+        url_for(
+            'main.manage_project',
+            project_id=project.id,
+            selected_version_id=version.id,
+        )
+    )
 
 
 @bp.route("/project/<int:project_id>/detect_conflicts")
