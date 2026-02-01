@@ -1,6 +1,12 @@
 // Global flag to ensure event delegation is only set up once
 let eventListenersAttached = false;
 
+// Snapshot of the edit form to detect changes in revision mode
+let editFormInitialData = null;
+
+// Cache for revision snapshots per requirement version
+const revisionCache = {};
+
 // Global function to attach event listeners - can be called multiple times
 function attachEventListeners() {
   console.log("Attaching event listeners...");
@@ -38,7 +44,8 @@ function attachEventListeners() {
             versionId,
           );
           if (reqId && versionId && typeof openEditModal === "function") {
-            openEditModal(reqId, versionId);
+            const selectedRevision = getSelectedRevisionSnapshot(reqId);
+            openEditModal(reqId, versionId, "edit", selectedRevision);
           } else {
             console.error("openEditModal not available or missing data:", {
               reqId,
@@ -46,6 +53,87 @@ function attachEventListeners() {
               openEditModal,
             });
           }
+        }
+      }
+    });
+
+    // Revision button click - use event delegation
+    document.addEventListener("click", function (e) {
+      if (
+        e.target.classList.contains("revision-requirement-btn") ||
+        e.target.closest(".revision-requirement-btn")
+      ) {
+        e.stopPropagation();
+        const button = e.target.classList.contains("revision-requirement-btn")
+          ? e.target
+          : e.target.closest(".revision-requirement-btn");
+
+        if (button && !button.disabled) {
+          e.preventDefault();
+          const reqId = button.getAttribute("data-req-id");
+          const versionId = button.getAttribute("data-version-id");
+          if (reqId && versionId && typeof openRevisionModal === "function") {
+            const selectedRevision = getSelectedRevisionSnapshot(reqId);
+            openRevisionModal(reqId, versionId, selectedRevision);
+          }
+        }
+      }
+    });
+
+    // Revision selector change - use event delegation
+    document.addEventListener("change", function (e) {
+      if (e.target.classList.contains("revision-selector")) {
+        const selector = e.target;
+        const reqId = selector.getAttribute("data-req-id");
+        const selectedValue = selector.value;
+
+        const row = document.getElementById(`req-row-${reqId}`);
+        const versionSelector = row?.querySelector(".version-selector");
+        const versionIndex = versionSelector?.value;
+        const versionData = versionIndex
+          ? row.querySelector(
+              `.version-data[data-version-index="${versionIndex}"]`,
+            )
+          : null;
+        const versionId = versionData?.getAttribute("data-version-id");
+        const cacheKey = `${reqId}:${versionId || ""}`;
+
+        if (selectedValue === "current") {
+          // Revert to current version selection and clear stored snapshot
+          const row = document.getElementById(`req-row-${reqId}`);
+          if (row) {
+            delete row.dataset.selectedRevisionJson;
+            delete row.dataset.selectedRevisionNumber;
+          }
+          if (versionSelector) {
+            updateRowWithVersionData(reqId, versionSelector.value);
+          }
+          return;
+        }
+
+        const revisions = revisionCache[cacheKey] || [];
+        const match = revisions.find(
+          (rev) => `${rev.revision_number}` === selectedValue,
+        );
+        const applyMatch = (rev) => {
+          if (rev) {
+            const row = document.getElementById(`req-row-${reqId}`);
+            if (row) {
+              row.dataset.selectedRevisionJson = JSON.stringify(rev);
+              row.dataset.selectedRevisionNumber = `${rev.revision_number || ""}`;
+            }
+            applyRevisionSnapshot(reqId, rev);
+          }
+        };
+        if (match) {
+          applyMatch(match);
+        } else if (versionId) {
+          loadRevisions(reqId, versionId).then((loaded) => {
+            const matchLoaded = loaded.find(
+              (rev) => `${rev.revision_number}` === selectedValue,
+            );
+            applyMatch(matchLoaded);
+          });
         }
       }
     });
@@ -58,9 +146,68 @@ function attachEventListeners() {
   if (editForm && !editForm.dataset.listenerAttached) {
     editForm.addEventListener("submit", function (e) {
       const versionId = document.getElementById("editVersionId").value;
-      this.action = `/requirement_version/${versionId}/update`;
+      const mode = document.getElementById("editMode").value || "edit";
+      const revisionNumber =
+        document.getElementById("editRevisionNumber")?.value || "";
+
+      // If a specific revision is selected, always route to the revise endpoint
+      if (revisionNumber) {
+        this.action = `/requirement_version/${versionId}/revise`;
+        document.getElementById("editSaveType").value = "revision";
+        document.getElementById("editMode").value = "revision";
+      } else if (mode === "revision") {
+        this.action = `/requirement_version/${versionId}/revise`;
+        document.getElementById("editSaveType").value = "revision";
+      } else {
+        this.action = `/requirement_version/${versionId}/update`;
+      }
     });
     editForm.dataset.listenerAttached = "true";
+  }
+
+  // Track form changes to enable the revision submit button only when there are edits
+  if (editForm && !editForm.dataset.changeListenerAttached) {
+    const changeHandler = function () {
+      if (document.getElementById("editMode").value === "revision") {
+        updateRevisionButtonState();
+      }
+    };
+
+    editForm.addEventListener("input", changeHandler);
+    editForm.addEventListener("change", changeHandler);
+
+    editForm.dataset.changeListenerAttached = "true";
+  }
+
+  // Enforce status based on action buttons (Bearbeitet/Revidiert -> In Bearbeitung, Freigegeben -> Freigabe)
+  const statusSelect = document.getElementById("editStatus");
+  const intermediateBtn = document.getElementById("editSaveIntermediateBtn");
+  const finalBtn = document.getElementById("editSaveFinalBtn");
+  const revisionBtn = document.getElementById("revisionSubmit");
+
+  if (
+    intermediateBtn &&
+    statusSelect &&
+    !intermediateBtn.dataset.listenerAttached
+  ) {
+    intermediateBtn.addEventListener("click", () => {
+      statusSelect.value = "In Bearbeitung";
+    });
+    intermediateBtn.dataset.listenerAttached = "true";
+  }
+
+  if (finalBtn && statusSelect && !finalBtn.dataset.listenerAttached) {
+    finalBtn.addEventListener("click", () => {
+      statusSelect.value = "Freigabe";
+    });
+    finalBtn.dataset.listenerAttached = "true";
+  }
+
+  if (revisionBtn && statusSelect && !revisionBtn.dataset.listenerAttached) {
+    revisionBtn.addEventListener("click", () => {
+      statusSelect.value = "In Bearbeitung";
+    });
+    revisionBtn.dataset.listenerAttached = "true";
   }
 
   // Apply filters button
@@ -126,9 +273,197 @@ function updateCustomColumns(newColumns) {
   initializeFilters();
 }
 
+// Fetch revision snapshots for a requirement version (cached)
+async function loadRevisions(reqId, versionId) {
+  if (!versionId) return [];
+  const cacheKey = `${reqId}:${versionId}`;
+  if (revisionCache[cacheKey]) return revisionCache[cacheKey];
+  try {
+    const res = await fetch(
+      `/requirement/${reqId}/revisions_json?version_id=${versionId}`,
+    );
+    if (!res.ok) return [];
+    const data = await res.json();
+    revisionCache[cacheKey] = data || [];
+    return revisionCache[cacheKey];
+  } catch (err) {
+    console.error("Failed to load revisions", err);
+    return [];
+  }
+}
+
+function populateRevisionSelector(reqId, row, revisions) {
+  const selector = row.querySelector(".revision-selector");
+  if (!selector) return;
+
+  // Prefer an explicit value, fall back to the existing option text or Entwurf
+  const currentRevision =
+    selector.dataset.currentRevision ||
+    (selector.options[0]?.textContent || "").trim() ||
+    "Entwurf";
+  selector.innerHTML = "";
+
+  const currentOption = document.createElement("option");
+  currentOption.value = "current";
+  currentOption.textContent = `${currentRevision || "Entwurf"}`;
+  selector.appendChild(currentOption);
+
+  const sortedRevs = [...revisions].sort(
+    (a, b) => (a.revision_number || 0) - (b.revision_number || 0),
+  );
+
+  sortedRevs.forEach((rev) => {
+    const opt = document.createElement("option");
+    opt.value = `${rev.revision_number}`;
+    const revLabel = rev.revision_label || rev.revision_number || "";
+    opt.textContent = `${revLabel || "Entwurf"}`;
+    selector.appendChild(opt);
+  });
+
+  // Default to current version to avoid overwriting the live view
+  selector.value = "current";
+}
+
+function applyRevisionSnapshot(reqId, revisionData) {
+  const row = document.getElementById(`req-row-${reqId}`);
+  if (!row || !revisionData) return;
+
+  row.querySelector(".title-cell").textContent = revisionData.title || "–";
+  const descCell = row.querySelector(".description-cell");
+  const descPreview = row.querySelector(".description-preview");
+  const description = revisionData.description || "";
+  if (descCell) descCell.textContent = description;
+  if (descPreview) refreshDescriptionPopover(descPreview, description);
+
+  const categoryCell = row.querySelector(".category-cell");
+  if (categoryCell) {
+    categoryCell.innerHTML = `<span class="badge bg-light text-secondary border">${revisionData.category || "–"}</span>`;
+  }
+
+  const statusCell = row.querySelector(".status-cell");
+  if (statusCell) {
+    const color = revisionData.status_color || "secondary";
+    const status = revisionData.status || "–";
+    statusCell.innerHTML = `<span class="badge rounded-pill bg-${color}">${status}</span>`;
+  }
+
+  const customData = revisionData.custom_data || {};
+  row.querySelectorAll(".custom-data-cell").forEach((cell) => {
+    const column = cell.getAttribute("data-column");
+    cell.textContent = customData[column] || "–";
+  });
+
+  // Quantifiable icon update
+  const quantifiableCell = row.querySelector(".quantifiable-cell");
+  if (quantifiableCell) {
+    const isQuant = !!revisionData.is_quantifiable;
+    const form = quantifiableCell.querySelector(".toggle-quantifiable-form");
+    if (form) {
+      const button = form.querySelector("button");
+      const icon = form.querySelector("i");
+      if (icon) {
+        if (isQuant) {
+          icon.className = "bi bi-check-circle-fill text-success";
+          icon.style.fontSize = "1.3rem";
+          if (button)
+            button.title = "Quantifizierbar - Klicken zum Deaktivieren";
+        } else {
+          icon.className = "bi bi-circle text-muted";
+          icon.style.fontSize = "1.3rem";
+          if (button)
+            button.title = "Nicht quantifizierbar - Klicken zum Aktivieren";
+        }
+      }
+    }
+  }
+
+  // Revision label display in the cell header
+  const revisionSelect = row.querySelector(".revision-selector");
+  if (revisionSelect) {
+    revisionSelect.value = `${revisionData.revision_number}`;
+  }
+}
+
+function getSelectedRevisionSnapshot(reqId) {
+  const row = document.getElementById(`req-row-${reqId}`);
+  if (!row || !row.dataset.selectedRevisionJson) return null;
+  try {
+    return JSON.parse(row.dataset.selectedRevisionJson);
+  } catch (err) {
+    console.error("Failed to parse stored revision snapshot", err);
+    return null;
+  }
+}
+
+function refreshDescriptionPopover(element, description) {
+  if (!element) return;
+  const safeDescription = description || "";
+  element.textContent = safeDescription;
+  element.setAttribute("data-description-full", safeDescription);
+  element.setAttribute("data-bs-toggle", "popover");
+  element.setAttribute("data-bs-trigger", "hover focus");
+  element.setAttribute("data-bs-placement", "top");
+
+  const existing = bootstrap.Popover.getInstance(element);
+  if (existing) {
+    existing.dispose();
+  }
+
+  new bootstrap.Popover(element, {
+    trigger: "hover focus",
+    html: false,
+    placement: "top",
+    content: safeDescription,
+    title: "Vollständige Beschreibung",
+  });
+}
+
+// Capture current edit form values for change detection
+function captureEditFormSnapshot() {
+  const form = document.getElementById("editRequirementForm");
+  if (!form) return {};
+  const formData = new FormData(form);
+  const snapshot = {};
+  formData.forEach((value, key) => {
+    snapshot[key] = value ?? "";
+  });
+
+  // Explicitly capture checkbox state for quantifiable
+  const quantCheckbox = document.getElementById("editQuantifiable");
+  snapshot.is_quantifiable = quantCheckbox && quantCheckbox.checked ? "on" : "";
+
+  return snapshot;
+}
+
+function hasRevisionChanges() {
+  if (!editFormInitialData) return false;
+  const current = captureEditFormSnapshot();
+  const keys = new Set([
+    ...Object.keys(editFormInitialData),
+    ...Object.keys(current),
+  ]);
+  for (const key of keys) {
+    if ((current[key] || "") !== (editFormInitialData[key] || "")) {
+      return true;
+    }
+  }
+  return false;
+}
+
+function updateRevisionButtonState() {
+  const revisionButton = document.getElementById("revisionSubmit");
+  const mode = document.getElementById("editMode")?.value || "edit";
+  if (!revisionButton || mode !== "revision") return;
+  revisionButton.disabled = !hasRevisionChanges();
+}
+
 // Functions
 function updateRowWithVersionData(reqId, versionIndex) {
   const row = document.getElementById(`req-row-${reqId}`);
+  if (row) {
+    delete row.dataset.selectedRevisionJson;
+    delete row.dataset.selectedRevisionNumber;
+  }
   const versionsData = document.getElementById(`versions-data-${reqId}`);
   const versionElements = versionsData.querySelectorAll(".version-data");
 
@@ -157,22 +492,7 @@ function updateRowWithVersionData(reqId, versionIndex) {
     const descriptionCell = row.querySelector(".description-preview");
     if (descriptionCell) {
       const description = selectedVersion.getAttribute("data-description");
-      descriptionCell.textContent = description;
-      descriptionCell.setAttribute("data-description-full", description);
-
-      // Update or create popover
-      const existingPopover = bootstrap.Popover.getInstance(descriptionCell);
-      if (existingPopover) {
-        existingPopover.setContent({ ".popover-body": description });
-      } else {
-        new bootstrap.Popover(descriptionCell, {
-          trigger: "hover focus",
-          html: false,
-          placement: "top",
-          content: description,
-          title: "Vollständige Beschreibung",
-        });
-      }
+      refreshDescriptionPopover(descriptionCell, description);
     }
 
     // Update quantifiable icon
@@ -224,6 +544,34 @@ function updateRowWithVersionData(reqId, versionIndex) {
     if (deleteForm) {
       deleteForm.action = `/requirement_version/${versionId}/delete`;
     }
+
+    const revisionCell = row.querySelector(".revision-cell");
+    if (revisionCell) {
+      const revisionValue = selectedVersion.getAttribute("data-revision");
+      const selector = revisionCell.querySelector(".revision-selector");
+      if (selector) {
+        selector.dataset.currentRevision = revisionValue || "Entwurf";
+        selector.innerHTML = "";
+        const opt = document.createElement("option");
+        opt.value = "current";
+        opt.textContent = `${revisionValue || "Entwurf"}`;
+        selector.appendChild(opt);
+        selector.value = "current";
+      } else {
+        revisionCell.textContent =
+          revisionValue && revisionValue !== "" ? revisionValue : "–";
+      }
+    }
+
+    const revisionButton = row.querySelector(".revision-requirement-btn");
+    if (revisionButton) {
+      revisionButton.setAttribute("data-version-id", versionId);
+    }
+
+    // Populate revision selector asynchronously (uses cache if available)
+    loadRevisions(reqId, versionId).then((revs) => {
+      populateRevisionSelector(reqId, row, revs);
+    });
   }
 }
 
@@ -391,10 +739,41 @@ function applyFilters() {
   console.log(`Filter applied: ${visibleCount}/${totalCount} visible`);
 }
 
-function openEditModal(reqId, versionId) {
+function openEditModal(
+  reqId,
+  versionId,
+  mode = "edit",
+  revisionOverride = null,
+) {
   console.log("Opening edit modal for req:", reqId, "version:", versionId);
 
   document.getElementById("editVersionId").value = versionId;
+
+  const modeInput = document.getElementById("editMode");
+  const saveTypeInput = document.getElementById("editSaveType");
+  const revisionNumberInput = document.getElementById("editRevisionNumber");
+  const editButtons = document.getElementById("editActionButtons");
+  const revisionButtonWrap = document.getElementById("revisionActionButton");
+  const revisionButton = document.getElementById("revisionSubmit");
+  const modalTitle = document.querySelector(
+    "#editRequirementModal .modal-title",
+  );
+
+  if (modeInput) modeInput.value = mode;
+  if (modalTitle)
+    modalTitle.textContent =
+      mode === "revision" ? "Anforderung revidieren" : "Anforderung bearbeiten";
+
+  if (mode === "revision") {
+    if (saveTypeInput) saveTypeInput.value = "revision";
+    if (editButtons) editButtons.classList.add("d-none");
+    if (revisionButtonWrap) revisionButtonWrap.classList.remove("d-none");
+    if (revisionButton) revisionButton.disabled = true;
+  } else {
+    if (saveTypeInput) saveTypeInput.value = "intermediate";
+    if (editButtons) editButtons.classList.remove("d-none");
+    if (revisionButtonWrap) revisionButtonWrap.classList.add("d-none");
+  }
 
   const versionsData = document.getElementById(`versions-data-${reqId}`);
   const versionElements = versionsData.querySelectorAll(".version-data");
@@ -407,44 +786,72 @@ function openEditModal(reqId, versionId) {
   });
 
   if (selectedVersion) {
-    document.getElementById("editTitle").value =
-      selectedVersion.getAttribute("data-title");
+    const revisionData = revisionOverride || getSelectedRevisionSnapshot(reqId);
+
+    if (revisionNumberInput) {
+      revisionNumberInput.value = revisionData?.revision_number
+        ? `${revisionData.revision_number}`
+        : "";
+    }
+
+    // Determine form source: selected revision snapshot (if any) otherwise the current version data
+    let customData = {};
+    let formSource = revisionData || {};
+    let status = null;
+
+    if (!revisionData) {
+      formSource = {
+        title: selectedVersion.getAttribute("data-title"),
+        description: selectedVersion.getAttribute("data-description"),
+        category: selectedVersion.getAttribute("data-category"),
+        status: selectedVersion.getAttribute("data-status"),
+        custom_data: null,
+        is_quantifiable: selectedVersion.getAttribute("data-is-quantifiable"),
+      };
+    }
+
+    // Parse custom data from the chosen source
+    if (revisionData && revisionData.custom_data) {
+      customData = revisionData.custom_data || {};
+      status = revisionData.status;
+    } else {
+      try {
+        const customDataStr = selectedVersion.getAttribute("data-custom-data");
+        if (
+          customDataStr &&
+          customDataStr.trim() !== "" &&
+          customDataStr !== "null"
+        ) {
+          customData = JSON.parse(customDataStr);
+        }
+      } catch (e) {
+        console.error("Error parsing custom data:", e);
+        customData = {};
+      }
+      status = formSource.status;
+    }
+
+    document.getElementById("editTitle").value = formSource.title || "";
     document.getElementById("editDescription").value =
-      selectedVersion.getAttribute("data-description");
-    document.getElementById("editCategory").value =
-      selectedVersion.getAttribute("data-category");
+      formSource.description || "";
+    document.getElementById("editCategory").value = formSource.category || "";
 
     // Set status
-    const status = selectedVersion.getAttribute("data-status");
     const editStatus = document.getElementById("editStatus");
     if (editStatus) {
       editStatus.value = status || "Entwurf";
     }
 
     // Set quantifiable checkbox
-    let customData = {};
-    try {
-      const customDataStr = selectedVersion.getAttribute("data-custom-data");
-      if (
-        customDataStr &&
-        customDataStr.trim() !== "" &&
-        customDataStr !== "null"
-      ) {
-        customData = JSON.parse(customDataStr);
-      }
-    } catch (e) {
-      console.error("Error parsing custom data:", e);
-    }
-
     const editQuantifiable = document.getElementById("editQuantifiable");
     if (editQuantifiable) {
-      const isQuantifiable =
-        customData.is_quantifiable === "true" ||
-        customData.is_quantifiable === true;
+      const quantFlag =
+        (revisionData && revisionData.is_quantifiable) ||
+        formSource.is_quantifiable ||
+        customData.is_quantifiable;
+      const isQuantifiable = quantFlag === true || quantFlag === "true";
       editQuantifiable.checked = isQuantifiable;
     }
-
-    // Parse custom data (already done above, reuse it)
 
     const dynamicContainer = document.getElementById("dynamicColumnsContainer");
     dynamicContainer.innerHTML = "";
@@ -473,6 +880,18 @@ function openEditModal(reqId, versionId) {
       dynamicContainer.appendChild(fieldDiv);
     });
 
+    // Capture initial state for change detection in revision mode
+    editFormInitialData = captureEditFormSnapshot();
+    updateRevisionButtonState();
+
+    // Preload revisions for this requirement version to enable quick switching in the table
+    loadRevisions(reqId, versionId).then((revs) => {
+      const row = document.getElementById(`req-row-${reqId}`);
+      if (row) {
+        populateRevisionSelector(reqId, row, revs);
+      }
+    });
+
     const modal = new bootstrap.Modal(
       document.getElementById("editRequirementModal"),
     );
@@ -480,16 +899,65 @@ function openEditModal(reqId, versionId) {
   }
 }
 
+function openRevisionModal(reqId, versionId, revisionOverride = null) {
+  openEditModal(reqId, versionId, "revision", revisionOverride);
+}
+
 // Initialize on DOMContentLoaded
 document.addEventListener("DOMContentLoaded", function () {
   console.log("Project.js loaded");
   console.log("Custom columns:", window.PROJECT_CUSTOM_COLUMNS);
 
+  // Ensure all description previews have an active popover on load
+  document.querySelectorAll(".description-preview").forEach((el) => {
+    const full = el.getAttribute("data-description-full") || el.textContent;
+    refreshDescriptionPopover(el, full);
+  });
+
   // Attach event listeners
   attachEventListeners();
 
+  // Force-select the preferred version (server-provided) to avoid falling back to latest
+  const preferredVersionId = window.SELECTED_VERSION_ID || null;
+  if (preferredVersionId) {
+    document.querySelectorAll("[data-req-id]").forEach((row) => {
+      const reqId = row.getAttribute("data-req-id");
+      const versionSelector = row.querySelector(".version-selector");
+      if (!versionSelector) return;
+
+      const match = row.querySelector(
+        `.version-data[data-version-id="${preferredVersionId}"]`,
+      );
+      if (match) {
+        const targetIndex = match.getAttribute("data-version-index");
+        if (targetIndex) {
+          versionSelector.value = targetIndex;
+          updateRowWithVersionData(reqId, targetIndex);
+        }
+      }
+    });
+  }
+
   // Initialize filters
   initializeFilters();
+
+  // Preload revision selectors for visible rows
+  document.querySelectorAll(".revision-selector").forEach((selector) => {
+    const reqId = selector.getAttribute("data-req-id");
+    if (!reqId) return;
+    const row = document.getElementById(`req-row-${reqId}`);
+    const versionSelector = row?.querySelector(".version-selector");
+    const versionIndex = versionSelector?.value;
+    const versionData = versionIndex
+      ? row.querySelector(`.version-data[data-version-index="${versionIndex}"]`)
+      : null;
+    const versionId = versionData?.getAttribute("data-version-id");
+    loadRevisions(reqId, versionId).then((revs) => {
+      if (row) {
+        populateRevisionSelector(reqId, row, revs);
+      }
+    });
+  });
 
   // Start polling if we are in a project view
   if (typeof window.PROJECT_ID !== "undefined") {
@@ -575,3 +1043,4 @@ function pollRequirementsStatus() {
     })
     .catch((err) => console.error("Polling error:", err));
 }
+('console.log("TEST-LOADED-PROJECT.JS");');
