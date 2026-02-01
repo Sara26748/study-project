@@ -34,20 +34,6 @@ content %} {% if not project %}
         </a>
         <div class="d-flex align-items-center gap-2">
           <h2 class="fw-bold m-0">Projektname: {{ project.name }}</h2>
-          <button class="btn btn-outline-info d-flex align-items-center ms-2" data-bs-toggle="modal" data-bs-target="#shareProjectModal" style="color: #0a3d62; border-color: #0dcaf0; background: #eaf6fb; transition: background 0.2s, color 0.2s;">
-            <i class="bi bi-share me-2" style="color: #0a3d62;"></i>
-            <span style="color: #0a3d62;">Projekt teilen</span>
-          </button>
-          <style>
-          .btn-outline-info[data-bs-toggle="modal"]:hover, .btn-outline-info[data-bs-toggle="modal"]:focus {
-            background: #0dcaf0 !important;
-            color: #fff !important;
-          }
-          .btn-outline-info[data-bs-toggle="modal"]:hover i,
-          .btn-outline-info[data-bs-toggle="modal"]:hover span {
-            color: #fff !important;
-          }
-          </style>
         </div>
         {% if project.shared_with %}
         <div class="mt-2">
@@ -194,10 +180,52 @@ document.addEventListener('DOMContentLoaded', function() {
             
             <!-- Actions -->
             <div class="col-md-5 text-end d-flex gap-2 justify-content-end align-items-center">
+                <!-- Einfügen Dropdown Button -->
+                <div class="dropdown">
+                  <button class="btn btn-outline-primary d-flex align-items-center shadow-sm dropdown-toggle" type="button" id="insertDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="bi bi-plus-lg me-2"></i> Einfügen
+                  </button>
+                  <ul class="dropdown-menu" aria-labelledby="insertDropdown">
+                    <li>
+                      <a class="dropdown-item" href="#" id="insertNewColumn">
+                        <i class="bi bi-table me-2"></i> Neue Spalte
+                      </a>
+                    </li>
+                    <li>
+                      <a class="dropdown-item" href="#" id="insertNewRequirement">
+                        <i class="bi bi-plus-circle me-2"></i> Neue Anforderung
+                      </a>
+                    </li>
+                  </ul>
+                </div>
                 <!-- Export/Import Buttons (Larger & Labeled) -->
                 <a href="{{ url_for('main.export_excel', project_id=project.id) }}" class="btn btn-outline-success px-3 d-flex align-items-center shadow-sm" title="Liste als Excel exportieren">
                     <i class="bi bi-file-earmark-arrow-up me-2 fw-bold"></i> Export
                 </a>
+                <button
+                  class="btn btn-outline-warning btn-uniform d-flex align-items-center share-btn"
+                  type="button"
+                  data-bs-toggle="modal"
+                  data-bs-target="#shareProjectModal"
+                  title="teilen"
+                >
+                  <i class="bi bi-share me-2"></i> <span class="share-btn-text">teilen</span>
+                </button>
+                <style>
+                .share-btn:hover, .share-btn:focus {
+                  background: #ffc107 !important;
+                  color: #fff !important;
+                  border-color: #ffc107 !important;
+                }
+                .share-btn:hover .share-btn-text,
+                .share-btn:focus .share-btn-text {
+                  color: #fff !important;
+                }
+                .share-btn:hover i,
+                .share-btn:focus i {
+                  color: #fff !important;
+                }
+                </style>
                 <button class="btn btn-outline-primary px-3 d-flex align-items-center shadow-sm" type="button" data-bs-toggle="modal" data-bs-target="#importExcelModal" title="Excel-Datei importieren">
                     <i class="bi bi-file-earmark-arrow-down me-2 fw-bold"></i> Import
                 </button>
@@ -205,14 +233,27 @@ document.addEventListener('DOMContentLoaded', function() {
                 <div class="border-start mx-2" style="height: 24px;"></div>
 
                 <div class="d-inline-block">
-                    <button
-                        class="btn btn-sm btn-outline-secondary"
-                        type="button"
-                        data-bs-toggle="collapse"
-                        data-bs-target="#addColumnForm"
-                    >
-                        <i class="bi bi-plus-lg"></i> Spalte
-                    </button>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  var insertNewColumn = document.getElementById('insertNewColumn');
+  var addColumnBtn = document.getElementById('addColumnBtn');
+  if(insertNewColumn && addColumnBtn) {
+    insertNewColumn.addEventListener('click', function(e) {
+      e.preventDefault();
+      addColumnBtn.click();
+    });
+  }
+  var insertNewRequirement = document.getElementById('insertNewRequirement');
+  var scrollToManualBtn = document.getElementById('scrollToManualBtn');
+  if(insertNewRequirement && scrollToManualBtn) {
+    insertNewRequirement.addEventListener('click', function(e) {
+      e.preventDefault();
+      scrollToManualBtn.click();
+    });
+  }
+});
+</script>
                     <!-- Column Remove Dropdown -->
                      <div class="dropdown d-inline-block">
                         <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
