@@ -645,74 +645,88 @@ endblock %} {% block content %}
               </div>
                 </small>
               </div>
+<div class="config-card">
+  <div class="config-card-header">
+    <div class="config-card-icon">
+      <i class="bi bi-layout-text-sidebar-reverse"></i>
+    </div>
+    <div>
+      <h3 class="config-card-title">Ausgabeformat</h3>
+      <p class="config-card-subtitle">
+        Sprache und Tabellenspalten festlegen
+      </p>
+    </div>
+  </div>
 
-              <!-- Output Language -->
-              <div class="mb-4">
-                <label class="form-label fw-semibold mb-2">
-                  <i class="bi bi-translate me-1 text-primary"></i>Ausgabe-Sprache
-                </label>
-                <select
-                  class="form-select"
-                  id="output_language"
-                  name="output_language"
-                  style="max-width: 240px"
-                >
-                  <option value="Deutsch" selected>Deutsch</option>
-                  <option value="Englisch">Englisch</option>
-                  <option value="Arabisch">Arabisch</option>
-                  <option value="Französisch">Französisch</option>
-                </select>
-                <small class="text-muted mt-2 d-block">
-                  <i class="bi bi-info-circle me-1 text-primary"></i>
-                  Die KI formuliert alle Anforderungen in der gewählten Sprache.
-                </small>
-              </div>
+  <!-- Output Language -->
+  <div class="mb-4">
+    <label class="form-label fw-semibold mb-2">
+      <i class="bi bi-translate me-1 text-primary"></i>Ausgabe-Sprache
+    </label>
+    <select
+      class="form-select"
+      id="output_language"
+      name="output_language"
+      style="max-width: 240px"
+    >
+      <option value="Deutsch" selected>Deutsch</option>
+      <option value="Englisch">Englisch</option>
+      <option value="Arabisch">Arabisch</option>
+      <option value="Französisch">Französisch</option>
+    </select>
+    <small class="text-muted mt-2 d-block">
+      <i class="bi bi-info-circle me-1 text-primary"></i>
+      Die KI formuliert alle Anforderungen in der gewählten Sprache.
+    </small>
+  </div>
 
-              <!-- Table Columns Schema -->
-              <div class="mb-3">
-                <label class="form-label fw-semibold mb-2">
-                  <i class="bi bi-table me-1 text-primary"></i>Tabellenspalten
-                  (Schema der Ausgabe)
-                </label>
-                <div id="columns-display" class="mb-3">
-                  <span class="column-badge standard">
-                    <i class="bi bi-star-fill me-1" style="color: white"></i
-                    >Titel
-                    <small class="ms-1 opacity-75">(Standard)</small>
-                  </span>
-                  <span class="column-badge standard">
-                    <i class="bi bi-star-fill me-1" style="color: white"></i
-                    >Beschreibung
-                    <small class="ms-1 opacity-75">(Standard)</small>
-                  </span>
-                  <span class="column-badge standard">
-                    <i class="bi bi-star-fill me-1" style="color: white"></i
-                    >Kategorie
-                    <small class="ms-1 opacity-75">(Standard)</small>
-                  </span>
-                  <!-- Custom columns will be added here dynamically -->
-                </div>
-                <div class="input-group">
-                  <input
-                    type="text"
-                    class="form-control"
-                    id="new_column_input"
-                    placeholder="Neue Spalte hinzufügen (z.B. Priorität, Kosten, Verantwortlich...)"
-                  />
-                  <button
-                    type="button"
-                    class="btn btn-outline-primary"
-                    id="add-column-btn"
-                  >
-                    <i class="bi bi-plus-circle me-1"></i>Spalte hinzufügen
-                  </button>
-                </div>
-                <small class="text-muted mt-2 d-block">
-                  <i class="bi bi-lightbulb me-1 text-primary"></i>
-                  Beispiele: Priorität, Kosten, Verantwortlich, Farbe, Status,
-                  Deadline
-                </small>
-              </div>
+  <!-- Table Columns Schema -->
+  <div class="mb-3">
+    <label class="form-label fw-semibold mb-2">
+      <i class="bi bi-table me-1 text-primary"></i>Tabellenspalten
+      (Schema der Ausgabe)
+    </label>
+    <div id="columns-display" class="mb-3">
+      <span class="column-badge standard">
+        <i class="bi bi-star-fill me-1" style="color: white"></i
+        >Titel
+        <small class="ms-1 opacity-75">(Standard)</small>
+      </span>
+      <span class="column-badge standard">
+        <i class="bi bi-star-fill me-1" style="color: white"></i
+        >Beschreibung
+        <small class="ms-1 opacity-75">(Standard)</small>
+      </span>
+      <span class="column-badge standard">
+        <i class="bi bi-star-fill me-1" style="color: white"></i
+        >Kategorie
+        <small class="ms-1 opacity-75">(Standard)</small>
+      </span>
+      <!-- Custom columns will be added here dynamically -->
+    </div>
+    <div class="input-group">
+      <input
+        type="text"
+        class="form-control"
+        id="new_column_input"
+        placeholder="Neue Spalte hinzufügen (z.B. Priorität, Kosten, Verantwortlich...)"
+      />
+      <button
+        type="button"
+        class="btn btn-outline-primary"
+        id="add-column-btn"
+      >
+        <i class="bi bi-plus-circle me-1"></i>Spalte hinzufügen
+      </button>
+    </div>
+    <small class="text-muted mt-2 d-block">
+      <i class="bi bi-lightbulb me-1 text-primary"></i>
+      Beispiele: Priorität, Kosten, Verantwortlich, Farbe, Status,
+      Deadline
+    </small>
+  </div>
+</div>
+
             </div>
 
             <!-- AI Model Selection -->
