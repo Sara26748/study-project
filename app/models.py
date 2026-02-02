@@ -108,6 +108,7 @@ class Requirement(db.Model):
 class RequirementVersion(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     requirement_id = db.Column(db.Integer, db.ForeignKey('requirement.id'), nullable=False)
+    revision = db.Column(db.String(20), nullable=True)  # Neue Spalte Revision
     version_index = db.Column(db.Integer, nullable=False)     # 1, 2, 3, ...
     version_label = db.Column(db.String(4), nullable=False)   # A, B, C, ...
 
@@ -167,7 +168,8 @@ class RequirementVersion(db.Model):
         status_colors = {
             'Entwurf': 'danger',      # Red
             'In Bearbeitung': 'warning', # Yellow
-            'Freigabe': 'success'     # Green
+            'Freigabe': 'success',    # Green
+            'Verworfen': 'dark',      # Dark
         }
         return status_colors.get(self.status, 'secondary')
     

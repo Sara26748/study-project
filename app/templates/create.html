@@ -158,6 +158,7 @@ document.addEventListener('DOMContentLoaded', function() {
 <script>
   window.PROJECT_CUSTOM_COLUMNS = {{ custom_columns|tojson|safe }};
   window.PROJECT_ID = {{ project.id }};
+  window.SELECTED_VERSION_ID = {{ selected_version_id or 'null' }};
 </script>
 
 <!-- Toolbar & Filter -->
@@ -179,6 +180,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     <option value="Entwurf">Entwurf</option>
                     <option value="In Bearbeitung">In Bearbeitung</option>
                     <option value="Freigabe">Freigabe</option>
+                    <option value="Verworfen">Verworfen</option>
                  </select>
             </div>
             <div class="col-md-2">
@@ -299,7 +301,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                 <span class="badge bg-success bg-opacity-10 text-success">Geschützt</span>
                             </li>
                             <li class="d-flex justify-content-between align-items-center px-3 py-1">
-                                <span class="small"><i class="bi bi-shield-fill-check text-success me-1"></i>Name</span>
+                                <span class="small"><i class="bi bi-shield-fill-check text-success me-1"></i>Anforderung</span>
                                 <span class="badge bg-success bg-opacity-10 text-success">Geschützt</span>
                             </li>
                             <li class="d-flex justify-content-between align-items-center px-3 py-1">
@@ -423,9 +425,10 @@ document.addEventListener('DOMContentLoaded', function() {
       <table class="table table-hover align-middle mb-0">
         <thead class="bg-secondary bg-opacity-10 text-dark">
           <tr>
-            <th class="ps-4 py-3" style="width: 5%">Version</th>
+            <th class="ps-4 py-3" style="width: 5%">Revision</th>
+            <th class="py-3" style="width: 5%">Version</th>
             <th class="py-3" style="width: 5%">ID</th>
-            <th class="py-3" style="width: 20%">Name</th>
+            <th class="py-3" style="width: 20%">Anforderung</th>
             <th class="py-3" style="width: 25%">Beschreibung</th>
             {% for column in custom_columns %}
             <th class="py-3" style="width: 10%">{{ column }}</th>
@@ -447,35 +450,55 @@ document.addEventListener('DOMContentLoaded', function() {
         </thead>
         <tbody>
           {% if req_with_versions %} {% for req, versions in req_with_versions %}
-          <tr id="req-row-{{ req.id }}" 
+          {% set selected_version = versions[-1] %}
+          {% if selected_version_id %}
+            {% for ver in versions %}
+              {% if ver.id == selected_version_id %}
+                {% set selected_version = ver %}
+              {% endif %}
+            {% endfor %}
+          {% endif %}
+            <tr id="req-row-{{ req.id }}" 
               data-req-id="{{ req.id }}" 
+              {% if selected_version_id and selected_version_id == selected_version.id %}data-preferred-version-id="{{ selected_version.id }}"{% endif %}
               class="requirement-row-clickable" 
               style="cursor: pointer;"
               onmouseover="this.style.backgroundColor='#f8f9fa'" 
               onmouseout="this.style.backgroundColor=''">
-            <td class="ps-4" onclick="event.stopPropagation();">
+            <td class="ps-4 revision-cell" onclick="event.stopPropagation();">
+              <select
+                class="form-select form-select-sm border-0 bg-transparent revision-selector"
+                data-req-id="{{ req.id }}"
+                style="width: auto; padding-left: 0; box-shadow: none;"
+              >
+                <option value="current" selected>
+                  {{ selected_version.revision or 'Entwurf' }}
+                </option>
+              </select>
+            </td>
+            <td>
               <select
                 class="form-select form-select-sm border-0 bg-transparent text-primary fw-bold p-0 version-selector"
                 style="width: auto; cursor: pointer;"
                 data-req-id="{{ req.id }}"
               >
                 {% for ver in versions %}
-                <option value="{{ ver.version_index }}" {% if loop.last %}selected{% endif %}>
+                <option value="{{ ver.version_index }}" {% if selected_version_id == ver.id %}selected{% elif loop.last %}selected{% endif %}>
                   {{ ver.version_label }}
                 </option>
                 {% endfor %}
               </select>
             </td>
-            <td class="text-muted small">#{{ loop.index }}</td>
+            <td class="text-muted small">REQ{{ loop.index }}</td>
             <td>
-                <span class="fw-bold title-cell text-dark">{{ versions[-1].title }}</span>
+                <span class="fw-bold title-cell text-dark">{{ selected_version.title }}</span>
                 <br>
                 <small class="text-muted user-cell">
-                     {% if versions[-1].created_by %}
-                     <i class="bi bi-person-plus-fill text-success"></i> Erstellt: {{ versions[-1].created_by.email.split('@')[0] }}
+                     {% if selected_version.created_by %}
+                     <i class="bi bi-person-plus-fill text-success"></i> Erstellt: {{ selected_version.created_by.email.split('@')[0] }}
                      {% endif %}
-                     {% if versions[-1].last_modified_by and versions[-1].last_modified_by.id != versions[-1].created_by.id %}
-                     <br><i class="bi bi-pencil-fill text-primary"></i> Bearbeitet: {{ versions[-1].last_modified_by.email.split('@')[0] }}
+                     {% if selected_version.last_modified_by and selected_version.last_modified_by.id != selected_version.created_by.id %}
+                     <br><i class="bi bi-pencil-fill text-primary"></i> Bearbeitet: {{ selected_version.last_modified_by.email.split('@')[0] }}
                      {% endif %}
                 </small>
             </td>
@@ -485,24 +508,24 @@ document.addEventListener('DOMContentLoaded', function() {
                      data-bs-toggle="popover" 
                      data-bs-trigger="hover focus"
                      data-bs-placement="top"
-                     data-bs-content="{{ versions[-1].description|replace('"', '&quot;')|replace("'", "&#39;") }}"
+                     data-bs-content="{{ selected_version.description|replace('"', '&quot;')|replace("'", "&#39;") }}"
                      data-bs-html="false"
-                     data-description-full="{{ versions[-1].description|e }}"
+                     data-description-full="{{ selected_version.description|e }}"
                      title="Vollständige Beschreibung">
-                    {{ versions[-1].description }}
+                    {{ selected_version.description }}
                 </div>
             </td>
             {% for column in custom_columns %}
             <td class="custom-data-cell" data-column="{{ column }}" onclick="window.location.href='{{ url_for('main.requirement_history', rid=req.id) }}'">
-              {{ versions[-1].get_custom_data().get(column, "–") }}
+              {{ selected_version.get_custom_data().get(column, "–") }}
             </td>
             {% endfor %}
             <td class="category-cell" onclick="window.location.href='{{ url_for('main.requirement_history', rid=req.id) }}'">
-                <span class="badge bg-light text-secondary border">{{ versions[-1].category or "–" }}</span>
+                <span class="badge bg-light text-secondary border">{{ selected_version.category or "–" }}</span>
             </td>
             <td class="status-cell" onclick="window.location.href='{{ url_for('main.requirement_history', rid=req.id) }}'">
-              <span class="badge rounded-pill bg-{{ versions[-1].get_status_color() }}"
-                >{{ versions[-1].status }}</span
+              <span class="badge rounded-pill bg-{{ selected_version.get_status_color() }}"
+                >{{ selected_version.status }}</span
               >
             </td>
             <td class="text-center" onclick="event.stopPropagation();">
@@ -515,8 +538,8 @@ document.addEventListener('DOMContentLoaded', function() {
             </td>
             <td class="quantifiable-cell text-center quantifiable-col" onclick="event.stopPropagation();">
               {% set custom_data = versions[-1].get_custom_data() %}
-              {% set is_quantifiable = custom_data.get('is_quantifiable', 'false') == 'true' or custom_data.get('is_quantifiable', False) == True %}
-              <form method="POST" action="{{ url_for('main.toggle_quantifiable', version_id=versions[-1].id) }}" class="d-inline toggle-quantifiable-form">
+              {% set is_quantifiable = selected_version.get_custom_data().get('is_quantifiable', 'false') == 'true' or selected_version.get_custom_data().get('is_quantifiable', False) == True %}
+              <form method="POST" action="{{ url_for('main.toggle_quantifiable', version_id=selected_version.id) }}" class="d-inline toggle-quantifiable-form">
                 <button type="submit" class="btn btn-sm btn-link p-0 border-0" title="{% if is_quantifiable %}Quantifizierbar - Klicken zum Deaktivieren{% else %}Nicht quantifizierbar - Klicken zum Aktivieren{% endif %}">
                   <i class="bi {% if is_quantifiable %}bi-check-circle-fill text-success{% else %}bi-circle text-muted{% endif %}" style="font-size: 1.3rem;"></i>
                 </button>
@@ -526,68 +549,38 @@ document.addEventListener('DOMContentLoaded', function() {
             <td class="actions-cell text-end pe-4">
               <div class="d-flex justify-content-end align-items-center">
                     <!-- Direct Lock Button -->
-                    <form method="POST" action="{{ url_for('main.toggle_block_requirement', version_id=versions[-1].id) }}" class="d-inline me-1">
-                        <button type="submit" class="btn btn-sm btn-icon rounded-circle {% if versions[-1].is_blocked %}text-danger{% else %}text-success{% endif %}" title="{% if versions[-1].is_blocked %}Freigeben{% else %}Blockieren{% endif %}">
-                            <i class="bi {% if versions[-1].is_blocked %}bi-lock-fill{% else %}bi-unlock{% endif %}"></i>
+                    <form method="POST" action="{{ url_for('main.toggle_block_requirement', version_id=selected_version.id) }}" class="d-inline me-1">
+                      <button type="submit" class="btn btn-sm btn-icon rounded-circle {% if selected_version.is_blocked %}text-danger{% else %}text-success{% endif %}" title="{% if selected_version.is_blocked %}Freigeben{% else %}Blockieren{% endif %}">
+                        <i class="bi {% if selected_version.is_blocked %}bi-lock-fill{% else %}bi-unlock{% endif %}"></i>
                         </button>
                     </form>
 
                     <div class="dropdown">
-                        <button class="btn btn-sm btn-light btn-icon rounded-circle" type="button" data-bs-toggle="dropdown" onclick="event.stopPropagation();">
-                            <i class="bi bi-three-dots-vertical"></i>
-                        </button>
+                      <button class="btn btn-sm btn-light btn-icon rounded-circle text-primary" type="button" data-bs-toggle="dropdown" onclick="event.stopPropagation();">
+                        <i class="bi bi-pencil-square"></i>
+                      </button>
                         <ul class="dropdown-menu dropdown-menu-end shadow border-0">
                             <li class="px-3 pt-3 pb-1">
                                 <button class="btn btn-outline-primary status-btn-vertical action-btn w-100 edit-requirement-btn" 
                                     type="button"
                                     data-req-id="{{ req.id }}" 
-                                    data-version-id="{{ versions[-1].id }}"
+                                    data-version-id="{{ selected_version.id }}"
                                     style="margin-bottom:0.25rem;"
-                                    {% if versions[-1].is_blocked %}disabled{% endif %}>
+                                    {% if selected_version.is_blocked %}disabled{% endif %}>
                                     <i class="bi bi-pencil me-2"></i> Bearbeiten
                                 </button>
-                                <form method="POST" action="{{ url_for('main.update_status', version_id=versions[-1].id) }}">
-                                  <button type="submit" class="btn btn-outline-danger status-btn-vertical action-btn w-100" style="margin-bottom:0.25rem;">
-                                    <i class="bi bi-circle me-2"></i> Entwurf
-                                  </button>
-                                  <input type="hidden" name="status" value="Entwurf">
-                                </form>
-                                <form method="POST" action="{{ url_for('main.update_status', version_id=versions[-1].id) }}">
-                                  <button type="submit" class="btn btn-outline-warning status-btn-vertical action-btn w-100" style="margin-bottom:0.25rem;">
-                                    <i class="bi bi-hourglass-split me-2"></i> In Bearbeitung
-                                  </button>
-                                  <input type="hidden" name="status" value="In Bearbeitung">
-                                </form>
-                                <form method="POST" action="{{ url_for('main.update_status', version_id=versions[-1].id) }}">
-                                  <button type="submit" class="btn btn-outline-success status-btn-vertical action-btn w-100" style="margin-bottom:0.25rem;">
-                                    <i class="bi bi-check2-circle me-2"></i> Freigabe
-                                  </button>
-                                  <input type="hidden" name="status" value="Freigabe">
-                                </form>
-                                <form method="POST" action="{{ url_for('main.update_status', version_id=versions[-1].id) }}">
-                                  <button type="submit" class="btn btn-outline-dark status-btn-vertical action-btn w-100 verworfen-btn" style="margin-bottom:0.25rem; background: #fff; color: #23272b; border: 1.5px solid #23272b;">
-                                    <i class="bi bi-x-circle me-2"></i> Verworfen
-                                  </button>
-                                  <input type="hidden" name="status" value="Verworfen">
-                                </form>
-                                <form method="POST" action="{{ url_for('main.delete_requirement_version', version_id=versions[-1].id) }}" class="delete-version-form">
+                                <button class="btn btn-outline-secondary status-btn-vertical action-btn w-100 revision-requirement-btn" 
+                                    type="button"
+                                    data-req-id="{{ req.id }}" 
+                                    data-version-id="{{ selected_version.id }}"
+                                    style="margin-bottom:0.25rem;">
+                                    <i class="bi bi-arrow-counterclockwise me-2"></i> Revidieren
+                                </button>
+                                <form method="POST" action="{{ url_for('main.delete_requirement_version', version_id=selected_version.id) }}" class="delete-version-form">
                                   <button type="submit" class="btn btn-outline-danger status-btn-vertical action-btn w-100" style="margin-bottom:0.25rem;" onclick="return confirm('Wirklich löschen?')">
                                     <i class="bi bi-trash me-2"></i> Löschen
                                   </button>
                                 </form>
-                                <style>
-                                .verworfen-btn {
-                                  background: #fff !important;
-                                  color: #23272b !important;
-                                  border-color: #23272b !important;
-                                  transition: background 0.2s, color 0.2s;
-                                }
-                                .verworfen-btn:hover, .verworfen-btn:focus {
-                                  background: #343a40 !important;
-                                  color: #fff !important;
-                                  border-color: #23272b !important;
-                                }
-                                </style>
                             </li>
                             </li>
                             <li>
@@ -624,6 +617,7 @@ document.addEventListener('DOMContentLoaded', function() {
                   data-status-color="{{ ver.get_status_color() }}"
                   data-custom-data="{{ ver.get_custom_data_json()|safe }}"
                   data-is-quantifiable="{{ 'true' if (ver.get_custom_data().get('is_quantifiable', 'false') == 'true' or ver.get_custom_data().get('is_quantifiable', False) == True) else 'false' }}"
+                  data-revision="{{ ver.revision or 'Entwurf' }}"
                 ></div>
                 {% endfor %}
               </div>
@@ -805,14 +799,16 @@ document.addEventListener('DOMContentLoaded', function() {
       <form id="editRequirementForm" method="POST">
         <div class="modal-body">
           <input type="hidden" id="editVersionId" name="version_id" />
+          <input type="hidden" id="editRevisionNumber" name="revision_number" />
           <input
             type="hidden"
             id="editSaveType"
             name="save_type"
             value="intermediate"
           />
+          <input type="hidden" id="editMode" name="mode" value="edit" />
           <div class="mb-3">
-            <label for="editTitle" class="form-label">Name *</label>
+            <label for="editTitle" class="form-label">Anforderung *</label>
             <input
               type="text"
               class="form-control"
@@ -848,6 +844,7 @@ document.addEventListener('DOMContentLoaded', function() {
               <option value="Entwurf">Entwurf</option>
               <option value="In Bearbeitung">In Bearbeitung</option>
               <option value="Freigabe">Freigabe</option>
+              <option value="Verworfen">Verworfen</option>
             </select>
           </div>
           <div class="mb-3">
@@ -874,20 +871,34 @@ document.addEventListener('DOMContentLoaded', function() {
           >
             Abbrechen
           </button>
-          <button
-            type="submit"
-            class="btn btn-warning"
-            onclick="document.getElementById('editSaveType').value='intermediate'"
-          >
-            Zwischenspeichern
-          </button>
-          <button
-            type="submit"
-            class="btn btn-success"
-            onclick="document.getElementById('editSaveType').value='final'"
-          >
-            Speichern (Freigabe)
-          </button>
+          <div id="editActionButtons" class="d-flex gap-2">
+            <button
+              type="submit"
+              class="btn btn-warning"
+              onclick="document.getElementById('editSaveType').value='intermediate'"
+              id="editSaveIntermediateBtn"
+            >
+              Bearbeitet
+            </button>
+            <button
+              type="submit"
+              class="btn btn-success"
+              onclick="document.getElementById('editSaveType').value='final'"
+              id="editSaveFinalBtn"
+            >
+              Freigegeben
+            </button>
+          </div>
+          <div id="revisionActionButton" class="d-none">
+            <button
+              type="submit"
+              class="btn btn-primary"
+              id="revisionSubmit"
+              disabled
+            >
+              Revidiert
+            </button>
+          </div>
         </div>
       </form>
     </div>
@@ -905,7 +916,7 @@ document.addEventListener('DOMContentLoaded', function() {
       <form id="manualRequirementForm" method="POST" action="{{ url_for('main.create_manual_requirement', project_id=project.id) }}">
         <div class="modal-body">
           <div class="mb-3">
-            <label for="manualTitle" class="form-label">Name *</label>
+            <label for="manualTitle" class="form-label">Anforderung *</label>
             <input type="text" class="form-control" id="manualTitle" name="title" required />
           </div>
           <div class="mb-3">
@@ -922,6 +933,7 @@ document.addEventListener('DOMContentLoaded', function() {
               <option value="Entwurf">Entwurf</option>
               <option value="In Bearbeitung">In Bearbeitung</option>
               <option value="Freigabe">Freigabe</option>
+              <option value="Verworfen">Verworfen</option>
             </select>
           </div>
           <div class="mb-3">
@@ -971,44 +983,34 @@ document.addEventListener('DOMContentLoaded', function() {
 <script>
 // Initialize Bootstrap Popovers for description tooltips
 document.addEventListener('DOMContentLoaded', function() {
-    var popoverTriggerList = [].slice.call(document.querySelectorAll('.description-preview[data-bs-toggle="popover"]'));
-    var popoverList = popoverTriggerList.map(function (popoverTriggerEl) {
-        // Get full description from data attribute
-        var fullDescription = popoverTriggerEl.getAttribute('data-description-full') || popoverTriggerEl.textContent;
-        
-        return new bootstrap.Popover(popoverTriggerEl, {
-            trigger: 'hover focus',
-            html: false,
-            placement: 'top',
-            content: fullDescription,
-            title: 'Vollständige Beschreibung'
+  const initAllPopovers = () => {
+    document.querySelectorAll('.description-preview').forEach((el) => {
+      const fullDescription = el.getAttribute('data-description-full') || el.textContent;
+      if (typeof refreshDescriptionPopover === 'function') {
+        refreshDescriptionPopover(el, fullDescription);
+      } else {
+        // Fallback: basic popover init if helper not yet available
+        const existing = bootstrap.Popover.getInstance(el);
+        if (existing) existing.dispose();
+        new bootstrap.Popover(el, {
+          trigger: 'hover focus',
+          html: false,
+          placement: 'top',
+          content: fullDescription,
+          title: 'Vollständige Beschreibung'
         });
+      }
     });
-    
-    // Re-initialize popovers when version changes
-    document.addEventListener('change', function(e) {
-        if (e.target.classList.contains('version-selector')) {
-            // Destroy existing popovers and reinitialize
-            popoverList.forEach(function(popover) {
-                if (popover) popover.dispose();
-            });
-            
-            // Reinitialize after a short delay to allow DOM update
-            setTimeout(function() {
-                var newPopoverTriggerList = [].slice.call(document.querySelectorAll('.description-preview[data-bs-toggle="popover"]'));
-                popoverList = newPopoverTriggerList.map(function (popoverTriggerEl) {
-                    var fullDescription = popoverTriggerEl.getAttribute('data-description-full') || popoverTriggerEl.textContent;
-                    return new bootstrap.Popover(popoverTriggerEl, {
-                        trigger: 'hover focus',
-                        html: false,
-                        placement: 'top',
-                        content: fullDescription,
-                        title: 'Vollständige Beschreibung'
-                    });
-                });
-            }, 100);
-        }
-    });
+  };
+
+  initAllPopovers();
+
+  // Re-initialize popovers when version changes
+  document.addEventListener('change', function(e) {
+    if (e.target.classList.contains('version-selector')) {
+      setTimeout(initAllPopovers, 50);
+    }
+  });
 });
 </script>
 
