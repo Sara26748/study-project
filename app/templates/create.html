@@ -1,5 +1,11 @@
 {% extends "base.html" %} {% block title %}Manage Project{% endblock %} {% block
+
 content %} 
+<style>
+  main.container {
+    max-width: 1400px;
+  }
+</style>
 
 
 {% if not project %}
@@ -182,7 +188,7 @@ document.addEventListener('DOMContentLoaded', function() {
             </div>
             
             <!-- Actions -->
-            <div class="col-md-5 text-end d-flex gap-2 justify-content-end align-items-center">
+            <div class="col-md-5 text-end d-flex gap-2 justify-content-md-end justify-content-start align-items-center flex-wrap">
                 <!-- Einfügen Dropdown Button -->
                 <div class="dropdown">
                   <button class="btn btn-outline-primary d-flex align-items-center shadow-sm dropdown-toggle" type="button" id="insertDropdown" data-bs-toggle="dropdown" aria-expanded="false">
@@ -338,6 +344,17 @@ document.addEventListener('DOMContentLoaded', function() {
         <div id="dynamicFiltersContainer" class="mt-2 row g-2"></div>
 
         <!-- Add Column Collapse -->
+        <button
+          type="button"
+          id="addColumnBtn"
+          class="btn btn-sm btn-outline-primary d-none"
+          data-bs-toggle="collapse"
+          data-bs-target="#addColumnForm"
+          aria-expanded="false"
+          aria-controls="addColumnForm"
+        >
+          Neue Spalte hinzufügen
+        </button>
         <div class="collapse mt-3 border-top pt-3" id="addColumnForm">
           <form
             method="POST"
