@@ -630,17 +630,19 @@ endblock %} {% block content %}
                     class="form-control"
                     id="num_requirements_value"
                     name="num_requirements_value"
-                    value="5"
+                    value=""
+                    placeholder="Automatisch"
                     min="1"
                     max="20"
+                    data-default-value="5"
                     disabled
                   />
                 </div>
                 <small class="text-muted mt-2 d-block">
                   <i class="bi bi-info-circle me-1 text-primary"></i>
-                  Bei "Keine Angabe" entscheidet die KI basierend auf dem Kontext
-                  (3-10 Requirements). Bei "Genau", "Mindestens" oder "Höchstens"
-                  wird die Zahl berücksichtigt.
+                  Bei "Automatisch" entscheidet die KI basierend auf dem Kontext
+                  (3-10 Requirements). Bei "Mindestens" oder "Höchstens" wird die
+                  Zahl berücksichtigt.
                 </small>
               </div>
                 </small>
@@ -990,12 +992,32 @@ endblock %} {% block content %}
   const agentForm = document.getElementById("agent-form");
   const progressBar = document.getElementById("ai-progress");
 
+
   // Number of requirements toggle
   const numReqMode = document.getElementById("num_requirements_mode");
   const numReqValue = document.getElementById("num_requirements_value");
+  let lastManualNumReqValue =
+    numReqValue.value || numReqValue.dataset.defaultValue || "5";
 
-  numReqMode.addEventListener("change", function () {
-    numReqValue.disabled = this.value === "auto";
+  function applyNumReqMode() {
+    const isAuto = numReqMode.value === "auto";
+    if (isAuto) {
+      numReqValue.value = "";
+      numReqValue.placeholder = "";
+    } else {
+      numReqValue.placeholder = "";
+      if (!numReqValue.value) {
+        numReqValue.value = lastManualNumReqValue;
+      }
+    }
+    numReqValue.disabled = isAuto;
+  }
+
+  numReqMode.addEventListener("change", applyNumReqMode);
+  numReqValue.addEventListener("input", function () {
+    if (this.value) {
+      lastManualNumReqValue = this.value;
+    }
   });
 
   // Mode Toggle Logic
@@ -1011,15 +1033,15 @@ endblock %} {% block content %}
       hiddenExtend.value = (selected === 'extend').toString();
       
       // Update UI state
-      if (selected === 'improve') {
-          // Locked count for improvement
-          numReqMode.disabled = true;
-          numReqValue.disabled = true;
-      } else {
-          // Enabled for New and Extend
-          numReqMode.disabled = false;
-          numReqValue.disabled = numReqMode.value === "auto";
-      }
+    if (selected === 'improve') {
+      // Locked count for improvement
+      numReqMode.disabled = true;
+      numReqValue.disabled = true;
+    } else {
+      // Enabled for New and Extend
+      numReqMode.disabled = false;
+      applyNumReqMode();
+    }
   }
 
   modeRadios.forEach(radio => {
@@ -1027,6 +1049,7 @@ endblock %} {% block content %}
   });
   
   // Initialize state
+  applyNumReqMode();
   updateMode();
 
   // Column management
