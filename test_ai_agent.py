@@ -5,6 +5,7 @@ Run this after logging into the application to test the AI agent endpoints
 
 import requests
 import json
+import pytest
 
 BASE_URL = "http://127.0.0.1:5000"
 
@@ -14,10 +15,9 @@ def test_ai_client_imports():
         from app.services import ai_client
         assert hasattr(ai_client, 'generate_requirements'), "generate_requirements function not found"
         print("✅ AI Client imports successfully")
-        return True
     except Exception as e:
         print(f"❌ AI Client import failed: {e}")
-        return False
+        pytest.fail(str(e))
 
 def test_config_loading():
     """Test that config loads environment variables correctly"""
@@ -37,10 +37,9 @@ def test_config_loading():
         print(f"   - API Key present: {bool(config.OPENAI_API_KEY)}")
         print(f"   - Model: {config.OPENAI_MODEL}")
         print(f"   - System prompt length: {len(prompt)} characters")
-        return True
     except Exception as e:
         print(f"❌ Config loading failed: {e}")
-        return False
+        pytest.fail(str(e))
 
 def test_ai_client_function_signature():
     """Test that generate_requirements has correct signature"""
@@ -56,10 +55,9 @@ def test_ai_client_function_signature():
         
         print("✅ AI Client function signature is correct")
         print(f"   - Parameters: {params}")
-        return True
     except Exception as e:
         print(f"❌ Function signature test failed: {e}")
-        return False
+        pytest.fail(str(e))
 
 def test_json_parsing_functions():
     """Test JSON parsing helper functions"""
@@ -79,52 +77,56 @@ def test_json_parsing_functions():
         assert isinstance(result2, list), "Should parse JSON from text"
         
         print("✅ JSON parsing functions work correctly")
-        return True
     except Exception as e:
         print(f"❌ JSON parsing test failed: {e}")
-        return False
+        pytest.fail(str(e))
 
 def test_models():
     """Test that models are correctly defined"""
     try:
-        from app.models import Requirement, Project
+        from app.models import Requirement, RequirementVersion, Project
         import inspect
         
-        # Check Requirement model
+        # Check Requirement model (base fields only, versioned data lives in RequirementVersion)
         req_attrs = [attr for attr in dir(Requirement) if not attr.startswith('_')]
-        required_fields = ['title', 'description', 'category', 'status', 'project_id', 'created_at']
+        required_fields = ['project_id', 'created_at', 'key', 'is_deleted', 'funktional']
         
         for field in required_fields:
             assert field in req_attrs, f"Requirement model missing {field}"
+
+        # Check RequirementVersion model for versioned fields
+        version_attrs = [attr for attr in dir(RequirementVersion) if not attr.startswith('_')]
+        version_required_fields = ['title', 'description', 'category', 'status', 'created_at', 'version_index', 'version_label']
+        for field in version_required_fields:
+            assert field in version_attrs, f"RequirementVersion model missing {field}"
         
         # Check Project model has requirements relationship
         assert hasattr(Project, 'requirements'), "Project model missing requirements relationship"
         
         print("✅ Models are correctly defined")
         print(f"   - Requirement fields: {required_fields}")
-        return True
+        print(f"   - RequirementVersion fields: {version_required_fields}")
     except Exception as e:
         print(f"❌ Models test failed: {e}")
-        return False
+        pytest.fail(str(e))
 
 def test_agent_routes():
     """Test that agent routes are registered"""
     try:
-        from app.agent import agent_bp
+        from app import create_app
         
-        # Check blueprint is defined
-        assert agent_bp is not None, "Agent blueprint not found"
-        assert agent_bp.name == 'agent', "Blueprint name incorrect"
+        app = create_app()
         
         # Check routes exist
-        rules = [rule.rule for rule in agent_bp.url_map.iter_rules() if rule.endpoint.startswith('agent.')]
+        rules = [rule.rule for rule in app.url_map.iter_rules() if rule.endpoint.startswith('agent.')]
+        assert rules, "No agent routes registered"
+        assert any(rule.startswith("/agent/") for rule in rules), "Agent base route not found"
         
         print("✅ Agent routes are registered")
-        print(f"   - Blueprint name: {agent_bp.name}")
-        return True
+        print(f"   - Agent routes: {rules}")
     except Exception as e:
         print(f"❌ Agent routes test failed: {e}")
-        return False
+        pytest.fail(str(e))
 
 def test_template_exists():
     """Test that the agent template exists"""
@@ -156,10 +158,9 @@ def test_template_exists():
         print("   - System Prompt field: REMOVED ✓")
         print("   - User-Beschreibung: PRESENT and OPTIONAL ✓")
         print("   - Key-Value pairs: PRESENT ✓")
-        return True
     except Exception as e:
         print(f"❌ Template test failed: {e}")
-        return False
+        pytest.fail(str(e))
 
 def test_requirements_txt():
     """Test that requirements.txt has necessary packages"""
@@ -173,10 +174,9 @@ def test_requirements_txt():
         print("✅ requirements.txt has necessary packages")
         print("   - openai: PRESENT ✓")
         print("   - python-dotenv: PRESENT ✓")
-        return True
     except Exception as e:
         print(f"❌ requirements.txt test failed: {e}")
-        return False
+        pytest.fail(str(e))
 
 def test_env_file():
     """Test that .env file exists and has API key"""
@@ -193,10 +193,9 @@ def test_env_file():
         
         print("✅ .env file exists and has API key")
         print(f"   - API key starts with: {api_key[:10]}...")
-        return True
     except Exception as e:
         print(f"❌ .env file test failed: {e}")
-        return False
+        pytest.fail(str(e))
 
 def run_all_tests():
     """Run all tests"""
