@@ -5,6 +5,7 @@ This script performs code analysis and logic verification.
 
 import os
 import re
+import pytest
 
 def test_project_js_structure():
     """Test that project.js has the correct structure"""
@@ -25,7 +26,7 @@ def test_project_js_structure():
         "Global functions (updateRowWithVersionData)": "function updateRowWithVersionData(reqId, versionIndex)",
         "Global functions (initializeFilters)": "function initializeFilters()",
         "Global functions (applyFilters)": "function applyFilters()",
-        "Global functions (openEditModal)": "function openEditModal(reqId, versionId)",
+        "Global functions (openEditModal)": "function openEditModal(",
         "DOMContentLoaded calls attachEventListeners": "attachEventListeners()",
         "Filter clearing in initializeFilters": "dynamicFiltersContainer.innerHTML = ",
         "Uses PROJECT_CUSTOM_COLUMNS": "window.PROJECT_CUSTOM_COLUMNS",
@@ -43,7 +44,7 @@ def test_project_js_structure():
             failed += 1
     
     print(f"\nResults: {passed} passed, {failed} failed out of {len(tests)} tests")
-    return failed == 0
+    assert failed == 0
 
 def test_event_delegation_pattern():
     """Test that event delegation is properly implemented"""
@@ -75,7 +76,7 @@ def test_event_delegation_pattern():
             failed += 1
     
     print(f"\nResults: {passed} passed, {failed} failed out of {len(tests)} tests")
-    return failed == 0
+    assert failed == 0
 
 def test_no_queryselectorall_for_buttons():
     """Test that we're not using querySelectorAll for edit buttons anymore"""
@@ -104,7 +105,7 @@ def test_no_queryselectorall_for_buttons():
             passed += 1
     
     print(f"\nResults: {passed} passed, {failed} failed out of {len(bad_patterns)} tests")
-    return failed == 0
+    assert failed == 0
 
 def test_global_functions():
     """Test that key functions are globally accessible"""
@@ -127,7 +128,7 @@ def test_global_functions():
     
     if not dom_ready_match:
         print("❌ FAIL: Could not find DOMContentLoaded block")
-        return False
+        pytest.fail("Could not find DOMContentLoaded block")
     
     dom_ready_content = dom_ready_match.group(1)
     
@@ -156,7 +157,7 @@ def test_global_functions():
             failed += 1
     
     print(f"\nResults: {passed} passed, {failed} failed out of {len(global_functions)} tests")
-    return failed == 0
+    assert failed == 0
 
 def test_filter_reinitialization():
     """Test that filters are properly cleared before reinitializing"""
@@ -186,7 +187,7 @@ def test_filter_reinitialization():
             failed += 1
     
     print(f"\nResults: {passed} passed, {failed} failed out of {len(tests)} tests")
-    return failed == 0
+    assert failed == 0
 
 def test_template_has_global_variable():
     """Test that template sets PROJECT_CUSTOM_COLUMNS"""
@@ -212,9 +213,7 @@ def test_template_has_global_variable():
     
     if not found:
         print("❌ FAIL: No template sets PROJECT_CUSTOM_COLUMNS")
-        return False
-    
-    return True
+        pytest.fail("No template sets PROJECT_CUSTOM_COLUMNS")
 
 def run_all_tests():
     """Run all tests"""

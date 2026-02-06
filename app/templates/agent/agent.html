@@ -333,7 +333,7 @@ endblock %} {% block content %}
         <i class="bi bi-arrow-left me-2"></i> Zurück
       </a>
       <h1 class="fw-bold">
-        <i class="bi bi-robot me-2 text-primary"></i>: Requirements Engineering mit KI-Agent
+        <i class="bi bi-robot me-2 text-primary"></i> Requirements Engineering mit KI-Agent
       </h1>
       <p class="text-muted">
         Generiere professionelle Anforderungen für das Projekt: 
@@ -421,7 +421,7 @@ endblock %} {% block content %}
               -->
             </div>
 
-            <!-- Context (Excel) -->
+            <!-- Kontext & Produkt-/Systembeschreibung in einem Rahmen -->
             <div class="config-card">
               <div class="config-card-header">
                 <div class="config-card-icon">
@@ -440,6 +440,7 @@ endblock %} {% block content %}
                 <div class="mb-3">
                   <label for="context_file_type" class="form-label">Dateityp auswählen</label>
                   <select id="context_file_type" name="context_file_type" class="form-select">
+                    <option value="none" selected>Kein Upload (optional)</option>
                     <option value="pdf">PDF</option>
                     <option value="excel">EXCEL</option>
                     <option value="both">EXCEL & PDF</option>
@@ -490,26 +491,67 @@ endblock %} {% block content %}
                   </div>
                 </div>
               </div>
-            </div>
-
-            <!-- Instruction + Configuration -->
-            <div class="config-card">
-              <div class="config-card-header">
+              <div class="config-card-header mt-4">
                 <div class="config-card-icon">
                   <i class="bi bi-chat-left-text"></i>
                 </div>
                 <div>
                   <h3 class="config-card-title">Produkt-/Systembeschreibung</h3>
-                  <p class="config-card-subtitle">
-                    Beschreiben Sie Ihr Produkt/System für:
-                    <ul class="mb-0 ps-3">
-                      <li>Neugenerierung (innovativ & kreativ)</li>
-                      <li>Erweiterung (geänderte oder neue, ergänzende Anforderungen)</li>
-                      <li>Überprüfung/Verbesserung der Anforderungsqualität, z.B. widerspruchsfrei, qualitativ hochwertige Formulierungen, quantifizierbare/messbare Anforderungen</li>
-                    </ul>
-                  </p>
+                  <p class="config-card-subtitle mb-0">Beschreiben Sie Ihr Produkt/System.</p>
                 </div>
               </div>
+
+              <!-- Generierungs-Modus Auswahl direkt bei der Produktbeschreibung -->
+              <div class="mb-4">
+                <label class="form-label fw-bold mb-3">
+                  <i class="bi bi-arrows-angle-expand me-1 text-primary"></i>Generierungs-Modus
+                </label>
+                <div class="d-flex flex-column gap-2">
+                  <div class="form-check">
+                    <input
+                      class="form-check-input"
+                      type="radio"
+                      name="generation_mode"
+                      id="mode_standard"
+                      value="standard"
+                    />
+                    <label class="form-check-label" for="mode_standard">
+                      <strong>Neugenerierung:</strong> innovativ & kreativ
+                    </label>
+                  </div>
+
+                  <div class="form-check">
+                    <input
+                      class="form-check-input"
+                      type="radio"
+                      name="generation_mode"
+                      id="mode_extend"
+                      value="extend"
+                    />
+                    <label class="form-check-label" for="mode_extend">
+                      <strong>Erweiterung:</strong> geänderte oder neue, ergänzende Anforderungen
+                    </label>
+                  </div>
+
+                  <div class="form-check">
+                    <input
+                      class="form-check-input"
+                      type="radio"
+                      name="generation_mode"
+                      id="mode_improve"
+                      value="improve"
+                    />
+                    <label class="form-check-label" for="mode_improve">
+                      <strong>Überprüfung/Verbesserung der Anforderungsqualität:</strong> z.B. widerspruchsfrei, qualitativ hochwertige Formulierungen, quantifizierbare/messbare Anforderungen
+                    </label>
+                  </div>
+                </div>
+
+                <!-- Hidden inputs for backend compatibility (will be set via JS) -->
+                <input type="hidden" id="improve_only" name="improve_only" value="false" />
+                <input type="hidden" id="extend_existing" name="extend_existing" value="false" />
+              </div>
+
               <textarea
                 class="form-control shadow-sm"
                 id="user_description"
@@ -554,64 +596,10 @@ endblock %} {% block content %}
 
               <hr class="my-4" />
 
-              <div class="config-card-header">
-                <div class="config-card-icon">
-                  <i class="bi bi-sliders"></i>
-                </div>
-                <div>
-                  <h3 class="config-card-title">
-                    Konfiguration der Generierung
-                  </h3>
-                  <p class="config-card-subtitle">
-                    Steuern Sie Anzahl und Ausgabe
-                  </p>
-                </div>
-              </div>
-
-
-
-              <!-- Mode Selection -->
-              <div class="mb-4 bg-light p-3 rounded border">
-                <label class="form-label fw-bold mb-3"><i class="bi bi-arrows-angle-expand me-1 text-primary"></i>Generierungs-Modus</label>
-                
-                <div class="d-flex flex-column gap-2">
-                    <!-- Standard -->
-                    <div class="form-check">
-                        <input class="form-check-input" type="radio" name="generation_mode" id="mode_standard" value="standard" checked>
-                        <label class="form-check-label" for="mode_standard">
-                            <strong>Neue Anforderungen erstellen</strong>
-                            <div class="text-muted small">Erstellt komplett neue Anforderungen basierend auf Ihrer Beschreibung.</div>
-                        </label>
-                    </div>
-
-                    <!-- Extend -->
-                    <div class="form-check">
-                        <input class="form-check-input" type="radio" name="generation_mode" id="mode_extend" value="extend">
-                        <label class="form-check-label" for="mode_extend">
-                            <strong>Bestehende erweitern</strong>
-                            <div class="text-muted small">Liest bestehende Anforderungen und fügt sinnvoll neue hinzu.</div>
-                        </label>
-                    </div>
-
-                    <!-- Improve -->
-                    <div class="form-check">
-                        <input class="form-check-input" type="radio" name="generation_mode" id="mode_improve" value="improve">
-                        <label class="form-check-label" for="mode_improve">
-                            <strong>Bestehende verbessern</strong>
-                            <div class="text-muted small">Optimiert Formulierung und Details Ihrer bestehenden Anforderungen. Keine neuen Einträge.</div>
-                        </label>
-                    </div>
-                </div>
-                
-                <!-- Hidden inputs for backend compatibility (will be set via JS) -->
-                <input type="hidden" id="improve_only" name="improve_only" value="false">
-                <input type="hidden" id="extend_existing" name="extend_existing" value="false">
-              </div>
-
               <!-- Number of Requirements -->
               <div class="mb-4">
-                <label class="form-label fw-semibold mb-2">
-                  <i class="bi bi-hash me-1 text-primary"></i>Anzahl der Anforderungen
+                <label class="form-label fw-bold mb-2">
+                  <i class="bi bi-list-ol me-1 text-primary"></i>Anzahl der Anforderungen
                 </label>
                 <div class="number-input-group">
                   <select
@@ -640,9 +628,7 @@ endblock %} {% block content %}
                 </div>
                 <small class="text-muted mt-2 d-block">
                   <i class="bi bi-info-circle me-1 text-primary"></i>
-                  Bei "Automatisch" entscheidet die KI basierend auf dem Kontext
-                  (3-10 Requirements). Bei "Mindestens" oder "Höchstens" wird die
-                  Zahl berücksichtigt.
+                  "Automatisch": KI schätzt und entscheidet selbst, basierend auf dem bereitgestellten Kontext.
                 </small>
               </div>
                 </small>
@@ -696,12 +682,12 @@ endblock %} {% block content %}
       </span>
       <span class="column-badge standard">
         <i class="bi bi-star-fill me-1" style="color: white"></i
-        >Titel
+        >Name
         <small class="ms-1 opacity-75">(Standard)</small>
       </span>
       <span class="column-badge standard">
         <i class="bi bi-star-fill me-1" style="color: white"></i
-        >Beschreibung
+        >Anforderung
         <small class="ms-1 opacity-75">(Standard)</small>
       </span>
       <span class="column-badge standard">
@@ -716,7 +702,7 @@ endblock %} {% block content %}
         type="text"
         class="form-control"
         id="new_column_input"
-        placeholder="Neue Spalte hinzufügen (z.B. Priorität, Kosten, Verantwortlich...)"
+        placeholder="Neue Spalte"
       />
       <button
         type="button"
@@ -726,11 +712,6 @@ endblock %} {% block content %}
         <i class="bi bi-plus-circle me-1"></i>Spalte hinzufügen
       </button>
     </div>
-    <small class="text-muted mt-2 d-block">
-      <i class="bi bi-lightbulb me-1 text-primary"></i>
-      Beispiele: Priorität, Kosten, Verantwortlich, Farbe, Status,
-      Deadline
-    </small>
   </div>
 </div>
 
@@ -751,65 +732,13 @@ endblock %} {% block content %}
                   -->
                 </div>
               </div>
-
-              <div class="row g-3">
-                <div class="col-md-6">
-                  <div class="model-card selected" data-model="gpt-4o-mini">
-                    <div class="model-card-header">
-                      <h5 class="mb-0 fw-bold">GPT-4o Mini</h5>
-                      <span class="model-badge recommended">Empfohlen</span>
-                    </div>
-                    <p class="text-muted small mb-2">Schnell & Günstig</p>
-                    <p class="small mb-0">
-                      Ideal für die meisten Aufgaben. Beste Balance zwischen
-                      Qualität und Geschwindigkeit.
-                    </p>
-                  </div>
-                </div>
-                <div class="col-md-6">
-                  <div class="model-card" data-model="gpt-4o">
-                    <div class="model-card-header">
-                      <h5 class="mb-0 fw-bold">GPT-4o</h5>
-                      <span class="model-badge advanced">Erweitert</span>
-                    </div>
-                    <p class="text-muted small mb-2">Höchste Qualität</p>
-                    <p class="small mb-0">
-                      Für komplexe Anforderungen mit maximaler Präzision und
-                      Detailtiefe.
-                    </p>
-                  </div>
-                </div>
-                <div class="col-md-6">
-                  <div class="model-card" data-model="gpt-4-turbo">
-                    <div class="model-card-header">
-                      <h5 class="mb-0 fw-bold">GPT-4 Turbo</h5>
-                      <span class="model-badge advanced">Erweitert</span>
-                    </div>
-                    <p class="text-muted small mb-2">Leistungsstark</p>
-                    <p class="small mb-0">
-                      Optimiert für große Kontexte und umfangreiche
-                      Anforderungsdokumente.
-                    </p>
-                  </div>
-                </div>
-                <div class="col-md-6">
-                  <div class="model-card" data-model="gpt-3.5-turbo">
-                    <div class="model-card-header">
-                      <h5 class="mb-0 fw-bold">GPT-3.5 Turbo</h5>
-                    </div>
-                    <p class="text-muted small mb-2">Schnell & Einfach</p>
-                    <p class="small mb-0">
-                      Für einfache Anforderungen und schnelle Prototypen.
-                    </p>
-                  </div>
-                </div>
+              <div class="mb-2">
+                <label class="form-label fw-semibold" for="ai_model">Modell</label>
+                <select class="form-select" id="ai_model" name="ai_model">
+                  <option value="" selected>Kein</option>
+                  <option value="gpt-4o-mini">GPT-4o Mini (OpenAI)</option>
+                </select>
               </div>
-              <input
-                type="hidden"
-                id="ai_model"
-                name="ai_model"
-                value="gpt-4o-mini"
-              />
             </div>
 
             <!-- Expert Settings -->
@@ -881,7 +810,8 @@ endblock %} {% block content %}
                   role="status"
                   aria-hidden="true"
                 ></span>
-                <i class="bi bi-stars me-2"></i> Anforderungen Generieren
+                <i class="bi bi-table me-2"></i>
+                <i class="bi bi-stars me-2"></i> Anforderungsliste generieren
               </button>
             </div>
           </form>
@@ -1026,19 +956,27 @@ endblock %} {% block content %}
   const hiddenExtend = document.getElementById("extend_existing");
 
   function updateMode() {
-      const selected = document.querySelector('input[name="generation_mode"]:checked').value;
-      
-      // Update hidden fields for backend
-      hiddenImprove.value = (selected === 'improve').toString();
-      hiddenExtend.value = (selected === 'extend').toString();
-      
-      // Update UI state
-    if (selected === 'improve') {
-      // Locked count for improvement
+    const selectedEl = document.querySelector('input[name="generation_mode"]:checked');
+
+    if (!selectedEl) {
+      hiddenImprove.value = "false";
+      hiddenExtend.value = "false";
+      numReqMode.disabled = false;
+      applyNumReqMode();
+      return;
+    }
+
+    const selected = selectedEl.value;
+
+    // Update hidden fields for backend
+    hiddenImprove.value = (selected === "improve").toString();
+    hiddenExtend.value = (selected === "extend").toString();
+
+    // Update UI state
+    if (selected === "improve") {
       numReqMode.disabled = true;
       numReqValue.disabled = true;
     } else {
-      // Enabled for New and Extend
       numReqMode.disabled = false;
       applyNumReqMode();
     }
@@ -1046,6 +984,33 @@ endblock %} {% block content %}
 
   modeRadios.forEach(radio => {
       radio.addEventListener('change', updateMode);
+  });
+
+  // Clear validation state on user corrections
+  function clearValidationState() {
+    const btn = document.getElementById("generate-btn");
+    const spinner = btn.querySelector(".spinner-border");
+    const messageDiv = document.getElementById("response-message");
+    btn.disabled = false;
+    spinner.classList.add("d-none");
+    messageDiv.classList.add("d-none");
+    messageDiv.innerHTML = "";
+    loadingState.classList.add("d-none");
+    agentForm.classList.remove("d-none");
+  }
+
+  document.getElementById("product_system").addEventListener("input", () => {
+    document.getElementById("product_system").classList.remove("is-invalid");
+    clearValidationState();
+  });
+
+  document.getElementById("ai_model").addEventListener("change", () => {
+    document.getElementById("ai_model").classList.remove("is-invalid");
+    clearValidationState();
+  });
+
+  modeRadios.forEach(radio => {
+    radio.addEventListener("change", clearValidationState);
   });
   
   // Initialize state
@@ -1091,17 +1056,7 @@ endblock %} {% block content %}
       });
   }
 
-  // Model selection
-  document.querySelectorAll(".model-card").forEach((card) => {
-    card.addEventListener("click", function () {
-      document
-        .querySelectorAll(".model-card")
-        .forEach((c) => c.classList.remove("selected"));
-      this.classList.add("selected");
-      document.getElementById("ai_model").value =
-        this.getAttribute("data-model");
-    });
-  });
+  // LLM selection handled directly via dropdown
 
   function getContextFile() {
     if (pdfInput.files.length > 0) {
@@ -1213,6 +1168,54 @@ endblock %} {% block content %}
       const btn = document.getElementById("generate-btn");
       const spinner = btn.querySelector(".spinner-border");
       const messageDiv = document.getElementById("response-message");
+      const productSystemInput = document.getElementById("product_system");
+      const modelSelect = document.getElementById("ai_model");
+      const modeEl = document.querySelector('input[name="generation_mode"]:checked');
+
+      // Ensure UI is in a clean state before validation (prevents stuck disabled state)
+      btn.disabled = false;
+      spinner.classList.add("d-none");
+      loadingState.classList.add("d-none");
+      agentForm.classList.remove("d-none");
+
+      // Validate required product/system
+      productSystemInput.classList.remove("is-invalid");
+      if (!productSystemInput.value.trim()) {
+        messageDiv.className = "alert alert-danger mt-3 shadow-sm";
+        messageDiv.innerHTML =
+          "<strong>Hinweis:</strong> Bitte Produkt/System angeben, bevor die Anforderungsliste generiert wird.";
+        messageDiv.classList.remove("d-none");
+        productSystemInput.classList.add("is-invalid");
+        productSystemInput.focus();
+        return;
+      }
+
+      // Require explicit generation mode selection
+      if (!modeEl) {
+        messageDiv.className = "alert alert-danger mt-3 shadow-sm";
+        messageDiv.innerHTML =
+          "<strong>Hinweis:</strong> Bitte einen Generierungs-Modus auswählen.";
+        messageDiv.classList.remove("d-none");
+        if (modeRadios.length > 0) {
+          modeRadios[0].focus();
+        }
+        return;
+      }
+
+      // Require explicit model selection ("Kein" is not allowed)
+      modelSelect.classList.remove("is-invalid");
+      if (!modelSelect.value) {
+        messageDiv.className = "alert alert-danger mt-3 shadow-sm";
+        messageDiv.innerHTML =
+          "<strong>Hinweis:</strong> Bitte ein LLM auswählen, bevor generiert wird.";
+        messageDiv.classList.remove("d-none");
+        modelSelect.classList.add("is-invalid");
+        modelSelect.focus();
+        return;
+      }
+
+      messageDiv.classList.add("d-none");
+      messageDiv.innerHTML = "";
 
       // Disable button and show spinner
       btn.disabled = true;

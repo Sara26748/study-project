@@ -4,12 +4,15 @@ Integration test for AI Agent - Tests the actual OpenAI integration
 
 import os
 from dotenv import load_dotenv
+import pytest
 
 # Load environment variables first
 load_dotenv()
 
 def test_openai_integration():
     """Test actual OpenAI API call with the configured settings"""
+    if os.getenv("RUN_OPENAI_INTEGRATION") != "1":
+        pytest.skip("Set RUN_OPENAI_INTEGRATION=1 to run OpenAI integration test")
     print("=" * 60)
     print("OPENAI INTEGRATION TEST")
     print("=" * 60)
@@ -33,7 +36,7 @@ def test_openai_integration():
         
         if not config.OPENAI_API_KEY:
             print("❌ OPENAI_API_KEY not loaded from environment")
-            return False
+            pytest.skip("OPENAI_API_KEY not set")
         
         # Test 1: Generate with user description only
         print("Test 1: User description only")
@@ -68,7 +71,7 @@ def test_openai_integration():
             
         except Exception as e:
             print(f"  ❌ Test 1 failed: {e}")
-            return False
+            pytest.fail(str(e))
         
         # Test 2: Generate with key-value pairs only
         print("Test 2: Key-value pairs only")
@@ -96,7 +99,7 @@ def test_openai_integration():
             
         except Exception as e:
             print(f"  ❌ Test 2 failed: {e}")
-            return False
+            pytest.fail(str(e))
         
         # Test 3: Generate with both
         print("Test 3: Both description and key-value pairs")
@@ -120,7 +123,7 @@ def test_openai_integration():
             
         except Exception as e:
             print(f"  ❌ Test 3 failed: {e}")
-            return False
+            pytest.fail(str(e))
         
         # Test 4: Empty input (should still work)
         print("Test 4: Empty input")
@@ -140,7 +143,7 @@ def test_openai_integration():
             
         except Exception as e:
             print(f"  ❌ Test 4 failed: {e}")
-            return False
+            pytest.fail(str(e))
         
         print("=" * 60)
         print("🎉 ALL INTEGRATION TESTS PASSED!")
@@ -156,18 +159,15 @@ def test_openai_integration():
         print("  ✅ JSON parsing working correctly")
         print()
         
-        return True
-        
     except Exception as e:
         print(f"❌ Integration test failed: {e}")
         import traceback
         traceback.print_exc()
-        return False
+        pytest.fail(str(e))
 
 if __name__ == "__main__":
-    success = test_openai_integration()
-    
-    if success:
+    try:
+        test_openai_integration()
         print("✅ The AI Agent is fully functional and ready to use!")
         print()
         print("Next steps:")
@@ -175,5 +175,7 @@ if __name__ == "__main__":
         print("2. Login to the application")
         print("3. Navigate to a project and click 'KI-Agent'")
         print("4. Test the UI manually")
-    else:
+    except pytest.SkipTest:
+        print("⚠️ Integration test skipped (OPENAI_API_KEY not set).")
+    except Exception:
         print("❌ Integration tests failed. Please check the errors above.")
