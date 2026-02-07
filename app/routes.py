@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash, abort, jsonify
+from flask import Blueprint, render_template, request, redirect, url_for, flash, abort, jsonify, session
 from flask_login import login_required, current_user
 from sqlalchemy import func, and_
 from datetime import datetime
@@ -283,6 +283,8 @@ def manage_project(project_id):
     if project.user_id != current_user.id and current_user not in project.shared_with:
         abort(403)
 
+    session["last_project_id"] = project_id
+
     # Get all requirements with ALL versions (not just the latest)
     # Filter out deleted requirements
     requirements = (
@@ -316,11 +318,15 @@ def manage_project(project_id):
 @login_required
 def deleted_requirements_overview():
     """Show all deleted requirements across all user's projects."""
-    projects = Project.query.filter_by(user_id=current_user.id).all()
-    
+    owned_projects = Project.query.filter_by(user_id=current_user.id).all()
+    shared_projects = current_user.shared_projects.all()
+    projects_by_id = {project.id: project for project in owned_projects}
+    for project in shared_projects:
+        projects_by_id.setdefault(project.id, project)
+
     # Collect deleted requirements from all projects
     all_deleted = []
-    for project in projects:
+    for project in projects_by_id.values():
         deleted_reqs = Requirement.query.filter_by(
             project_id=project.id, 
             is_deleted=True
@@ -335,9 +341,18 @@ def deleted_requirements_overview():
                     'version': latest_version
                 })
     
+    last_project_id = session.get("last_project_id")
+    if last_project_id not in projects_by_id:
+        last_project_id = None
+    if not last_project_id:
+        last_project_id = next(iter(projects_by_id), None)
+    if last_project_id:
+        session["last_project_id"] = last_project_id
+
     return render_template(
         "deleted_requirements_overview.html",
-        deleted_items=all_deleted
+        deleted_items=all_deleted,
+        last_project_id=last_project_id
     )
 
 @bp.route("/requirement/<int:rid>/history")
@@ -407,7 +422,7 @@ def delete_project(project_id):
 
     db.session.delete(project)
     db.session.commit()
-    flash(f"Project '{project.name}' has been deleted.", "success")
+    flash(f"Projekt '{project.name}' wurde geloescht.", "success")
     return redirect(url_for('main.home'))
 
 
@@ -479,6 +494,9 @@ def update_custom_data(version_id):
     # Authorization check
     check_version_access(version)
 
+    if version.status == 'Verworfen':
+        return jsonify({'success': False, 'error': 'Requirement is rejected'}), 400
+
     # After a release, allow only revisions, not direct edits
     if version.requirement.has_release_event():
         flash("Diese Anforderung wurde bereits freigegeben und kann nur noch revidiert werden.", "warning")
@@ -508,18 +526,31 @@ def update_status(version_id):
     version = RequirementVersion.query.get_or_404(version_id)
     # Authorization check
     check_version_access(version)
+
+    is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
     
     status = request.form.get('status')
+    if version.status == 'Verworfen' and status != 'Verworfen':
+        if is_ajax:
+             return jsonify({'success': False, 'error': 'Requirement is rejected'}), 400
+        flash("Diese Anforderung ist verworfen und kann nur noch gelöscht werden.", "warning")
+        return redirect(
+            url_for(
+                'main.manage_project',
+                project_id=version.requirement.project_id,
+                selected_version_id=version.id,
+            )
+        )
     if status in ['Entwurf', 'In Bearbeitung', 'Freigabe', 'Verworfen']:
         version.status = status
         db.session.commit()
         
-        if request.headers.get('X-Requested-With') == 'XMLHttpRequest' or request.accept_mimetypes.accept_json:
+        if is_ajax:
              return jsonify({'success': True, 'status': status, 'color': version.get_status_color()})
              
         flash(f"Status updated to '{status}'.", "success")
     else:
-        if request.headers.get('X-Requested-With') == 'XMLHttpRequest' or request.accept_mimetypes.accept_json:
+        if is_ajax:
              return jsonify({'success': False, 'error': 'Invalid status'}), 400
         flash("Invalid status value.", "danger")
     
@@ -801,6 +832,16 @@ def update_requirement_version(version_id):
     version = RequirementVersion.query.get_or_404(version_id)
     # Authorization check
     check_version_access(version)
+
+    if version.status == 'Verworfen':
+        flash("Diese Anforderung ist verworfen und kann nur noch gelöscht werden.", "warning")
+        return redirect(
+            url_for(
+                'main.manage_project',
+                project_id=version.requirement.project_id,
+                selected_version_id=version.id,
+            )
+        )
     
     # Get form data
     title = request.form.get('title', '').strip()
@@ -957,6 +998,16 @@ def revise_requirement_version(version_id):
 
     version = RequirementVersion.query.get_or_404(version_id)
     check_version_access(version)
+
+    if version.status == 'Verworfen':
+        flash("Diese Anforderung ist verworfen und kann nur noch gelöscht werden.", "warning")
+        return redirect(
+            url_for(
+                'main.manage_project',
+                project_id=version.requirement.project_id,
+                selected_version_id=version.id,
+            )
+        )
 
     title = request.form.get('title', '').strip()
     description = request.form.get('description', '').strip()
@@ -1241,6 +1292,16 @@ def toggle_quantifiable(version_id):
     
     version = RequirementVersion.query.get_or_404(version_id)
     check_version_access(version)
+
+    if version.status == 'Verworfen':
+        flash("Diese Anforderung ist verworfen und kann nur noch gelöscht werden.", "warning")
+        return redirect(
+            url_for(
+                'main.manage_project',
+                project_id=version.requirement.project_id,
+                selected_version_id=version.id,
+            )
+        )
     
     custom_data = version.get_custom_data()
     current_value = custom_data.get('is_quantifiable', 'false')
@@ -1287,19 +1348,20 @@ def delete_requirement_version(version_id):
     # Authorization check
     check_requirement_access(req)
 
-    project_id = req.project_id
+    if version.status != 'Verworfen':
+        flash("Löschen ist nur möglich, wenn die Anforderung verworfen ist.", "warning")
+        return redirect(
+            url_for(
+                'main.manage_project',
+                project_id=req.project_id,
+                selected_version_id=version.id,
+            )
+        )
 
-    # Check if there are any remaining versions
-    remaining_versions = RequirementVersion.query.filter_by(requirement_id=req.id).count()
-
-    if remaining_versions == 1:
-        # This is the last version, mark the requirement as deleted instead of deleting the version
-        req.is_deleted = True
-        flash("Last version deleted. Requirement moved to trash.", "success")
-    else:
-        # Delete this specific version
-        db.session.delete(version)
-        flash(f"Version {version.version_label} deleted successfully.", "success")
+    # When a requirement is deleted after being rejected, move the entire requirement to trash
+    # (all versions/revisions are treated as deleted together).
+    req.is_deleted = True
+    flash("Anforderung wurde in den Papierkorb verschoben.", "success")
 
     db.session.commit()
 
@@ -1312,6 +1374,17 @@ def delete_requirement(req_id):
     req = Requirement.query.get_or_404(req_id)
     # Authorization check
     check_requirement_access(req)
+
+    latest_version = req.get_latest_version()
+    if latest_version and latest_version.status != 'Verworfen':
+        flash("Löschen ist nur möglich, wenn die Anforderung verworfen ist.", "warning")
+        return redirect(
+            url_for(
+                'main.manage_project',
+                project_id=req.project_id,
+                selected_version_id=latest_version.id,
+            )
+        )
 
     # Soft delete
     req.is_deleted = True
@@ -1327,12 +1400,8 @@ def restore_requirement(req_id):
     req = Requirement.query.get_or_404(req_id)
     # Authorization check
     check_requirement_access(req)
-    
-    # Restore
-    req.is_deleted = False
-    db.session.commit()
-    
-    flash("Requirement restored successfully.", "success")
+
+    flash("Wiederherstellen ist deaktiviert. Geloschte Anforderungen konnen nur endgultig entfernt werden.", "warning")
     return redirect(url_for('main.deleted_requirements_overview'))
 
 # Route to permanently delete a requirement
@@ -1364,6 +1433,10 @@ def regenerate_requirement(req_id):
     latest_version = req.get_latest_version()
     if not latest_version:
         flash("No existing version found to regenerate.", "danger")
+        return redirect(url_for('main.manage_project', project_id=req.project_id))
+
+    if latest_version.status == 'Verworfen':
+        flash("Diese Anforderung ist verworfen und kann nur noch gelöscht werden.", "warning")
         return redirect(url_for('main.manage_project', project_id=req.project_id))
     
     try:
@@ -2148,6 +2221,12 @@ def toggle_funktional(req_id):
 
     req = Requirement.query.get_or_404(req_id)
     check_requirement_access(req)
+    latest_version = req.get_latest_version()
+    if latest_version and latest_version.status == 'Verworfen':
+        flash("Diese Anforderung ist verworfen und kann nur noch gelöscht werden.", "warning")
+        return redirect(
+            request.referrer or url_for('main.manage_project', project_id=req.project_id)
+        )
     # Toggle Wert setzen
     new_value = request.form.get("funktional")
     old_value = req.funktional

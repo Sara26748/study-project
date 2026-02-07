@@ -1,135 +1,326 @@
 /* Custom styles for table enhancements */
 .table-section {
-    margin-top: 2rem; /* Abstand zwischen Tabellen */
-    border: 1px solid #ddd; /* Sichtbarer Rahmen */
-    padding: 1rem; /* Innenabstand */
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Leichter Schatten */
-    border-radius: 8px; /* Abgerundete Ecken */
-    background-color: #f8f9fa; /* Heller grauer Hintergrund für bessere Übersichtlichkeit */
+  margin-top: 2rem; /* Abstand zwischen Tabellen */
+  border: 1px solid #ddd; /* Sichtbarer Rahmen */
+  padding: 1rem; /* Innenabstand */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Leichter Schatten */
+  border-radius: 8px; /* Abgerundete Ecken */
+  background-color: #f8f9fa; /* Heller grauer Hintergrund für bessere Übersichtlichkeit */
 }
 
 .table-section h3 {
-    font-size: 1.5rem; /* Größere Überschriften */
-    font-weight: bold; /* Fett */
-    margin-bottom: 1rem;
+  font-size: 1.5rem; /* Größere Überschriften */
+  font-weight: bold; /* Fett */
+  margin-bottom: 1rem;
 }
 
 /* Zusätzliche feine Rahmen für Zellen, falls table-bordered nicht ausreicht */
 .table-bordered th,
 .table-bordered td {
-    border: 1px solid #dee2e6; /* Feine Rahmenlinien */
+  border: 1px solid #dee2e6; /* Feine Rahmenlinien */
 }
 
 /* Abwechselnde Zeilenfarben, falls table-striped nicht reicht */
 .table-striped tbody tr:nth-of-type(odd) {
-    background-color: rgba(0, 0, 0, 0.05); /* Hellgrau für ungerade Zeilen */
+  background-color: rgba(0, 0, 0, 0.05); /* Hellgrau für ungerade Zeilen */
 }
 
 .table-striped tbody tr:nth-of-type(even) {
-    background-color: #ffffff; /* Weiß für gerade Zeilen */
+  background-color: #ffffff; /* Weiß für gerade Zeilen */
 }
 
 /* Modern Header & Navigation Styles */
 .navbar {
-    z-index: 1030;
+  z-index: 1030;
 }
 
 /* Header Logo Hover */
 .navbar-brand:hover {
-    opacity: 0.85;
-    transition: opacity 0.2s ease;
+  opacity: 0.85;
+  transition: opacity 0.2s ease;
 }
 
 /* User Dropdown Button Focus */
 #userDropdown:focus {
-    outline: 2px solid #0d6efd;
-    outline-offset: 2px;
-    border-radius: 4px;
+  outline: 2px solid #0d6efd;
+  outline-offset: 2px;
+  border-radius: 4px;
 }
 
 /* Dropdown Menu Items */
 .dropdown-item {
-    transition: all 0.2s ease;
+  transition: all 0.2s ease;
 }
 
 .dropdown-item:focus {
-    background-color: #f8f9fa;
-    outline: 2px solid #0d6efd;
-    outline-offset: -2px;
+  background-color: #f8f9fa;
+  outline: 2px solid #0d6efd;
+  outline-offset: -2px;
 }
 
 .dropdown-item:hover {
-    background-color: #f8f9fa;
-    color: #0d6efd;
+  background-color: #f8f9fa;
+  color: #0d6efd;
 }
 
 /* Active Navigation State in Dropdown */
 .dropdown-item.active {
-    background-color: rgba(13, 110, 253, 0.1) !important;
-    color: #0d6efd !important;
-    font-weight: 600;
+  background-color: rgba(13, 110, 253, 0.1) !important;
+  color: #0d6efd !important;
+  font-weight: 600;
 }
 
 /* Services Submenu Button */
 #servicesSubmenu:focus {
-    outline: 2px solid #0d6efd;
-    outline-offset: -2px;
+  outline: 2px solid #0d6efd;
+  outline-offset: -2px;
 }
 
 #servicesSubmenu:hover {
-    background-color: #f8f9fa;
-    color: #0d6efd;
+  background-color: #f8f9fa;
+  color: #0d6efd;
 }
 
 /* User Avatar Hover Effect */
 #userDropdown:hover .rounded-circle {
-    transform: scale(1.05);
-    transition: transform 0.2s ease;
+  transform: scale(1.05);
+  transition: transform 0.2s ease;
 }
 
 /* Modern Back Buttons - SaaS Clean Style */
 .btn-outline-primary.bg-light {
-    border: 1px solid #e0e7ff !important;
-    background-color: #f8f9ff !important;
-    color: #0d6efd !important;
+  border: 1px solid #e0e7ff !important;
+  background-color: #f8f9ff !important;
+  color: #0d6efd !important;
 }
 
 .btn-outline-primary.bg-light:hover {
-    background-color: #0d6efd !important;
-    color: white !important;
-    border-color: #0d6efd !important;
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(13, 110, 253, 0.15) !important;
+  background-color: #0d6efd !important;
+  color: white !important;
+  border-color: #0d6efd !important;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(13, 110, 253, 0.15) !important;
 }
 
 .btn-outline-primary.bg-light:focus {
-    box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.1) !important;
-    border-color: #0d6efd !important;
+  box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.1) !important;
+  border-color: #0d6efd !important;
 }
 
 .btn-outline-primary.bg-light:active {
-    transform: translateY(0);
-    box-shadow: 0 2px 4px rgba(13, 110, 253, 0.1) !important;
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(13, 110, 253, 0.1) !important;
 }
 
 /* Modern Footer Styles */
 footer {
-    margin-top: auto;
+  margin-top: auto;
+}
+
+/* Modern action buttons */
+.btn-modern {
+  border-radius: 999px;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease,
+    background 0.15s ease,
+    color 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.btn-modern:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.12);
+}
+
+.btn-modern:active {
+  transform: translateY(0);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.12);
+}
+
+/* Import button light blue color */
+.btn-import {
+  border-color: #7ec8ff !important;
+  color: #7ec8ff !important;
+}
+
+.btn-import:hover,
+.btn-import:focus {
+  background-color: #7ec8ff !important;
+  border-color: #7ec8ff !important;
+  color: #ffffff !important;
 }
 
 footer .container {
-    padding-top: 1.5rem;
-    padding-bottom: 1.5rem;
+  padding-top: 1.5rem;
+  padding-bottom: 1.5rem;
 }
 
 /* Responsive: Hide user name on small screens */
 @media (max-width: 767px) {
-    .navbar-brand span {
-        font-size: 0.9rem;
-    }
-    
-    footer .container {
-        padding-top: 1rem;
-        padding-bottom: 1rem;
-    }
+  .navbar-brand span {
+    font-size: 0.9rem;
+  }
+
+  footer .container {
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+  }
+}
+
+/* Centered flash messages */
+.flash-overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  z-index: 1100;
+}
+
+.flash-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  width: min(560px, 92vw);
+}
+
+.flash-card {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 0.75rem;
+  align-items: center;
+  padding: 0.9rem 1.1rem;
+  border-radius: 16px;
+  background: #ffffff;
+  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.18);
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  animation: flash-pop 0.3s ease-out;
+  pointer-events: auto;
+}
+
+.flash-card.flash-success {
+  border-left: 6px solid #22c55e;
+}
+
+.flash-card.flash-error {
+  border-left: 6px solid #ef4444;
+}
+
+.flash-card.flash-warning {
+  border-left: 6px solid #f59e0b;
+}
+
+.flash-card.flash-info {
+  border-left: 6px solid #3b82f6;
+}
+
+.flash-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(15, 23, 42, 0.06);
+  color: #0f172a;
+  font-size: 1.1rem;
+}
+
+.flash-text {
+  font-weight: 600;
+  color: #0f172a;
+  line-height: 1.4;
+}
+
+.flash-close {
+  border: none;
+  background: transparent;
+  color: #64748b;
+  font-size: 1.25rem;
+  padding: 0.15rem 0.25rem;
+}
+
+.flash-close:hover {
+  color: #0f172a;
+}
+
+.flash-hide {
+  opacity: 0;
+  transform: translateY(-6px) scale(0.98);
+  transition:
+    opacity 0.2s ease,
+    transform 0.2s ease;
+}
+
+@keyframes flash-pop {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Action overlay */
+.action-overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(15, 23, 42, 0.4);
+  backdrop-filter: blur(6px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+  z-index: 1200;
+}
+
+.action-overlay.is-active {
+  opacity: 1;
+  pointer-events: all;
+}
+
+.action-card {
+  background: #ffffff;
+  padding: 1.5rem 2rem;
+  border-radius: 20px;
+  box-shadow: 0 24px 60px rgba(15, 23, 42, 0.28);
+  text-align: center;
+  width: min(360px, 90vw);
+}
+
+.action-spinner {
+  width: 48px;
+  height: 48px;
+  margin: 0 auto 0.75rem;
+  border-radius: 50%;
+  border: 4px solid rgba(37, 99, 235, 0.2);
+  border-top-color: #2563eb;
+  animation: spin 0.9s linear infinite;
+}
+
+.action-title {
+  font-weight: 700;
+  color: #0f172a;
+  font-size: 1.05rem;
+}
+
+.action-subtitle {
+  color: #64748b;
+  font-size: 0.95rem;
+  margin-top: 0.35rem;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
 }

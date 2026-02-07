@@ -427,7 +427,7 @@ function refreshDescriptionPopover(element, description) {
     html: false,
     placement: "top",
     content: safeDescription,
-    title: "Vollständige Beschreibung",
+    title: "Vollständige Anforderung",
   });
 }
 
@@ -444,6 +444,10 @@ function captureEditFormSnapshot() {
   // Explicitly capture checkbox state for quantifiable
   const quantCheckbox = document.getElementById("editQuantifiable");
   snapshot.is_quantifiable = quantCheckbox && quantCheckbox.checked ? "on" : "";
+
+  // Explicitly capture checkbox state for funktional
+  const funkCheckbox = document.getElementById("editFunktional");
+  snapshot.funktional = funkCheckbox && funkCheckbox.checked ? "on" : "";
 
   return snapshot;
 }
@@ -504,6 +508,8 @@ function updateRowWithVersionData(reqId, versionIndex) {
     const statusCell = row.querySelector(".status-cell");
     const status = selectedVersion.getAttribute("data-status");
     const statusColor = selectedVersion.getAttribute("data-status-color");
+    const isRejected = status === "Verworfen";
+    row.dataset.isRejected = isRejected ? "true" : "false";
     statusCell.innerHTML = `<span class="badge bg-${statusColor}">${status}</span>`;
 
     // Update description with popover
@@ -561,12 +567,28 @@ function updateRowWithVersionData(reqId, versionIndex) {
         selectedVersion.getAttribute("data-is-blocked") === "true";
       const hasReleased = row?.dataset.hasReleased === "true";
       editButton.setAttribute("data-version-id", versionId);
-      editButton.disabled = isBlocked || hasReleased;
+      editButton.disabled = isBlocked || hasReleased || isRejected;
     }
 
     const deleteForm = row.querySelector(".delete-version-form");
     if (deleteForm) {
       deleteForm.action = `/requirement_version/${versionId}/delete`;
+    }
+
+    const deleteButton = row.querySelector(".delete-requirement-btn");
+    if (deleteButton) {
+      deleteButton.disabled = !isRejected;
+      deleteButton.title = isRejected
+        ? "Wirklich löschen?"
+        : "Nur nach Verworfen löschbar";
+    }
+
+    const rejectButton = row.querySelector(".reject-requirement-btn");
+    if (rejectButton) {
+      rejectButton.disabled = isRejected;
+      rejectButton.title = isRejected
+        ? "Bereits verworfen"
+        : "Status Verworfen";
     }
 
     const revisionCell = row.querySelector(".revision-cell");
@@ -599,7 +621,36 @@ function updateRowWithVersionData(reqId, versionIndex) {
     if (revisionButton) {
       revisionButton.setAttribute("data-version-id", revisionVersionId);
       const hasReleased = row?.dataset.hasReleased === "true";
-      revisionButton.disabled = !hasReleased;
+      revisionButton.disabled = !hasReleased || isRejected;
+    }
+
+    const regenerateButton = row.querySelector(".regenerate-requirement-btn");
+    if (regenerateButton) {
+      const isBlocked =
+        selectedVersion.getAttribute("data-is-blocked") === "true";
+      regenerateButton.disabled = isBlocked || isRejected;
+    }
+
+    const lockButton = row.querySelector(".toggle-lock-btn");
+    if (lockButton) {
+      lockButton.disabled = isRejected;
+      if (isRejected) {
+        lockButton.title = "Verworfen - nur löschen möglich";
+      }
+    }
+
+    const funktionalButton = row.querySelector(
+      ".toggle-funktional-form button",
+    );
+    if (funktionalButton) {
+      funktionalButton.disabled = isRejected;
+    }
+
+    const quantifiableButton = row.querySelector(
+      ".toggle-quantifiable-form button",
+    );
+    if (quantifiableButton) {
+      quantifiableButton.disabled = isRejected;
     }
 
     // Populate revision selector asynchronously (uses cache if available)
@@ -843,6 +894,7 @@ function openEditModal(
         status: selectedVersion.getAttribute("data-status"),
         custom_data: null,
         is_quantifiable: selectedVersion.getAttribute("data-is-quantifiable"),
+        funktional: selectedVersion.getAttribute("data-is-funktional"),
       };
     }
 
@@ -887,6 +939,22 @@ function openEditModal(
         customData.is_quantifiable;
       const isQuantifiable = quantFlag === true || quantFlag === "true";
       editQuantifiable.checked = isQuantifiable;
+    }
+
+    // Set funktional checkbox
+    const editFunktional = document.getElementById("editFunktional");
+    if (editFunktional) {
+      const funkFlag =
+        (revisionData && revisionData.funktional) ||
+        formSource.funktional ||
+        customData.funktional;
+      const isFunktional =
+        funkFlag === true ||
+        funkFlag === "true" ||
+        funkFlag === "1" ||
+        funkFlag === 1 ||
+        funkFlag === "on";
+      editFunktional.checked = isFunktional;
     }
 
     const dynamicContainer = document.getElementById("dynamicColumnsContainer");
@@ -1055,14 +1123,22 @@ function pollRequirementsStatus() {
           `form[action*="/requirement_version/${item.version_id}/toggle_block"]`,
         );
 
+        const isRejected =
+          item.status === "Verworfen" || row?.dataset.isRejected === "true";
+
         if (editBtn) {
           const hasReleased = row?.dataset.hasReleased === "true";
-          editBtn.disabled = item.is_blocked || hasReleased;
+          editBtn.disabled = item.is_blocked || hasReleased || isRejected;
         }
 
         if (toggleForm) {
           const btn = toggleForm.querySelector("button");
           if (btn) {
+            btn.disabled = isRejected;
+            if (isRejected) {
+              btn.title = "Verworfen - nur löschen möglich";
+              return;
+            }
             if (item.is_blocked) {
               // Locked: Red filled lock
               btn.innerHTML = '<i class="bi bi-lock-fill"></i>';

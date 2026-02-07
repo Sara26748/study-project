@@ -5,9 +5,20 @@
 <div class="container mt-4">
   <div class="d-flex justify-content-between align-items-center mb-4">
     <h2><i class="bi bi-trash"></i> Gelöschte Anforderungen</h2>
-    <a href="{{ url_for('main.home') }}" class="btn btn-primary">
-      <i class="bi bi-arrow-left"></i> Zurück zur Startseite
-    </a>
+    <div class="d-flex gap-2">
+      {% if last_project_id %}
+      <a href="{{ url_for('main.manage_project', project_id=last_project_id) }}" class="btn btn-outline-primary">
+        <i class="bi bi-list-check"></i> Zur Anforderungsliste
+      </a>
+      {% else %}
+      <button type="button" class="btn btn-outline-secondary" disabled>
+        <i class="bi bi-list-check"></i> Zur Anforderungsliste
+      </button>
+      {% endif %}
+      <a href="{{ url_for('main.home') }}" class="btn btn-primary">
+        <i class="bi bi-arrow-left"></i> Zurück zur Startseite
+      </a>
+    </div>
   </div>
 
   {% if deleted_items %}
@@ -36,8 +47,8 @@
                   <tr>
                     <th style="width: 5%;">Version</th>
                     <th style="width: 5%;">ID</th>
-                    <th style="width: 20%;">Title</th>
-                    <th style="width: 30%;">Beschreibung</th>
+                    <th style="width: 20%;">Name</th>
+                    <th style="width: 30%;">Anforderung</th>
                     <th style="width: 10%;">Kategorie</th>
                     <th style="width: 10%;">Status</th>
                     <th style="width: 20%;">Aktionen</th>
@@ -64,12 +75,6 @@
         
         <!-- Actions -->
         <td>
-          <form method="POST" action="{{ url_for('main.restore_requirement', req_id=item.requirement.id) }}" class="d-inline">
-            <button type="submit" class="btn btn-sm btn-success me-1">
-              <i class="bi bi-arrow-counterclockwise"></i> Wiederherstellen
-            </button>
-          </form>
-          
           <form method="POST" action="{{ url_for('main.delete_requirement_permanently', req_id=item.requirement.id) }}" class="d-inline">
             <button type="submit" class="btn btn-sm btn-danger" 
                     onclick="return confirm('Anforderung endgültig löschen? Diese Aktion kann nicht rückgängig gemacht werden!')">
