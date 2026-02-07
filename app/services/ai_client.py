@@ -136,6 +136,7 @@ Antworte NUR mit diesem JSON, ohne zusätzlichen Text davor oder danach."""
 
     try:
         # Call OpenAI Chat Completions API
+        max_output_tokens = 8000
         response = client.chat.completions.create(
             model=model,
             messages=[
@@ -144,7 +145,7 @@ Antworte NUR mit diesem JSON, ohne zusätzlichen Text davor oder danach."""
                 {"role": "user", "content": user_message}
             ],
             temperature=0.2,
-            max_tokens=4000
+            max_tokens=max_output_tokens
         )
 
         # Extract response content
@@ -312,10 +313,10 @@ def _validate_and_normalize_requirements(requirements: list, columns: list = Non
     if num_requirements and num_requirements > 0:
         return normalized[:min(num_requirements, max_cap)]
     if num_requirements_mode == "auto" or not num_requirements_mode:
-        return normalized[:min(10, max_cap)]
+        return normalized
     if num_requirements_mode == "min":
         return normalized[:max_cap]
-    return normalized[:max_cap]
+    return normalized
 
 
 def detect_conflicts(requirements_list: list[dict]) -> list[dict]:

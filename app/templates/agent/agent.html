@@ -622,7 +622,6 @@ endblock %} {% block content %}
                     placeholder="Automatisch"
                     min="1"
                     max="20"
-                    data-default-value="5"
                     disabled
                   />
                 </div>
@@ -927,7 +926,7 @@ endblock %} {% block content %}
   const numReqMode = document.getElementById("num_requirements_mode");
   const numReqValue = document.getElementById("num_requirements_value");
   let lastManualNumReqValue =
-    numReqValue.value || numReqValue.dataset.defaultValue || "5";
+    numReqValue.value || "";
 
   function applyNumReqMode() {
     const isAuto = numReqMode.value === "auto";
@@ -936,7 +935,7 @@ endblock %} {% block content %}
       numReqValue.placeholder = "";
     } else {
       numReqValue.placeholder = "";
-      if (!numReqValue.value) {
+      if (!numReqValue.value && lastManualNumReqValue) {
         numReqValue.value = lastManualNumReqValue;
       }
     }
@@ -1211,6 +1210,16 @@ endblock %} {% block content %}
         messageDiv.classList.remove("d-none");
         modelSelect.classList.add("is-invalid");
         modelSelect.focus();
+        return;
+      }
+
+      if (numReqMode.value !== "auto" && !numReqValue.value) {
+        messageDiv.className = "alert alert-danger mt-3 shadow-sm";
+        messageDiv.innerHTML =
+          "<strong>Hinweis:</strong> Bitte eine Anzahl fuer die Generierung angeben.";
+        messageDiv.classList.remove("d-none");
+        numReqValue.classList.add("is-invalid");
+        numReqValue.focus();
         return;
       }
 

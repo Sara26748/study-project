@@ -125,6 +125,8 @@ def generate(project_id):
                 except (ValueError, TypeError):
                     num_requirements_value = None
             num_requirements_mode = num_req_mode
+            if num_req_mode in {'exact', 'min', 'max'} and not num_requirements_value:
+                return jsonify({'ok': False, 'error': 'Bitte eine Anzahl angeben.'}), 400
             if num_req_mode == 'exact' and num_requirements_value:
                 num_requirements = num_requirements_value
         except Exception:
@@ -148,6 +150,8 @@ def generate(project_id):
             except (ValueError, TypeError):
                 num_requirements_value = None
         num_requirements_mode = num_req_mode
+        if num_req_mode in {'exact', 'min', 'max'} and not num_requirements_value:
+            return jsonify({'ok': False, 'error': 'Bitte eine Anzahl angeben.'}), 400
         if num_req_mode == 'exact' and num_requirements_value:
             num_requirements = num_requirements_value
 
