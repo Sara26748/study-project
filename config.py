@@ -68,6 +68,11 @@ Regeln:
         )
     elif num_requirements_mode == "max" and num_requirements_value and num_requirements_value > 0:
         count_instruction = f"\n- Generiere MAXIMAL {num_requirements_value} Requirements."
+    elif num_requirements_mode == "auto" or not num_requirements_mode:
+        count_instruction = (
+            "\n- Generiere so viele Requirements wie moeglich und sinnvoll."
+            "\n- Keine feste Obergrenze; nutze den Kontext maximal aus."
+        )
 
     # Product context
     if product_system and product_system.strip():
