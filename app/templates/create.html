@@ -451,6 +451,8 @@ document.addEventListener('DOMContentLoaded', function() {
         <tbody>
           {% if req_with_versions %} {% for req, versions in req_with_versions %}
           {% set selected_version = versions[-1] %}
+          {% set has_released = req.has_release_event() %}
+          {% set latest_released = req.get_latest_released_version() %}
           {% if selected_version_id %}
             {% for ver in versions %}
               {% if ver.id == selected_version_id %}
@@ -460,6 +462,8 @@ document.addEventListener('DOMContentLoaded', function() {
           {% endif %}
             <tr id="req-row-{{ req.id }}" 
               data-req-id="{{ req.id }}" 
+              data-has-released="{{ 'true' if has_released else 'false' }}"
+              data-released-version-id="{{ latest_released.id if latest_released else '' }}"
               {% if selected_version_id and selected_version_id == selected_version.id %}data-preferred-version-id="{{ selected_version.id }}"{% endif %}
               class="requirement-row-clickable" 
               style="cursor: pointer;"
@@ -472,7 +476,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 style="width: auto; padding-left: 0; box-shadow: none;"
               >
                 <option value="current" selected>
-                  {{ selected_version.revision or 'Entwurf' }}
+                  {{ selected_version.get_revision_display() }}
                 </option>
               </select>
             </td>
@@ -566,14 +570,15 @@ document.addEventListener('DOMContentLoaded', function() {
                                     data-req-id="{{ req.id }}" 
                                     data-version-id="{{ selected_version.id }}"
                                     style="margin-bottom:0.25rem;"
-                                    {% if selected_version.is_blocked %}disabled{% endif %}>
+                                    {% if selected_version.is_blocked or has_released %}disabled{% endif %}>
                                     <i class="bi bi-pencil me-2"></i> Bearbeiten
                                 </button>
                                 <button class="btn btn-outline-secondary status-btn-vertical action-btn w-100 revision-requirement-btn" 
                                     type="button"
                                     data-req-id="{{ req.id }}" 
-                                    data-version-id="{{ selected_version.id }}"
-                                    style="margin-bottom:0.25rem;">
+                                  data-version-id="{{ latest_released.id if latest_released else selected_version.id }}"
+                                  style="margin-bottom:0.25rem;"
+                                    {% if not has_released %}disabled{% endif %}>
                                     <i class="bi bi-arrow-counterclockwise me-2"></i> Revidieren
                                 </button>
                                 <form method="POST" action="{{ url_for('main.delete_requirement_version', version_id=selected_version.id) }}" class="delete-version-form">
@@ -615,9 +620,10 @@ document.addEventListener('DOMContentLoaded', function() {
                   data-category="{{ ver.category or '' }}"
                   data-status="{{ ver.status }}"
                   data-status-color="{{ ver.get_status_color() }}"
+                  data-is-blocked="{{ 'true' if ver.is_blocked else 'false' }}"
                   data-custom-data="{{ ver.get_custom_data_json()|safe }}"
                   data-is-quantifiable="{{ 'true' if (ver.get_custom_data().get('is_quantifiable', 'false') == 'true' or ver.get_custom_data().get('is_quantifiable', False) == True) else 'false' }}"
-                  data-revision="{{ ver.revision or 'Entwurf' }}"
+                  data-revision="{{ ver.get_revision_display() }}"
                 ></div>
                 {% endfor %}
               </div>
@@ -799,7 +805,7 @@ document.addEventListener('DOMContentLoaded', function() {
       <form id="editRequirementForm" method="POST">
         <div class="modal-body">
           <input type="hidden" id="editVersionId" name="version_id" />
-          <input type="hidden" id="editRevisionNumber" name="revision_number" />
+          <input type="hidden" id="editRevisionKey" name="revision_key" />
           <input
             type="hidden"
             id="editSaveType"
@@ -897,6 +903,14 @@ document.addEventListener('DOMContentLoaded', function() {
               disabled
             >
               Revidiert
+            </button>
+            <button
+              type="submit"
+              class="btn btn-success"
+              id="revisionFinalizeBtn"
+              disabled
+            >
+              Freigegeben
             </button>
           </div>
         </div>

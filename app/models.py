@@ -105,6 +105,51 @@ class Requirement(db.Model):
             return None
         return self.versions[-1]
 
+    def _has_release_change(self, changes):
+        """Check if a change record represents a release event."""
+        if not changes:
+            return False
+        status_value = changes.get('status')
+        if status_value and 'freigabe' in str(status_value).lower():
+            return True
+        nested_changes = changes.get('changes')
+        if isinstance(nested_changes, dict):
+            nested_status = nested_changes.get('status')
+            if nested_status and 'freigabe' in str(nested_status).lower():
+                return True
+        elif isinstance(nested_changes, str):
+            if 'freigabe' in nested_changes.lower():
+                return True
+        snapshot = changes.get('revision_snapshot')
+        if isinstance(snapshot, dict):
+            snap_status = snapshot.get('status')
+            if snap_status and str(snap_status).lower() == 'freigabe':
+                return True
+            return True
+        return False
+
+    def get_latest_released_version(self):
+        """Return the version associated with the latest release event."""
+        latest_event_time = None
+        latest_version = None
+        for ver in self.versions or []:
+            if ver.status and str(ver.status).lower() == 'freigabe':
+                event_time = ver.created_at
+                if latest_event_time is None or event_time > latest_event_time:
+                    latest_event_time = event_time
+                    latest_version = ver
+            for entry in ver.change_history or []:
+                if self._has_release_change(entry.get_changes()):
+                    event_time = entry.created_at
+                    if latest_event_time is None or event_time > latest_event_time:
+                        latest_event_time = event_time
+                        latest_version = ver
+        return latest_version
+
+    def has_release_event(self):
+        """Check if this requirement has ever been released."""
+        return self.get_latest_released_version() is not None
+
 class RequirementVersion(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     requirement_id = db.Column(db.Integer, db.ForeignKey('requirement.id'), nullable=False)
@@ -172,6 +217,18 @@ class RequirementVersion(db.Model):
             'Verworfen': 'dark',      # Dark
         }
         return status_colors.get(self.status, 'secondary')
+
+    def get_revision_display(self):
+        """Format revision label like 'i.A' for display."""
+        if not self.revision or self.revision == 'Entwurf':
+            return ''
+        value = self.revision.strip()
+        if '.' in value:
+            roman_part, round_part = value.split('.', 1)
+            roman_part = roman_part.strip().lower()
+            round_letter = round_part.strip().upper()[:1] or 'A'
+            return f"{roman_part}.{round_letter}"
+        return f"{value.lower()}.A"
     
     def can_be_edited_by(self, user):
         """Check if user can edit this version (not blocked or blocked by this user or project owner)."""
