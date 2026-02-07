@@ -421,7 +421,7 @@ def generate(project_id):
                 description=description,
                 category=category,
                 status=status,
-                revision="Entwurf",
+                revision=None,
                 created_by_id=current_user.id  # Track who created this version
             )
             

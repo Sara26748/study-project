@@ -95,15 +95,17 @@ function attachEventListeners() {
               `.version-data[data-version-index="${versionIndex}"]`,
             )
           : null;
-        const versionId = versionData?.getAttribute("data-version-id");
-        const cacheKey = `${reqId}:${versionId || ""}`;
+        const releasedVersionId = row?.dataset.releasedVersionId || "";
+        const revisionVersionId =
+          releasedVersionId || versionData?.getAttribute("data-version-id");
+        const cacheKey = `${reqId}:${revisionVersionId || ""}`;
 
         if (selectedValue === "current") {
           // Revert to current version selection and clear stored snapshot
           const row = document.getElementById(`req-row-${reqId}`);
           if (row) {
             delete row.dataset.selectedRevisionJson;
-            delete row.dataset.selectedRevisionNumber;
+            delete row.dataset.selectedRevisionKey;
           }
           if (versionSelector) {
             updateRowWithVersionData(reqId, versionSelector.value);
@@ -113,24 +115,24 @@ function attachEventListeners() {
 
         const revisions = revisionCache[cacheKey] || [];
         const match = revisions.find(
-          (rev) => `${rev.revision_number}` === selectedValue,
+          (rev) => `${rev.revision_key}` === selectedValue,
         );
         const applyMatch = (rev) => {
           if (rev) {
             const row = document.getElementById(`req-row-${reqId}`);
             if (row) {
               row.dataset.selectedRevisionJson = JSON.stringify(rev);
-              row.dataset.selectedRevisionNumber = `${rev.revision_number || ""}`;
+              row.dataset.selectedRevisionKey = `${rev.revision_key || ""}`;
             }
             applyRevisionSnapshot(reqId, rev);
           }
         };
         if (match) {
           applyMatch(match);
-        } else if (versionId) {
-          loadRevisions(reqId, versionId).then((loaded) => {
+        } else if (revisionVersionId) {
+          loadRevisions(reqId, revisionVersionId).then((loaded) => {
             const matchLoaded = loaded.find(
-              (rev) => `${rev.revision_number}` === selectedValue,
+              (rev) => `${rev.revision_key}` === selectedValue,
             );
             applyMatch(matchLoaded);
           });
@@ -147,11 +149,11 @@ function attachEventListeners() {
     editForm.addEventListener("submit", function (e) {
       const versionId = document.getElementById("editVersionId").value;
       const mode = document.getElementById("editMode").value || "edit";
-      const revisionNumber =
-        document.getElementById("editRevisionNumber")?.value || "";
+      const revisionKey =
+        document.getElementById("editRevisionKey")?.value || "";
 
       // If a specific revision is selected, always route to the revise endpoint
-      if (revisionNumber) {
+      if (revisionKey) {
         this.action = `/requirement_version/${versionId}/revise`;
         document.getElementById("editSaveType").value = "revision";
         document.getElementById("editMode").value = "revision";
@@ -184,6 +186,7 @@ function attachEventListeners() {
   const intermediateBtn = document.getElementById("editSaveIntermediateBtn");
   const finalBtn = document.getElementById("editSaveFinalBtn");
   const revisionBtn = document.getElementById("revisionSubmit");
+  const revisionFinalizeBtn = document.getElementById("revisionFinalizeBtn");
 
   if (
     intermediateBtn &&
@@ -208,6 +211,17 @@ function attachEventListeners() {
       statusSelect.value = "In Bearbeitung";
     });
     revisionBtn.dataset.listenerAttached = "true";
+  }
+
+  if (
+    revisionFinalizeBtn &&
+    statusSelect &&
+    !revisionFinalizeBtn.dataset.listenerAttached
+  ) {
+    revisionFinalizeBtn.addEventListener("click", () => {
+      statusSelect.value = "Freigabe";
+    });
+    revisionFinalizeBtn.dataset.listenerAttached = "true";
   }
 
   // Apply filters button
@@ -296,16 +310,16 @@ function populateRevisionSelector(reqId, row, revisions) {
   const selector = row.querySelector(".revision-selector");
   if (!selector) return;
 
-  // Prefer an explicit value, fall back to the existing option text or Entwurf
+  // Prefer an explicit value, fall back to the existing option text
   const currentRevision =
     selector.dataset.currentRevision ||
     (selector.options[0]?.textContent || "").trim() ||
-    "Entwurf";
+    "";
   selector.innerHTML = "";
 
   const currentOption = document.createElement("option");
   currentOption.value = "current";
-  currentOption.textContent = `${currentRevision || "Entwurf"}`;
+  currentOption.textContent = `${currentRevision || ""}`;
   selector.appendChild(currentOption);
 
   const sortedRevs = [...revisions].sort(
@@ -314,9 +328,8 @@ function populateRevisionSelector(reqId, row, revisions) {
 
   sortedRevs.forEach((rev) => {
     const opt = document.createElement("option");
-    opt.value = `${rev.revision_number}`;
-    const revLabel = rev.revision_label || rev.revision_number || "";
-    opt.textContent = `${revLabel || "Entwurf"}`;
+    opt.value = `${rev.revision_key}`;
+    opt.textContent = rev.revision_label || "";
     selector.appendChild(opt);
   });
 
@@ -380,7 +393,7 @@ function applyRevisionSnapshot(reqId, revisionData) {
   // Revision label display in the cell header
   const revisionSelect = row.querySelector(".revision-selector");
   if (revisionSelect) {
-    revisionSelect.value = `${revisionData.revision_number}`;
+    revisionSelect.value = `${revisionData.revision_key}`;
   }
 }
 
@@ -452,9 +465,12 @@ function hasRevisionChanges() {
 
 function updateRevisionButtonState() {
   const revisionButton = document.getElementById("revisionSubmit");
+  const revisionFinalizeBtn = document.getElementById("revisionFinalizeBtn");
   const mode = document.getElementById("editMode")?.value || "edit";
   if (!revisionButton || mode !== "revision") return;
-  revisionButton.disabled = !hasRevisionChanges();
+  const disabledState = !hasRevisionChanges();
+  revisionButton.disabled = disabledState;
+  if (revisionFinalizeBtn) revisionFinalizeBtn.disabled = disabledState;
 }
 
 // Functions
@@ -462,7 +478,7 @@ function updateRowWithVersionData(reqId, versionIndex) {
   const row = document.getElementById(`req-row-${reqId}`);
   if (row) {
     delete row.dataset.selectedRevisionJson;
-    delete row.dataset.selectedRevisionNumber;
+    delete row.dataset.selectedRevisionKey;
   }
   const versionsData = document.getElementById(`versions-data-${reqId}`);
   const versionElements = versionsData.querySelectorAll(".version-data");
@@ -476,6 +492,8 @@ function updateRowWithVersionData(reqId, versionIndex) {
 
   if (selectedVersion) {
     const versionId = selectedVersion.getAttribute("data-version-id");
+    const releasedVersionId = row?.dataset.releasedVersionId || "";
+    const revisionVersionId = releasedVersionId || versionId;
     row.querySelector(".title-cell").textContent =
       selectedVersion.getAttribute("data-title");
     row.querySelector(".description-cell").textContent =
@@ -538,7 +556,13 @@ function updateRowWithVersionData(reqId, versionIndex) {
     });
 
     const editButton = row.querySelector(".edit-requirement-btn");
-    editButton.setAttribute("data-version-id", versionId);
+    if (editButton) {
+      const isBlocked =
+        selectedVersion.getAttribute("data-is-blocked") === "true";
+      const hasReleased = row?.dataset.hasReleased === "true";
+      editButton.setAttribute("data-version-id", versionId);
+      editButton.disabled = isBlocked || hasReleased;
+    }
 
     const deleteForm = row.querySelector(".delete-version-form");
     if (deleteForm) {
@@ -547,14 +571,22 @@ function updateRowWithVersionData(reqId, versionIndex) {
 
     const revisionCell = row.querySelector(".revision-cell");
     if (revisionCell) {
-      const revisionValue = selectedVersion.getAttribute("data-revision");
+      let revisionValue = selectedVersion.getAttribute("data-revision");
+      if (releasedVersionId) {
+        const releasedVersionEl = versionsData.querySelector(
+          `.version-data[data-version-id="${releasedVersionId}"]`,
+        );
+        if (releasedVersionEl) {
+          revisionValue = releasedVersionEl.getAttribute("data-revision") || "";
+        }
+      }
       const selector = revisionCell.querySelector(".revision-selector");
       if (selector) {
-        selector.dataset.currentRevision = revisionValue || "Entwurf";
+        selector.dataset.currentRevision = revisionValue || "";
         selector.innerHTML = "";
         const opt = document.createElement("option");
         opt.value = "current";
-        opt.textContent = `${revisionValue || "Entwurf"}`;
+        opt.textContent = `${revisionValue || ""}`;
         selector.appendChild(opt);
         selector.value = "current";
       } else {
@@ -565,11 +597,13 @@ function updateRowWithVersionData(reqId, versionIndex) {
 
     const revisionButton = row.querySelector(".revision-requirement-btn");
     if (revisionButton) {
-      revisionButton.setAttribute("data-version-id", versionId);
+      revisionButton.setAttribute("data-version-id", revisionVersionId);
+      const hasReleased = row?.dataset.hasReleased === "true";
+      revisionButton.disabled = !hasReleased;
     }
 
     // Populate revision selector asynchronously (uses cache if available)
-    loadRevisions(reqId, versionId).then((revs) => {
+    loadRevisions(reqId, revisionVersionId).then((revs) => {
       populateRevisionSelector(reqId, row, revs);
     });
   }
@@ -751,10 +785,11 @@ function openEditModal(
 
   const modeInput = document.getElementById("editMode");
   const saveTypeInput = document.getElementById("editSaveType");
-  const revisionNumberInput = document.getElementById("editRevisionNumber");
+  const revisionKeyInput = document.getElementById("editRevisionKey");
   const editButtons = document.getElementById("editActionButtons");
   const revisionButtonWrap = document.getElementById("revisionActionButton");
   const revisionButton = document.getElementById("revisionSubmit");
+  const revisionFinalizeBtn = document.getElementById("revisionFinalizeBtn");
   const modalTitle = document.querySelector(
     "#editRequirementModal .modal-title",
   );
@@ -769,6 +804,7 @@ function openEditModal(
     if (editButtons) editButtons.classList.add("d-none");
     if (revisionButtonWrap) revisionButtonWrap.classList.remove("d-none");
     if (revisionButton) revisionButton.disabled = true;
+    if (revisionFinalizeBtn) revisionFinalizeBtn.disabled = true;
   } else {
     if (saveTypeInput) saveTypeInput.value = "intermediate";
     if (editButtons) editButtons.classList.remove("d-none");
@@ -788,9 +824,9 @@ function openEditModal(
   if (selectedVersion) {
     const revisionData = revisionOverride || getSelectedRevisionSnapshot(reqId);
 
-    if (revisionNumberInput) {
-      revisionNumberInput.value = revisionData?.revision_number
-        ? `${revisionData.revision_number}`
+    if (revisionKeyInput) {
+      revisionKeyInput.value = revisionData?.revision_key
+        ? `${revisionData.revision_key}`
         : "";
     }
 
@@ -1020,7 +1056,8 @@ function pollRequirementsStatus() {
         );
 
         if (editBtn) {
-          editBtn.disabled = item.is_blocked;
+          const hasReleased = row?.dataset.hasReleased === "true";
+          editBtn.disabled = item.is_blocked || hasReleased;
         }
 
         if (toggleForm) {
