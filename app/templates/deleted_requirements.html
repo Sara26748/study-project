@@ -23,8 +23,8 @@ project.name }}{% endblock %} {% block content %}
             <tr>
               <th style="width: 5%">Version</th>
               <th style="width: 5%">ID</th>
-              <th style="width: 15%">Title</th>
-              <th style="width: 25%">Beschreibung</th>
+              <th style="width: 15%">Name</th>
+              <th style="width: 25%">Anforderung</th>
 
               <!-- Dynamic Columns -->
               {% for column in custom_columns %}
@@ -64,12 +64,20 @@ project.name }}{% endblock %} {% block content %}
               <td>
                 <form
                   method="POST"
-                  action="{{ url_for('main.restore_requirement', req_id=req.id) }}"
+                  action="{{ url_for('main.delete_requirement_permanently', req_id=req.id) }}"
                   class="d-inline"
                 >
-                  <button type="submit" class="btn btn-sm btn-success">
-                    <i class="bi bi-arrow-counterclockwise"></i>
-                    Wiederherstellen
+                  <button
+                    type="submit"
+                    class="btn btn-sm btn-danger"
+                    onclick="
+                      return confirm(
+                        'Anforderung endgültig löschen? Diese Aktion kann nicht rückgängig gemacht werden!',
+                      );
+                    "
+                  >
+                    <i class="bi bi-trash-fill"></i>
+                    Endgültig löschen
                   </button>
                 </form>
               </td>

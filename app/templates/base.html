@@ -62,7 +62,7 @@
         <!-- Right Side: Notifications + User Avatar/Dropdown -->
         <div class="d-flex align-items-center gap-3 ms-auto">
           {% if current_user.is_authenticated %}
-          
+
           <!-- Notification Bell -->
           <div class="dropdown me-2">
             <button
@@ -143,16 +143,69 @@
 
           <!-- Language Button rechts neben Glocke -->
           <div class="dropdown me-2">
-            <button class="btn language-btn d-flex align-items-center fw-semibold" type="button" id="languageDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-              <span class="me-2 d-flex align-items-center"><img src="https://flagcdn.com/de.svg" width="22" alt="Deutsch" style="border-radius:3px;"></span>
-              <span style="min-width:70px; text-align:left;">Deutsch</span>
-              <span class="ms-2"><i class="bi bi-chevron-down" style="font-size:1rem;"></i></span>
+            <button
+              class="btn language-btn d-flex align-items-center fw-semibold"
+              type="button"
+              id="languageDropdown"
+              data-bs-toggle="dropdown"
+              aria-expanded="false"
+            >
+              <span class="me-2 d-flex align-items-center"
+                ><img
+                  src="https://flagcdn.com/de.svg"
+                  width="22"
+                  alt="Deutsch"
+                  style="border-radius: 3px"
+              /></span>
+              <span style="min-width: 70px; text-align: left">Deutsch</span>
+              <span class="ms-2"
+                ><i class="bi bi-chevron-down" style="font-size: 1rem"></i
+              ></span>
             </button>
-            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="languageDropdown">
-              <li><a class="dropdown-item d-flex align-items-center" href="#"><img src="https://flagcdn.com/de.svg" width="22" class="me-2" alt="Deutsch">Deutsch</a></li>
-              <li><a class="dropdown-item d-flex align-items-center" href="#"><img src="https://flagcdn.com/gb.svg" width="22" class="me-2" alt="English">English</a></li>
-              <li><a class="dropdown-item d-flex align-items-center" href="#"><img src="https://flagcdn.com/fr.svg" width="22" class="me-2" alt="Français">Français</a></li>
-              <li><a class="dropdown-item d-flex align-items-center" href="#"><img src="https://flagcdn.com/es.svg" width="22" class="me-2" alt="Español">Español</a></li>
+            <ul
+              class="dropdown-menu dropdown-menu-end"
+              aria-labelledby="languageDropdown"
+            >
+              <li>
+                <a class="dropdown-item d-flex align-items-center" href="#"
+                  ><img
+                    src="https://flagcdn.com/de.svg"
+                    width="22"
+                    class="me-2"
+                    alt="Deutsch"
+                  />Deutsch</a
+                >
+              </li>
+              <li>
+                <a class="dropdown-item d-flex align-items-center" href="#"
+                  ><img
+                    src="https://flagcdn.com/gb.svg"
+                    width="22"
+                    class="me-2"
+                    alt="English"
+                  />English</a
+                >
+              </li>
+              <li>
+                <a class="dropdown-item d-flex align-items-center" href="#"
+                  ><img
+                    src="https://flagcdn.com/fr.svg"
+                    width="22"
+                    class="me-2"
+                    alt="Français"
+                  />Français</a
+                >
+              </li>
+              <li>
+                <a class="dropdown-item d-flex align-items-center" href="#"
+                  ><img
+                    src="https://flagcdn.com/es.svg"
+                    width="22"
+                    class="me-2"
+                    alt="Español"
+                  />Español</a
+                >
+              </li>
             </ul>
             <style>
               .language-btn {
@@ -164,11 +217,14 @@
                 padding: 0.35rem 1.2rem 0.35rem 0.8rem !important;
                 font-size: 1.05rem !important;
                 min-height: 38px;
-                transition: border-color 0.18s, box-shadow 0.18s;
+                transition:
+                  border-color 0.18s,
+                  box-shadow 0.18s;
               }
-              .language-btn:focus, .language-btn:hover {
+              .language-btn:focus,
+              .language-btn:hover {
                 border-color: #b6d0ff !important;
-                box-shadow: 0 2px 8px 0 rgba(80,180,255,0.10);
+                box-shadow: 0 2px 8px 0 rgba(80, 180, 255, 0.1);
                 color: #1a4fbf !important;
               }
               .language-btn .bi-chevron-down {
@@ -307,34 +363,54 @@
       </div>
     </nav>
 
-
-
     <main class="container mt-5" style="padding-top: 24px !important">
       <!-- Flash Messages -->
       {% with messages = get_flashed_messages(with_categories=true) %} {% if
       messages %}
-      <div class="flash-messages">
-        {% for category, message in messages %}
-        <div
-          class="alert alert-{{ 'success' if category == 'success' else 'danger' if category == 'error' else 'info' }} alert-dismissible fade show"
-          role="alert"
-        >
-          <strong
-            >{% if category == 'success' %}✓{% elif category == 'error' %}✗{%
-            else %}ℹ{% endif %}</strong
+      <div class="flash-overlay" aria-live="polite" aria-atomic="true">
+        <div class="flash-stack">
+          {% for category, message in messages %}
+          <div
+            class="flash-card flash-{{ 'success' if category == 'success' else 'error' if category in ['error','danger'] else 'warning' if category == 'warning' else 'info' }}"
+            role="status"
+            data-flash
           >
-          {{ message }}
-          <button
-            type="button"
-            class="btn-close"
-            data-bs-dismiss="alert"
-            aria-label="Close"
-          ></button>
+            <div class="flash-icon">
+              {% if category == 'success' %}
+              <i class="bi bi-check-circle-fill"></i>
+              {% elif category in ['error','danger'] %}
+              <i class="bi bi-x-circle-fill"></i>
+              {% elif category == 'warning' %}
+              <i class="bi bi-exclamation-triangle-fill"></i>
+              {% else %}
+              <i class="bi bi-info-circle-fill"></i>
+              {% endif %}
+            </div>
+            <div class="flash-text">{{ message }}</div>
+            <button
+              type="button"
+              class="flash-close"
+              aria-label="Close"
+              data-flash-close
+            >
+              <i class="bi bi-x"></i>
+            </button>
+          </div>
+          {% endfor %}
         </div>
-        {% endfor %}
       </div>
       {% endif %} {% endwith %} {% block content %}{% endblock %}
     </main>
+
+    <div class="action-overlay" id="actionOverlay" aria-hidden="true">
+      <div class="action-card">
+        <div class="action-spinner"></div>
+        <div class="action-title">Vorgang wird ausgefuehrt</div>
+        <div class="action-subtitle">
+          Bitte warten, Seite wird aktualisiert.
+        </div>
+      </div>
+    </div>
 
     <!-- Confirmation Modal -->
     <div
@@ -416,15 +492,75 @@
           ).hide();
         });
 
-      // Auto-dismiss flash messages after 5 seconds
+      // Auto-dismiss flash messages after 4.5 seconds
       document.addEventListener("DOMContentLoaded", function () {
-        setTimeout(function () {
-          const alerts = document.querySelectorAll(".alert");
-          alerts.forEach(function (alert) {
-            const bsAlert = new bootstrap.Alert(alert);
-            bsAlert.close();
+        const flashCards = document.querySelectorAll("[data-flash]");
+        flashCards.forEach(function (card) {
+          const closeBtn = card.querySelector("[data-flash-close]");
+          const closeCard = function () {
+            card.classList.add("flash-hide");
+            setTimeout(() => card.remove(), 300);
+          };
+          if (closeBtn) {
+            closeBtn.addEventListener("click", closeCard);
+          }
+          setTimeout(closeCard, 4500);
+        });
+
+        const overlay = document.getElementById("actionOverlay");
+        const showOverlay = function () {
+          if (!overlay) return;
+          overlay.classList.add("is-active");
+          overlay.setAttribute("aria-hidden", "false");
+        };
+
+        document.querySelectorAll("form").forEach(function (form) {
+          if (form.dataset.noLoading === "true") return;
+          const method = (form.getAttribute("method") || "get").toLowerCase();
+          if (method !== "post") return;
+          form.addEventListener("submit", function () {
+            showOverlay();
           });
-        }, 5000);
+        });
+
+        document.querySelectorAll("[data-loading-link]").forEach(function (el) {
+          el.addEventListener("click", function () {
+            showOverlay();
+          });
+        });
+
+        document.addEventListener("click", function (event) {
+          const link = event.target.closest("a");
+          if (!link) return;
+          if (link.dataset.noLoading === "true") return;
+          if (link.target === "_blank" || link.hasAttribute("download")) return;
+          if (
+            event.defaultPrevented ||
+            event.metaKey ||
+            event.ctrlKey ||
+            event.shiftKey
+          )
+            return;
+          const href = link.getAttribute("href") || "";
+          if (!href || href.startsWith("#")) return;
+          let url;
+          try {
+            url = new URL(href, window.location.origin);
+          } catch (e) {
+            return;
+          }
+          if (url.origin !== window.location.origin) return;
+          if (
+            url.pathname === window.location.pathname &&
+            url.search === window.location.search
+          )
+            return;
+          showOverlay();
+        });
+
+        window.addEventListener("beforeunload", function () {
+          showOverlay();
+        });
 
         // Load notifications
         loadNotifications();

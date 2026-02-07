@@ -41,8 +41,32 @@ content %}
         <a href="{{ url_for('main.home') }}" class="text-decoration-none text-primary small mb-1 d-inline-flex align-items-center fw-medium" style="transition: color 0.2s ease;" onmouseover="this.style.color='#0a58ca'" onmouseout="this.style.color='#0d6efd'">
             <i class="bi bi-arrow-left me-1"></i> Zurück zur Übersicht
         </a>
-        <div class="d-flex align-items-center gap-2">
+        <div class="d-flex align-items-center gap-2 flex-wrap">
           <h2 class="fw-bold m-0">Projektname: {{ project.name }}</h2>
+          <button
+            class="btn btn-outline-primary btn-uniform btn-modern d-flex align-items-center share-btn ms-2"
+            type="button"
+            data-bs-toggle="modal"
+            data-bs-target="#shareProjectModal"
+            title="teilen"
+          >
+            <i class="bi bi-share me-2"></i> <span class="share-btn-text">Teilen</span>
+          </button>
+          <style>
+          .share-btn:hover, .share-btn:focus {
+            background: #0d6efd !important;
+            color: #fff !important;
+            border-color: #0d6efd !important;
+          }
+          .share-btn:hover .share-btn-text,
+          .share-btn:focus .share-btn-text {
+            color: #fff !important;
+          }
+          .share-btn:hover i,
+          .share-btn:focus i {
+            color: #fff !important;
+          }
+          </style>
         </div>
         {% if project.shared_with %}
         <div class="mt-2">
@@ -70,15 +94,6 @@ content %}
         </button>
          Projekt teilen Button wurde nach oben verschoben -->
 
-        <!-- Button: Neue Anforderung hinzufügen (scrollt nach unten) -->
-        <button id="scrollToManualBtn" class="btn d-flex align-items-center shadow-sm px-4 fw-bold text-white border-0" type="button" style="background: linear-gradient(90deg, #6c757d 0%, #adb5bd 100%); border-radius: 2rem; letter-spacing: 0.5px; font-size: 1rem; transition: transform 0.15s;">
-          <span class="me-2 d-flex align-items-center">
-            <i class="bi bi-plus-circle-fill" style="font-size: 1.3rem; animation: pulseAdd 1.2s infinite alternate;"></i>
-          </span>
-          Neue Anforderung hinzufügen
-        </button>
-
-        
         
         <!-- Data Menu Removed - moved to toolbar -->
     </div>
@@ -176,7 +191,7 @@ document.addEventListener('DOMContentLoaded', function() {
             <!-- Filters -->
             <div class="col-md-2">
                  <select class="form-select border-0 bg-light" id="filterStatus">
-                    <option value="">Status: Alle</option>
+                    <option value="">Status</option>
                     <option value="Entwurf">Entwurf</option>
                     <option value="In Bearbeitung">In Bearbeitung</option>
                     <option value="Freigabe">Freigabe</option>
@@ -185,63 +200,22 @@ document.addEventListener('DOMContentLoaded', function() {
             </div>
             <div class="col-md-2">
                  <select class="form-select border-0 bg-light" id="filterCategory">
-                    <option value="">Kategorie: Alle</option>
+                    <option value="">Kategorie</option>
                  </select>
             </div>
             
             <!-- Actions -->
             <div class="col-md-5 text-end d-flex gap-2 justify-content-md-end justify-content-start align-items-center flex-wrap">
-                <!-- Einfügen Dropdown Button -->
-                <div class="dropdown">
-                  <button class="btn btn-outline-primary d-flex align-items-center shadow-sm dropdown-toggle" type="button" id="insertDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                    <i class="bi bi-plus-lg me-2"></i> Einfügen
-                  </button>
-                  <ul class="dropdown-menu" aria-labelledby="insertDropdown">
-                    <li>
-                      <a class="dropdown-item" href="#" id="insertNewColumn">
-                        <i class="bi bi-table me-2"></i> Neue Spalte
-                      </a>
-                    </li>
-                    <li>
-                      <a class="dropdown-item" href="#" id="insertNewRequirement">
-                        <i class="bi bi-plus-circle me-2"></i> Neue Anforderung
-                      </a>
-                    </li>
-                  </ul>
-                </div>
                 <!-- Export/Import Buttons (Larger & Labeled) -->
-                <a href="{{ url_for('main.export_excel', project_id=project.id) }}" class="btn btn-outline-success px-3 d-flex align-items-center shadow-sm" title="Liste als Excel exportieren">
+                <button id="scrollToSyslmBtn" class="btn btn-outline-primary btn-modern px-3 d-flex align-items-center shadow-sm" type="button" title="SysLM v2 code">
+                  <i class="bi bi-lightning-charge-fill me-2"></i> SysLM v2 code
+                </button>
+                <a href="{{ url_for('main.export_excel', project_id=project.id) }}" class="btn btn-outline-success btn-modern px-3 d-flex align-items-center shadow-sm" title="Liste als Excel exportieren">
                     <i class="bi bi-file-earmark-arrow-up me-2 fw-bold"></i> Export
                 </a>
-                <button
-                  class="btn btn-outline-warning btn-uniform d-flex align-items-center share-btn"
-                  type="button"
-                  data-bs-toggle="modal"
-                  data-bs-target="#shareProjectModal"
-                  title="teilen"
-                >
-                  <i class="bi bi-share me-2"></i> <span class="share-btn-text">teilen</span>
-                </button>
-                <style>
-                .share-btn:hover, .share-btn:focus {
-                  background: #ffc107 !important;
-                  color: #fff !important;
-                  border-color: #ffc107 !important;
-                }
-                .share-btn:hover .share-btn-text,
-                .share-btn:focus .share-btn-text {
-                  color: #fff !important;
-                }
-                .share-btn:hover i,
-                .share-btn:focus i {
-                  color: #fff !important;
-                }
-                </style>
-                <button class="btn btn-outline-primary px-3 d-flex align-items-center shadow-sm" type="button" data-bs-toggle="modal" data-bs-target="#importExcelModal" title="Excel-Datei importieren">
+                <button class="btn btn-outline-primary btn-modern btn-import px-3 d-flex align-items-center shadow-sm" type="button" data-bs-toggle="modal" data-bs-target="#importExcelModal" title="Excel-Datei importieren">
                     <i class="bi bi-file-earmark-arrow-down me-2 fw-bold"></i> Import
                 </button>
-
-                <div class="border-start mx-2" style="height: 24px;"></div>
 
                 <div class="d-inline-block">
 
@@ -265,81 +239,7 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 });
 </script>
-                    <!-- Column Remove Dropdown -->
-                     <div class="dropdown d-inline-block">
-                        <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                           <i class="bi bi-gear"></i>
-                        </button>
-                        <ul class="dropdown-menu dropdown-menu-end">
-                            <li><h6 class="dropdown-header">Spalten verwalten</h6></li>
-                            <li><small class="text-muted px-3 d-block mb-2">
-                                <i class="bi bi-shield-fill-check text-success"></i> = Geschützte Spalten (nicht löschbar)
-                            </small></li>
-                            
-                            <!-- Special Columns Toggle -->
-                            <li class="px-3 py-1 bg-light">
-                                <small class="text-muted fw-bold">Anzeige-Optionen</small>
-                            </li>
-                            <li class="d-flex justify-content-between align-items-center px-3 py-2">
-                                <span class="small"><i class="bi bi-circle-half text-secondary me-1"></i>Quantifizierbar</span>
-                                <div class="form-check form-switch m-0">
-                                    <input class="form-check-input" type="checkbox" role="switch" id="toggleQuantifiableCol" checked>
-                                </div>
-                            </li>
-                            <li><hr class="dropdown-divider"></li>
-
-                            <!-- Protected Standard Columns (cannot be deleted) -->
-                            <li class="px-3 py-1 bg-light">
-                                <small class="text-muted fw-bold">Standard-Spalten (Geschützt)</small>
-                            </li>
-                            <li class="d-flex justify-content-between align-items-center px-3 py-1">
-                                <span class="small"><i class="bi bi-shield-fill-check text-success me-1"></i>ID</span>
-                                <span class="badge bg-success bg-opacity-10 text-success">Geschützt</span>
-                            </li>
-                            <li class="d-flex justify-content-between align-items-center px-3 py-1">
-                                <span class="small"><i class="bi bi-shield-fill-check text-success me-1"></i>Version</span>
-                                <span class="badge bg-success bg-opacity-10 text-success">Geschützt</span>
-                            </li>
-                            <li class="d-flex justify-content-between align-items-center px-3 py-1">
-                                <span class="small"><i class="bi bi-shield-fill-check text-success me-1"></i>Anforderung</span>
-                                <span class="badge bg-success bg-opacity-10 text-success">Geschützt</span>
-                            </li>
-                            <li class="d-flex justify-content-between align-items-center px-3 py-1">
-                                <span class="small"><i class="bi bi-shield-fill-check text-success me-1"></i>Description</span>
-                                <span class="badge bg-success bg-opacity-10 text-success">Geschützt</span>
-                            </li>
-                            <li class="d-flex justify-content-between align-items-center px-3 py-1">
-                                <span class="small"><i class="bi bi-shield-fill-check text-success me-1"></i>Category</span>
-                                <span class="badge bg-success bg-opacity-10 text-success">Geschützt</span>
-                            </li>
-                            <li class="d-flex justify-content-between align-items-center px-3 py-1">
-                                <span class="small"><i class="bi bi-shield-fill-check text-success me-1"></i>Status</span>
-                                <span class="badge bg-success bg-opacity-10 text-success">Geschützt</span>
-                            </li>
-                            
-                            <!-- Custom Columns (can be deleted) -->
-                            {% if custom_columns %}
-                            <li><hr class="dropdown-divider"></li>
-                            <li class="px-3 py-1 bg-light">
-                                <small class="text-muted fw-bold">Custom-Spalten</small>
-                            </li>
-                            {% for column in custom_columns %}
-                            <li class="d-flex justify-content-between align-items-center px-3 py-1">
-                                <span class="small"><i class="bi bi-tag text-primary me-1"></i>{{ column }}</span>
-                                <form method="POST" action="{{ url_for('main.remove_column', project_id=project.id, column_name=column) }}" class="d-inline" onsubmit="return confirm('Spalte {{ column }} wirklich löschen?')">
-                                    <button type="submit" class="btn btn-link text-danger p-0 ms-2" title="Spalte löschen">
-                                        <i class="bi bi-trash"></i>
-                                    </button>
-                                </form>
-                            </li>
-                            {% endfor %}
-                            {% else %}
-                            <li><hr class="dropdown-divider"></li>
-                            <li><span class="text-muted small px-3">Keine Custom-Spalten vorhanden</span></li>
-                            {% endif %}
-                        </ul>
-                    </div>
-                </div>
+                  </div>
             </div>
         </div>
         
@@ -390,11 +290,11 @@ document.addEventListener('DOMContentLoaded', function() {
 <div class="card-header bg-white py-3 border-0 d-flex align-items-center justify-content-between">
     <div class="d-flex align-items-center gap-2">
       <h5 class="mb-0 fw-bold text-secondary">Anforderungsliste</h5>
-      <a href="{{ url_for('main.kanban_view', project_id=project.id) }}" class="btn d-flex align-items-center ms-2 gap-2" title="Kanban Board" style="border: 1.5px solid #dee2e6; background: #f8f9fa; color: #6c757d; transition: background 0.2s, color 0.2s;">
+      <a href="{{ url_for('main.kanban_view', project_id=project.id) }}" class="btn btn-modern d-flex align-items-center ms-2 gap-2" title="Kanban Board" style="border: 1.5px solid #dee2e6; background: #f8f9fa; color: #6c757d; transition: background 0.2s, color 0.2s;">
         <i class="bi bi-kanban" style="color: #6c757d;"></i>
         <span style="color: #6c757d;">Kanban Board</span>
       </a>
-      <button class="btn d-flex align-items-center ms-2 gap-2" id="check-conflicts-btn" title="Widersprüche prüfen" style="border: 1.5px solid #ffe066; background: #fffbe6; color: #ffc107; transition: background 0.2s, color 0.2s;">
+      <button class="btn btn-modern d-flex align-items-center ms-2 gap-2" id="check-conflicts-btn" title="Widersprüche prüfen" style="border: 1.5px solid #ffe066; background: #fffbe6; color: #ffc107; transition: background 0.2s, color 0.2s;">
         <i class="bi bi-exclamation-triangle" style="color: #ffc107;"></i>
         <span style="color: #ffc107;">Widersprüche prüfen</span>
       </button>
@@ -419,33 +319,147 @@ document.addEventListener('DOMContentLoaded', function() {
       }
       </style>
     </div>
+    <div class="d-flex align-items-center gap-2 flex-wrap">
+      <button id="scrollToManualBtn" class="btn btn-sm btn-modern d-flex align-items-center shadow-sm fw-bold text-white border-0" type="button" style="background: linear-gradient(90deg, #6c757d 0%, #adb5bd 100%); border-radius: 1.3rem; letter-spacing: 0.3px; font-size: 0.78rem; padding: 0.25rem 0.7rem; transition: transform 0.15s; min-width: 170px; justify-content: center;">
+        <span class="me-2 d-flex align-items-center">
+          <i class="bi bi-plus-circle-fill" style="font-size: 0.9rem; animation: pulseAdd 1.2s infinite alternate;"></i>
+        </span>
+        Neue Anforderung hinzufügen
+      </button>
+      <div class="dropdown d-inline-block ms-1">
+        <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+           <i class="bi bi-layout-three-columns"></i>
+        </button>
+        <ul class="dropdown-menu dropdown-menu-end">
+            <li><h6 class="dropdown-header">Spalten verwalten</h6></li>
+
+            <li class="px-3 py-1 bg-light">
+              <small class="text-muted fw-bold">+ Einfügen</small>
+            </li>
+            <li>
+              <a class="dropdown-item" href="#" id="insertNewColumn">
+                <i class="bi bi-table me-2"></i> Neue Spalte
+              </a>
+            </li>
+            <li>
+              <a class="dropdown-item" href="#" id="insertNewRequirement">
+                <i class="bi bi-plus-circle me-2"></i> Neue Anforderung
+              </a>
+            </li>
+            <li><hr class="dropdown-divider"></li>
+
+        <li class="px-3 py-2">
+          <div class="d-flex gap-2">
+            <button type="button" class="btn btn-sm btn-outline-secondary w-100" id="showAllColumnsBtn">Alle anzeigen</button>
+            <button type="button" class="btn btn-sm btn-outline-secondary w-100" id="hideAllColumnsBtn">Alle ausblenden</button>
+          </div>
+        </li>
+        <li><hr class="dropdown-divider"></li>
+
+        <li class="px-3 py-1 bg-light">
+          <small class="text-muted fw-bold">Spalten anzeigen</small>
+        </li>
+        <li class="d-flex justify-content-between align-items-center px-3 py-2">
+          <span class="small">Revision</span>
+          <div class="form-check form-switch m-0">
+            <input class="form-check-input col-toggle" type="checkbox" role="switch" data-col-key="revision" checked>
+          </div>
+        </li>
+        <li class="d-flex justify-content-between align-items-center px-3 py-2">
+          <span class="small">Version</span>
+          <div class="form-check form-switch m-0">
+            <input class="form-check-input col-toggle" type="checkbox" role="switch" data-col-key="version" checked>
+          </div>
+        </li>
+        <li class="d-flex justify-content-between align-items-center px-3 py-2">
+          <span class="small">Kategorie</span>
+          <div class="form-check form-switch m-0">
+            <input class="form-check-input col-toggle" type="checkbox" role="switch" data-col-key="category" checked>
+          </div>
+        </li>
+        <li class="d-flex justify-content-between align-items-center px-3 py-2">
+          <span class="small">Status</span>
+          <div class="form-check form-switch m-0">
+            <input class="form-check-input col-toggle" type="checkbox" role="switch" data-col-key="status" checked>
+          </div>
+        </li>
+        <li class="d-flex justify-content-between align-items-center px-3 py-2">
+          <span class="small">Funktional</span>
+          <div class="form-check form-switch m-0">
+            <input class="form-check-input col-toggle" type="checkbox" role="switch" data-col-key="funktional" checked>
+          </div>
+        </li>
+        <li class="d-flex justify-content-between align-items-center px-3 py-2">
+          <span class="small">Quantifizierbar</span>
+          <div class="form-check form-switch m-0">
+            <input class="form-check-input col-toggle" type="checkbox" role="switch" data-col-key="quantifizierbar" checked>
+          </div>
+        </li>
+
+        {% if custom_columns %}
+        <li><hr class="dropdown-divider"></li>
+        <li class="px-3 py-1 bg-light">
+          <small class="text-muted fw-bold">Hinzugefugte-Splaten</small>
+        </li>
+        {% for column in custom_columns %}
+        <li class="d-flex justify-content-between align-items-center px-3 py-2">
+          <span class="small"><i class="bi bi-tag text-primary me-1"></i>{{ column }}</span>
+          <div class="form-check form-switch m-0">
+            <input class="form-check-input col-toggle" type="checkbox" role="switch" data-col-key="custom-{{ column|replace(' ', '-')|replace('/', '-')|lower }}" checked>
+          </div>
+        </li>
+        {% endfor %}
+        {% endif %}
+
+        {% if custom_columns %}
+        <li><hr class="dropdown-divider"></li>
+        <li class="px-3 py-1 bg-light">
+          <small class="text-muted fw-bold">Hinzugefugte Spalten verwalten</small>
+        </li>
+        {% for column in custom_columns %}
+        <li class="d-flex justify-content-between align-items-center px-3 py-1">
+          <span class="small"><i class="bi bi-tag text-primary me-1"></i>{{ column }}</span>
+          <form method="POST" action="{{ url_for('main.remove_column', project_id=project.id, column_name=column) }}" class="d-inline" onsubmit="return confirm('Spalte {{ column }} wirklich löschen?')">
+            <button type="submit" class="btn btn-link text-danger p-0 ms-2" title="Spalte löschen">
+              <i class="bi bi-trash"></i>
+            </button>
+          </form>
+        </li>
+        {% endfor %}
+        {% else %}
+        <li><hr class="dropdown-divider"></li>
+        <li><span class="text-muted small px-3">keine hinzugefugte Spalten</span></li>
+        {% endif %}
+      </ul>
+      </div>
+    </div>
 </div>
   <div class="card-body p-0">
     <!-- Entfernt table-responsive, damit die Tabelle die volle Höhe einnimmt und die Seite scrollbar bleibt -->
       <table class="table table-hover align-middle mb-0">
         <thead class="bg-secondary bg-opacity-10 text-dark">
           <tr>
-            <th class="ps-4 py-3" style="width: 5%">Revision</th>
-            <th class="py-3" style="width: 5%">Version</th>
+            <th class="ps-4 py-3" style="width: 5%" data-col-key="revision">Revision</th>
+            <th class="py-3" style="width: 5%" data-col-key="version">Version</th>
             <th class="py-3" style="width: 5%">ID</th>
-            <th class="py-3" style="width: 20%">Anforderung</th>
-            <th class="py-3" style="width: 25%">Beschreibung</th>
+            <th class="py-3" style="width: 20%">Name</th>
+            <th class="py-3" style="width: 25%">Anforderung</th>
             {% for column in custom_columns %}
-            <th class="py-3" style="width: 10%">{{ column }}</th>
+            <th class="py-3" style="width: 10%" data-col-key="custom-{{ column|replace(' ', '-')|replace('/', '-')|lower }}">{{ column }}</th>
             {% endfor %}
-            <th class="py-3" style="width: 10%">Kategorie</th>
-            <th class="py-3" style="width: 10%">Status</th>
-            <th class="py-3 text-center" style="width: 8%">
+            <th class="py-3" style="width: 10%" data-col-key="category">Kategorie</th>
+            <th class="py-3" style="width: 10%" data-col-key="status">Status</th>
+            <th class="py-3 text-center" style="width: 8%" data-col-key="funktional">
               <span title="Funktional: Diese Anforderung ist funktional (Checkbox zum Umschalten)">
                 Funktional
               </span>
             </th>
-            <th class="py-3 text-center quantifiable-col" style="width: 8%">
+            <th class="py-3 text-center quantifiable-col" style="width: 8%" data-col-key="quantifizierbar">
               <span title="Quantifizierbar: Diese Anforderung kann quantitativ gemessen werden (z.B. Performance-Werte, Zeitlimits, etc.)">
                 Quantifizierbar
               </span>
             </th>
-            <th class="text-end pe-4 py-3" style="width: 8%">Aktionen</th>
+            <th class="text-end pe-4 py-3" style="width: 8%" data-col-key="actions">Aktionen</th>
           </tr>
         </thead>
         <tbody>
@@ -469,7 +483,7 @@ document.addEventListener('DOMContentLoaded', function() {
               style="cursor: pointer;"
               onmouseover="this.style.backgroundColor='#f8f9fa'" 
               onmouseout="this.style.backgroundColor=''">
-            <td class="ps-4 revision-cell" onclick="event.stopPropagation();">
+            <td class="ps-4 revision-cell" onclick="event.stopPropagation();" data-col-key="revision">
               <select
                 class="form-select form-select-sm border-0 bg-transparent revision-selector"
                 data-req-id="{{ req.id }}"
@@ -480,7 +494,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 </option>
               </select>
             </td>
-            <td>
+            <td data-col-key="version">
               <select
                 class="form-select form-select-sm border-0 bg-transparent text-primary fw-bold p-0 version-selector"
                 style="width: auto; cursor: pointer;"
@@ -515,46 +529,46 @@ document.addEventListener('DOMContentLoaded', function() {
                      data-bs-content="{{ selected_version.description|replace('"', '&quot;')|replace("'", "&#39;") }}"
                      data-bs-html="false"
                      data-description-full="{{ selected_version.description|e }}"
-                     title="Vollständige Beschreibung">
+                     title="Vollständige Anforderung">
                     {{ selected_version.description }}
                 </div>
             </td>
             {% for column in custom_columns %}
-            <td class="custom-data-cell" data-column="{{ column }}" onclick="window.location.href='{{ url_for('main.requirement_history', rid=req.id) }}'">
+            <td class="custom-data-cell" data-column="{{ column }}" data-col-key="custom-{{ column|replace(' ', '-')|replace('/', '-')|lower }}" onclick="window.location.href='{{ url_for('main.requirement_history', rid=req.id) }}'">
               {{ selected_version.get_custom_data().get(column, "–") }}
             </td>
             {% endfor %}
-            <td class="category-cell" onclick="window.location.href='{{ url_for('main.requirement_history', rid=req.id) }}'">
+            <td class="category-cell" data-col-key="category" onclick="window.location.href='{{ url_for('main.requirement_history', rid=req.id) }}'">
                 <span class="badge bg-light text-secondary border">{{ selected_version.category or "–" }}</span>
             </td>
-            <td class="status-cell" onclick="window.location.href='{{ url_for('main.requirement_history', rid=req.id) }}'">
+            <td class="status-cell" data-col-key="status" onclick="window.location.href='{{ url_for('main.requirement_history', rid=req.id) }}'">
               <span class="badge rounded-pill bg-{{ selected_version.get_status_color() }}"
                 >{{ selected_version.status }}</span
               >
             </td>
-            <td class="text-center" onclick="event.stopPropagation();">
+            <td class="text-center" data-col-key="funktional" onclick="event.stopPropagation();">
               <form method="POST" action="{{ url_for('main.toggle_funktional', req_id=req.id) }}" class="d-inline toggle-funktional-form">
                 <input type="hidden" name="funktional" value="{{ '0' if req.funktional else '1' }}">
-                <button type="submit" class="btn btn-sm btn-link p-0 border-0" title="{% if req.funktional %}Funktional - Klicken zum Deaktivieren{% else %}Nicht funktional - Klicken zum Aktivieren{% endif %}">
+                <button type="submit" class="btn btn-sm btn-link p-0 border-0" title="{% if req.funktional %}Funktional - Klicken zum Deaktivieren{% else %}Nicht funktional - Klicken zum Aktivieren{% endif %}" {% if selected_version.status == 'Verworfen' %}disabled{% endif %}>
                   <i class="bi {% if req.funktional %}bi-check-circle-fill text-success{% else %}bi-circle text-muted{% endif %}" style="font-size: 1.3rem;"></i>
                 </button>
               </form>
             </td>
-            <td class="quantifiable-cell text-center quantifiable-col" onclick="event.stopPropagation();">
+            <td class="quantifiable-cell text-center quantifiable-col" data-col-key="quantifizierbar" onclick="event.stopPropagation();">
               {% set custom_data = versions[-1].get_custom_data() %}
               {% set is_quantifiable = selected_version.get_custom_data().get('is_quantifiable', 'false') == 'true' or selected_version.get_custom_data().get('is_quantifiable', False) == True %}
               <form method="POST" action="{{ url_for('main.toggle_quantifiable', version_id=selected_version.id) }}" class="d-inline toggle-quantifiable-form">
-                <button type="submit" class="btn btn-sm btn-link p-0 border-0" title="{% if is_quantifiable %}Quantifizierbar - Klicken zum Deaktivieren{% else %}Nicht quantifizierbar - Klicken zum Aktivieren{% endif %}">
+                <button type="submit" class="btn btn-sm btn-link p-0 border-0" title="{% if is_quantifiable %}Quantifizierbar - Klicken zum Deaktivieren{% else %}Nicht quantifizierbar - Klicken zum Aktivieren{% endif %}" {% if selected_version.status == 'Verworfen' %}disabled{% endif %}>
                   <i class="bi {% if is_quantifiable %}bi-check-circle-fill text-success{% else %}bi-circle text-muted{% endif %}" style="font-size: 1.3rem;"></i>
                 </button>
               </form>
             </td>
             
-            <td class="actions-cell text-end pe-4">
+            <td class="actions-cell text-end pe-4" data-col-key="actions">
               <div class="d-flex justify-content-end align-items-center">
                     <!-- Direct Lock Button -->
                     <form method="POST" action="{{ url_for('main.toggle_block_requirement', version_id=selected_version.id) }}" class="d-inline me-1">
-                      <button type="submit" class="btn btn-sm btn-icon rounded-circle {% if selected_version.is_blocked %}text-danger{% else %}text-success{% endif %}" title="{% if selected_version.is_blocked %}Freigeben{% else %}Blockieren{% endif %}">
+                      <button type="submit" class="btn btn-sm btn-icon rounded-circle toggle-lock-btn {% if selected_version.is_blocked %}text-danger{% else %}text-success{% endif %}" title="{% if selected_version.is_blocked %}Freigeben{% else %}Blockieren{% endif %}" {% if selected_version.status == 'Verworfen' %}disabled{% endif %}>
                         <i class="bi {% if selected_version.is_blocked %}bi-lock-fill{% else %}bi-unlock{% endif %}"></i>
                         </button>
                     </form>
@@ -570,7 +584,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                     data-req-id="{{ req.id }}" 
                                     data-version-id="{{ selected_version.id }}"
                                     style="margin-bottom:0.25rem;"
-                                    {% if selected_version.is_blocked or has_released %}disabled{% endif %}>
+                                    {% if selected_version.is_blocked or has_released or selected_version.status == 'Verworfen' %}disabled{% endif %}>
                                     <i class="bi bi-pencil me-2"></i> Bearbeiten
                                 </button>
                                 <button class="btn btn-outline-secondary status-btn-vertical action-btn w-100 revision-requirement-btn" 
@@ -578,12 +592,24 @@ document.addEventListener('DOMContentLoaded', function() {
                                     data-req-id="{{ req.id }}" 
                                   data-version-id="{{ latest_released.id if latest_released else selected_version.id }}"
                                   style="margin-bottom:0.25rem;"
-                                    {% if not has_released %}disabled{% endif %}>
+                                    {% if not has_released or selected_version.status == 'Verworfen' %}disabled{% endif %}>
                                     <i class="bi bi-arrow-counterclockwise me-2"></i> Revidieren
                                 </button>
-                                <form method="POST" action="{{ url_for('main.delete_requirement_version', version_id=selected_version.id) }}" class="delete-version-form">
-                                  <button type="submit" class="btn btn-outline-danger status-btn-vertical action-btn w-100" style="margin-bottom:0.25rem;" onclick="return confirm('Wirklich löschen?')">
-                                    <i class="bi bi-trash me-2"></i> Löschen
+                                <form method="POST" action="{{ url_for('main.update_status', version_id=selected_version.id) }}">
+                                  <input type="hidden" name="status" value="Verworfen" />
+                                  <button type="submit" class="btn btn-outline-dark status-btn-vertical action-btn w-100 reject-requirement-btn" style="margin-bottom:0.25rem;" {% if selected_version.status == 'Verworfen' %}disabled{% endif %}>
+                                    <i class="bi bi-x-circle me-2"></i> Verwerfen
+                                  </button>
+                                </form>
+                                <form method="POST" action="{{ url_for('main.delete_requirement_version', version_id=selected_version.id) }}" class="delete-version-form" id="delete-requirement-form-{{ selected_version.id }}">
+                                  <button
+                                    type="button"
+                                    class="btn btn-outline-danger status-btn-vertical action-btn w-100 delete-requirement-btn"
+                                    style="margin-bottom:0.25rem;"
+                                    onclick="showConfirmModal('Anforderung wirklich loeschen? Diese Aktion verschiebt sie in den Papierkorb.', function () { document.getElementById('delete-requirement-form-{{ selected_version.id }}').submit(); })"
+                                    {% if selected_version.status != 'Verworfen' %}disabled{% endif %}
+                                  >
+                                    <i class="bi bi-trash me-2"></i> Loeschen
                                   </button>
                                 </form>
                             </li>
@@ -598,7 +624,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             <!-- Regenerate -->
                             <li>
                                <form method="POST" action="{{ url_for('main.regenerate_requirement', req_id=req.id) }}">
-                                    <button type="submit" class="dropdown-item text-success" {% if versions[-1].is_blocked %}disabled{% endif %}>
+                                    <button type="submit" class="dropdown-item text-success regenerate-requirement-btn" {% if versions[-1].is_blocked or selected_version.status == 'Verworfen' %}disabled{% endif %}>
                                         <i class="bi bi-magic me-2"></i> Neu generieren (KI)
                                     </button>
                                </form>
@@ -622,6 +648,7 @@ document.addEventListener('DOMContentLoaded', function() {
                   data-status-color="{{ ver.get_status_color() }}"
                   data-is-blocked="{{ 'true' if ver.is_blocked else 'false' }}"
                   data-custom-data="{{ ver.get_custom_data_json()|safe }}"
+                  data-is-funktional="{{ 'true' if req.funktional else 'false' }}"
                   data-is-quantifiable="{{ 'true' if (ver.get_custom_data().get('is_quantifiable', 'false') == 'true' or ver.get_custom_data().get('is_quantifiable', False) == True) else 'false' }}"
                   data-revision="{{ ver.get_revision_display() }}"
                 ></div>
@@ -645,40 +672,53 @@ document.addEventListener('DOMContentLoaded', function() {
         </tbody>
       </table>
 
-      <!-- Bereich unter der Tabelle mit zwei Buttons -->
-      <div class="d-flex flex-column flex-md-row gap-3 justify-content-center align-items-center my-5" id="bottom-action-buttons">
-        <button class="btn btn-lg px-5 py-3 fw-bold text-white shadow-lg border-0 d-flex align-items-center justify-content-center" type="button" id="generate-syslm-btn" style="background: linear-gradient(90deg, #4f8cff 0%, #38c6ff 100%); border-radius: 2rem; letter-spacing: 0.5px; font-size: 1.25rem; transition: transform 0.15s;">
-          <span class="me-2 d-flex align-items-center">
-            <i class="bi bi-lightning-charge-fill" style="font-size: 1.7rem; animation: pulse 1.2s infinite alternate;"></i>
-          </span>
-          Generiere SysLM v2 code
-        </button>
-        <style>
-        @keyframes pulse {
-          0% { color: #fff700; filter: drop-shadow(0 0 6px #fff700); }
-          100% { color: #ffffff; filter: drop-shadow(0 0 16px #38c6ff); }
-        }
-        #generate-syslm-btn:hover {
-          transform: scale(1.04) translateY(-2px);
-          box-shadow: 0 8px 32px 0 rgba(80,180,255,0.25);
-        }
-        </style>
-        <button class="btn btn-lg px-5 py-3 fw-bold text-white shadow-lg border-0 d-flex align-items-center justify-content-center" type="button" id="manual-add-btn" data-bs-toggle="modal" data-bs-target="#manualRequirementModal" style="background: linear-gradient(90deg, #6c757d 0%, #adb5bd 100%); border-radius: 2rem; letter-spacing: 0.5px; font-size: 1.25rem; transition: transform 0.15s;">
-          <span class="me-2 d-flex align-items-center">
-            <i class="bi bi-plus-circle-fill" style="font-size: 1.7rem; animation: pulseAdd 1.2s infinite alternate;"></i>
-          </span>
-          Neue Anforderung hinzufügen
-        </button>
-        <style>
-        @keyframes pulseAdd {
-          0% { color: #dee2e6; filter: drop-shadow(0 0 6px #dee2e6); }
-          100% { color: #ffffff; filter: drop-shadow(0 0 16px #adb5bd); }
-        }
-        #manual-add-btn:hover {
-          transform: scale(1.04) translateY(-2px);
-          box-shadow: 0 8px 32px 0 rgba(108,117,125,0.18);
-        }
-        </style>
+      <!-- Bereich unter der Tabelle: SysLM-Karte rechts + Vollbreite-Anforderung -->
+      <div class="mt-5" id="bottom-action-section">
+        <div class="mt-4" id="manual-add-section">
+          <button class="btn btn-lg px-5 py-3 fw-bold text-white shadow-lg border-0 d-flex align-items-center justify-content-center w-100" type="button" id="manual-add-btn" data-bs-toggle="modal" data-bs-target="#manualRequirementModal" style="background: linear-gradient(90deg, #6c757d 0%, #adb5bd 100%); border-radius: 1rem; letter-spacing: 0.5px; font-size: 1.25rem; transition: transform 0.15s;">
+            <span class="me-2 d-flex align-items-center">
+              <i class="bi bi-plus-circle-fill" style="font-size: 1.7rem; animation: pulseAdd 1.2s infinite alternate;"></i>
+            </span>
+            Neue Anforderung hinzufügen
+          </button>
+          <style>
+          @keyframes pulseAdd {
+            0% { color: #dee2e6; filter: drop-shadow(0 0 6px #dee2e6); }
+            100% { color: #ffffff; filter: drop-shadow(0 0 16px #adb5bd); }
+          }
+          #manual-add-btn:hover {
+            transform: scale(1.02) translateY(-2px);
+            box-shadow: 0 8px 32px 0 rgba(108,117,125,0.18);
+          }
+          </style>
+        </div>
+
+        <div class="row g-3 justify-content-start mt-3" id="syslm-section">
+          <div class="col-12 col-md-7 col-lg-5">
+            <div class="card border-0 shadow-sm h-100">
+              <div class="card-body p-4">
+                <h5 class="fw-bold mb-2">SysLM v2 Code</h5>
+                <p class="text-muted mb-4">Erstellt automatisch den SysLM v2 Code aus den aktuellen Anforderungen.</p>
+                <button class="btn btn-xl px-5 py-4 fw-bold text-white shadow-lg border-0 d-flex align-items-center justify-content-center w-100" type="button" id="generate-syslm-btn" style="background: linear-gradient(90deg, #4f8cff 0%, #38c6ff 100%); border-radius: 0.8rem; letter-spacing: 0.5px; font-size: 1.45rem; transition: transform 0.15s;">
+                  <span class="me-2 d-flex align-items-center">
+                    <i class="bi bi-lightning-charge-fill" style="font-size: 2rem; animation: pulse 1.2s infinite alternate;"></i>
+                  </span>
+                  Generiere SysLM v2 code
+                </button>
+                <style>
+                @keyframes pulse {
+                  0% { color: #fff700; filter: drop-shadow(0 0 6px #fff700); }
+                  100% { color: #ffffff; filter: drop-shadow(0 0 16px #38c6ff); }
+                }
+                #generate-syslm-btn:hover {
+                  transform: scale(1.04) translateY(-2px);
+                  box-shadow: 0 8px 32px 0 rgba(80,180,255,0.25);
+                }
+                </style>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     <!-- ...existing code... -->
   </div>
@@ -812,9 +852,10 @@ document.addEventListener('DOMContentLoaded', function() {
             name="save_type"
             value="intermediate"
           />
+          <input type="hidden" id="editStatus" name="status" value="" />
           <input type="hidden" id="editMode" name="mode" value="edit" />
           <div class="mb-3">
-            <label for="editTitle" class="form-label">Anforderung *</label>
+            <label for="editTitle" class="form-label">Name *</label>
             <input
               type="text"
               class="form-control"
@@ -825,7 +866,7 @@ document.addEventListener('DOMContentLoaded', function() {
           </div>
           <div class="mb-3">
             <label for="editDescription" class="form-label"
-              >Beschreibung *</label
+              >Anforderung *</label
             >
             <textarea
               class="form-control"
@@ -845,15 +886,6 @@ document.addEventListener('DOMContentLoaded', function() {
             />
           </div>
           <div class="mb-3">
-            <label for="editStatus" class="form-label">Status</label>
-            <select class="form-select" id="editStatus" name="status">
-              <option value="Entwurf">Entwurf</option>
-              <option value="In Bearbeitung">In Bearbeitung</option>
-              <option value="Freigabe">Freigabe</option>
-              <option value="Verworfen">Verworfen</option>
-            </select>
-          </div>
-          <div class="mb-3">
             <div class="form-check">
               <input
                 class="form-check-input"
@@ -864,6 +896,20 @@ document.addEventListener('DOMContentLoaded', function() {
               <label class="form-check-label" for="editQuantifiable">
                 <strong>Quantifizierbar</strong>
                 <small class="text-muted d-block">Diese Anforderung kann quantitativ gemessen werden (z.B. Performance-Werte, Zeitlimits, etc.)</small>
+              </label>
+            </div>
+          </div>
+          <div class="mb-3">
+            <div class="form-check">
+              <input
+                class="form-check-input"
+                type="checkbox"
+                id="editFunktional"
+                name="funktional"
+              />
+              <label class="form-check-label" for="editFunktional">
+                <strong>Funktional</strong>
+                <small class="text-muted d-block">Diese Anforderung ist funktional (z.B. beschreibt eine Funktion oder ein Verhalten).</small>
               </label>
             </div>
           </div>
@@ -884,7 +930,7 @@ document.addEventListener('DOMContentLoaded', function() {
               onclick="document.getElementById('editSaveType').value='intermediate'"
               id="editSaveIntermediateBtn"
             >
-              Bearbeitet
+              Bearbeiten
             </button>
             <button
               type="submit"
@@ -892,13 +938,13 @@ document.addEventListener('DOMContentLoaded', function() {
               onclick="document.getElementById('editSaveType').value='final'"
               id="editSaveFinalBtn"
             >
-              Freigegeben
+              Freigeben
             </button>
           </div>
           <div id="revisionActionButton" class="d-none">
             <button
               type="submit"
-              class="btn btn-primary"
+              class="btn btn-outline-secondary"
               id="revisionSubmit"
               disabled
             >
@@ -910,7 +956,7 @@ document.addEventListener('DOMContentLoaded', function() {
               id="revisionFinalizeBtn"
               disabled
             >
-              Freigegeben
+              Freigeben
             </button>
           </div>
         </div>
@@ -930,25 +976,16 @@ document.addEventListener('DOMContentLoaded', function() {
       <form id="manualRequirementForm" method="POST" action="{{ url_for('main.create_manual_requirement', project_id=project.id) }}">
         <div class="modal-body">
           <div class="mb-3">
-            <label for="manualTitle" class="form-label">Anforderung *</label>
+            <label for="manualTitle" class="form-label">Name *</label>
             <input type="text" class="form-control" id="manualTitle" name="title" required />
           </div>
           <div class="mb-3">
-            <label for="manualDescription" class="form-label">Beschreibung *</label>
+            <label for="manualDescription" class="form-label">Anforderung *</label>
             <textarea class="form-control" id="manualDescription" name="description" rows="4" required></textarea>
           </div>
           <div class="mb-3">
             <label for="manualCategory" class="form-label">Kategorie</label>
             <input type="text" class="form-control" id="manualCategory" name="category" />
-          </div>
-          <div class="mb-3">
-            <label for="manualStatus" class="form-label">Status</label>
-            <select class="form-select" id="manualStatus" name="status">
-              <option value="Entwurf">Entwurf</option>
-              <option value="In Bearbeitung">In Bearbeitung</option>
-              <option value="Freigabe">Freigabe</option>
-              <option value="Verworfen">Verworfen</option>
-            </select>
           </div>
           <div class="mb-3">
             <div class="form-check">
@@ -977,10 +1014,18 @@ document.addEventListener('DOMContentLoaded', function() {
         // Scroll-Button oben: Scrollt zum Bereich unter der Tabelle
         document.addEventListener('DOMContentLoaded', function() {
           var scrollBtn = document.getElementById('scrollToManualBtn');
-          var bottomBtns = document.getElementById('bottom-action-buttons');
-          if(scrollBtn && bottomBtns) {
+          var manualAddSection = document.getElementById('manual-add-section');
+          if(scrollBtn && manualAddSection) {
             scrollBtn.addEventListener('click', function() {
-              bottomBtns.scrollIntoView({behavior: 'smooth'});
+              manualAddSection.scrollIntoView({behavior: 'smooth'});
+            });
+          }
+
+          var syslmBtn = document.getElementById('scrollToSyslmBtn');
+          var syslmSection = document.getElementById('syslm-section');
+          if(syslmBtn && syslmSection) {
+            syslmBtn.addEventListener('click', function() {
+              syslmSection.scrollIntoView({behavior: 'smooth'});
             });
           }
         });
@@ -1078,33 +1123,56 @@ document.addEventListener('DOMContentLoaded', function() {
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const toggleQuantifiable = document.getElementById('toggleQuantifiableCol');
-    if (!toggleQuantifiable) return;
-    
-    // Function to update visibility
-    function updateQuantifiableVisibility(show) {
-        const elements = document.querySelectorAll('.quantifiable-col');
-        elements.forEach(el => {
-            if (show) {
-                el.classList.remove('d-none');
-            } else {
-                el.classList.add('d-none');
-            }
-        });
-        localStorage.setItem('showQuantifiableCol', show);
-    }
-    
-    // Initialize from localStorage (default to true)
-    const storedState = localStorage.getItem('showQuantifiableCol');
-    const initialState = storedState === null ? true : storedState === 'true';
-    
-    toggleQuantifiable.checked = initialState;
-    updateQuantifiableVisibility(initialState);
-    
-    // Event listener
-    toggleQuantifiable.addEventListener('change', function() {
-        updateQuantifiableVisibility(this.checked);
+  const toggles = document.querySelectorAll('.col-toggle[data-col-key]');
+  if (!toggles.length) return;
+
+  const storagePrefix = 'colVisibility.';
+
+  function setColumnVisibility(key, show) {
+    const elements = document.querySelectorAll(`[data-col-key="${key}"]`);
+    elements.forEach(el => {
+      el.classList.toggle('d-none', !show);
     });
+    localStorage.setItem(`${storagePrefix}${key}`, show);
+  }
+
+  function getStoredState(key) {
+    const stored = localStorage.getItem(`${storagePrefix}${key}`);
+    return stored === null ? true : stored === 'true';
+  }
+
+  toggles.forEach(toggle => {
+    const key = toggle.getAttribute('data-col-key');
+    const initial = getStoredState(key);
+    toggle.checked = initial;
+    setColumnVisibility(key, initial);
+
+    toggle.addEventListener('change', function() {
+      setColumnVisibility(key, this.checked);
+    });
+  });
+
+  function setAllColumns(show) {
+    toggles.forEach(toggle => {
+      const key = toggle.getAttribute('data-col-key');
+      toggle.checked = show;
+      setColumnVisibility(key, show);
+    });
+    setColumnVisibility('actions', true);
+  }
+
+  const showAllBtn = document.getElementById('showAllColumnsBtn');
+  const hideAllBtn = document.getElementById('hideAllColumnsBtn');
+  if (showAllBtn) {
+    showAllBtn.addEventListener('click', function() {
+      setAllColumns(true);
+    });
+  }
+  if (hideAllBtn) {
+    hideAllBtn.addEventListener('click', function() {
+      setAllColumns(false);
+    });
+  }
 });
 </script>
 
