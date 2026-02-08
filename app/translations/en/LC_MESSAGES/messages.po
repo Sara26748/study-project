@@ -1,0 +1,612 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: requirements-tool\n"
+"Language: en\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "Benachrichtigungen"
+msgstr "Notifications"
+
+msgid "Alle als gelesen markieren"
+msgstr "Mark all as read"
+
+msgid "Lade Benachrichtigungen..."
+msgstr "Loading notifications..."
+
+msgid "Alle anzeigen"
+msgstr "View all"
+
+msgid "Startseite"
+msgstr "Home"
+
+msgid "Projekt erstellen"
+msgstr "Create project"
+
+msgid "Gelöschte Anforderungen"
+msgstr "Deleted requirements"
+
+msgid "Abmelden"
+msgstr "Sign out"
+
+msgid "Anmelden"
+msgstr "Sign in"
+
+msgid "Registrieren"
+msgstr "Register"
+
+msgid "Vorgang wird ausgeführt"
+msgstr "Processing"
+
+msgid "Bitte warten, Seite wird aktualisiert."
+msgstr "Please wait, the page is updating."
+
+msgid "Bestätigung erforderlich"
+msgstr "Confirmation required"
+
+msgid "Möchten Sie diese Aktion wirklich ausführen?"
+msgstr "Do you really want to perform this action?"
+
+msgid "Abbrechen"
+msgstr "Cancel"
+
+msgid "Bestätigen"
+msgstr "Confirm"
+
+msgid "Alle Rechte vorbehalten."
+msgstr "All rights reserved."
+
+msgid "Keine Benachrichtigungen"
+msgstr "No notifications"
+
+msgid "Meine Projekte"
+msgstr "My projects"
+
+msgid "Dashboard"
+msgstr "Dashboard"
+
+msgid "Willkommen zurück,"
+msgstr "Welcome back,"
+
+msgid "Neues Projekt"
+msgstr "New project"
+
+msgid "Projekt suchen..."
+msgstr "Search project..."
+
+msgid "geteilt"
+msgstr "shared"
+
+msgid "Privat"
+msgstr "Private"
+
+msgid "Anforderungen"
+msgstr "Requirements"
+
+msgid "Möchten Sie das Projekt %(name)s wirklich löschen? Alle Daten gehen verloren."
+msgstr "Do you really want to delete project %(name)s? All data will be lost."
+
+msgid "Projekt löschen"
+msgstr "Delete project"
+
+msgid "Starten Sie jetzt mit Ihrem ersten Projekt durch."
+msgstr "Start now with your first project."
+
+msgid "Jetzt starten"
+msgstr "Get started"
+
+msgid "Keine Projekte gefunden, die Ihrer Suche entsprechen."
+msgstr "No projects match your search."
+
+msgid "E-Mail"
+msgstr "Email"
+
+msgid "Passwort"
+msgstr "Password"
+
+msgid "Noch kein Konto? Registrieren"
+msgstr "No account yet? Register"
+
+msgid "Bereits ein Konto? Anmelden"
+msgstr "Already have an account? Sign in"
+
+msgid "Projekt verwalten"
+msgstr "Manage project"
+
+msgid "Neues Projekt erstellen"
+msgstr "Create new project"
+
+msgid "Hier kannst du neue Projekte erstellen."
+msgstr "Here you can create new projects."
+
+msgid "Projektname"
+msgstr "Project name"
+
+msgid "Zurueck zur Startseite"
+msgstr "Back to home"
+
+msgid "Zurueck zur Uebersicht"
+msgstr "Back to overview"
+
+msgid "Teilen"
+msgstr "Share"
+
+msgid "Gefundene Widersprueche (KI-Analyse)"
+msgstr "Detected conflicts (AI analysis)"
+
+msgid "Laden..."
+msgstr "Loading..."
+
+msgid "KI analysiert alle Anforderungen auf logische Brueche..."
+msgstr "AI is analyzing all requirements for logical inconsistencies..."
+
+msgid "Schliessen"
+msgstr "Close"
+
+msgid "Folgende potenzielle Konflikte wurden gefunden:"
+msgstr "The following potential conflicts were found:"
+
+msgid "Hoch"
+msgstr "High"
+
+msgid "Keine logischen Widersprueche gefunden."
+msgstr "No logical conflicts found."
+
+msgid "Fehler bei der Analyse:"
+msgstr "Error during analysis:"
+
+msgid "Konflikt zwischen Req"
+msgstr "Conflict between Req"
+
+msgid "Suche..."
+msgstr "Search..."
+
+msgid "Status"
+msgstr "Status"
+
+msgid "Entwurf"
+msgstr "Draft"
+
+msgid "In Bearbeitung"
+msgstr "In progress"
+
+msgid "Freigabe"
+msgstr "Release"
+
+msgid "Verworfen"
+msgstr "Rejected"
+
+msgid "Kategorie"
+msgstr "Category"
+
+msgid "SysML v2 Code"
+msgstr "SysML v2 code"
+
+msgid "Liste als Excel exportieren"
+msgstr "Export list as Excel"
+
+msgid "Export"
+msgstr "Export"
+
+msgid "Excel-Datei importieren"
+msgstr "Import Excel file"
+
+msgid "Import"
+msgstr "Import"
+
+msgid "Neue Spalte hinzufuegen:"
+msgstr "Add new column:"
+
+msgid "Name (z.B. Prioritaet)"
+msgstr "Name (e.g. Priority)"
+
+msgid "Hinzufuegen"
+msgstr "Add"
+
+msgid "Die KI wird diese Spalte bei zukuenftigen Generierungen beruecksichtigen."
+msgstr "The AI will consider this column for future generations."
+
+msgid "Anforderungsliste"
+msgstr "Requirements list"
+
+msgid "Kanban Board"
+msgstr "Kanban board"
+
+msgid "Widersprueche pruefen"
+msgstr "Check conflicts"
+
+msgid "Neue Anforderung hinzufuegen"
+msgstr "Add new requirement"
+
+msgid "Spalten verwalten"
+msgstr "Manage columns"
+
+msgid "+ Einfuegen"
+msgstr "+ Insert"
+
+msgid "Neue Spalte"
+msgstr "New column"
+
+msgid "Neue Anforderung"
+msgstr "New requirement"
+
+msgid "Alle ausblenden"
+msgstr "Hide all"
+
+msgid "Spalten anzeigen"
+msgstr "Show columns"
+
+msgid "Revision"
+msgstr "Revision"
+
+msgid "Version"
+msgstr "Version"
+
+msgid "Funktional"
+msgstr "Functional"
+
+msgid "Quantifizierbar"
+msgstr "Quantifiable"
+
+msgid "Hinzugefuegte Spalten"
+msgstr "Added columns"
+
+msgid "Hinzugefuegte Spalten verwalten"
+msgstr "Manage added columns"
+
+msgid "Spalte %(name)s wirklich loeschen?"
+msgstr "Really delete column %(name)s?"
+
+msgid "Spalte loeschen"
+msgstr "Delete column"
+
+msgid "Keine hinzugefuegten Spalten"
+msgstr "No added columns"
+
+msgid "Name"
+msgstr "Name"
+
+msgid "Anforderung"
+msgstr "Requirement"
+
+msgid "Funktional: Diese Anforderung ist funktional (Checkbox zum Umschalten)"
+msgstr "Functional: This requirement is functional (checkbox to toggle)"
+
+msgid "Quantifizierbar: Diese Anforderung kann quantitativ gemessen werden (z.B. Performance-Werte, Zeitlimits, etc.)"
+msgstr "Quantifiable: This requirement can be measured quantitatively (e.g. performance values, time limits, etc.)"
+
+msgid "Aktionen"
+msgstr "Actions"
+
+msgid "Vollstaendige Anforderung"
+msgstr "Full requirement"
+
+msgid "Funktional - Klicken zum Deaktivieren"
+msgstr "Functional - click to deactivate"
+
+msgid "Nicht funktional - Klicken zum Aktivieren"
+msgstr "Not functional - click to activate"
+
+msgid "Quantifizierbar - Klicken zum Deaktivieren"
+msgstr "Quantifiable - click to deactivate"
+
+msgid "Nicht quantifizierbar - Klicken zum Aktivieren"
+msgstr "Not quantifiable - click to activate"
+
+msgid "Freigeben"
+msgstr "Release"
+
+msgid "Blockieren"
+msgstr "Block"
+
+msgid "Bearbeiten"
+msgstr "Edit"
+
+msgid "Revidieren"
+msgstr "Revise"
+
+msgid "Verwerfen"
+msgstr "Reject"
+
+msgid "Anforderung wirklich loeschen? Diese Aktion verschiebt sie in den Papierkorb."
+msgstr "Really delete the requirement? This will move it to the trash."
+
+msgid "Loeschen"
+msgstr "Delete"
+
+msgid "Testfaelle generieren"
+msgstr "Generate test cases"
+
+msgid "Neu generieren (KI)"
+msgstr "Regenerate (AI)"
+
+msgid "Noch keine Anforderungen vorhanden."
+msgstr "No requirements yet."
+
+msgid "Erste Anforderung generieren"
+msgstr "Generate first requirement"
+
+msgid "Erstellt automatisch den SysML v2 Code aus den aktuellen Anforderungen."
+msgstr "Automatically generates SysML v2 code from current requirements."
+
+msgid "Generiere SysML v2 Code"
+msgstr "Generate SysML v2 code"
+
+msgid "Generierte Testfaelle"
+msgstr "Generated test cases"
+
+msgid "KI generiert Testfaelle..."
+msgstr "AI is generating test cases..."
+
+msgid "Kopieren"
+msgstr "Copy"
+
+msgid "Projekt teilen"
+msgstr "Share project"
+
+msgid "E-Mail-Adresse"
+msgstr "Email address"
+
+msgid "Excel importieren"
+msgstr "Import Excel"
+
+msgid "Importieren"
+msgstr "Import"
+
+msgid "Anforderung bearbeiten"
+msgstr "Edit requirement"
+
+msgid "Diese Anforderung kann quantitativ gemessen werden (z.B. Performance-Werte, Zeitlimits, etc.)"
+msgstr "This requirement can be measured quantitatively (e.g. performance values, time limits, etc.)"
+
+msgid "Diese Anforderung ist funktional (z.B. beschreibt eine Funktion oder ein Verhalten)."
+msgstr "This requirement is functional (e.g. describes a function or behavior)."
+
+msgid "Revidiert"
+msgstr "Revised"
+
+msgid "Erstellen"
+msgstr "Create"
+
+msgid "Vollstaendige Beschreibung"
+msgstr "Full description"
+
+msgid "Fehler:"
+msgstr "Error:"
+
+msgid "Unbekannter Fehler"
+msgstr "Unknown error"
+
+msgid "Netzwerkfehler:"
+msgstr "Network error:"
+
+msgid "KI-Cockpit"
+msgstr "AI cockpit"
+
+msgid "Zurück"
+msgstr "Back"
+
+msgid "Requirements Engineering mit KI-Agent"
+msgstr "Requirements engineering with AI agent"
+
+msgid "Generiere professionelle Anforderungen für das Projekt:"
+msgstr "Generate professional requirements for the project:"
+
+msgid "Unbenanntes Projekt"
+msgstr "Untitled project"
+
+msgid "KI analysiert Ihre Anforderungen..."
+msgstr "AI is analyzing your requirements..."
+
+msgid "Kontext verstehen"
+msgstr "Understand context"
+
+msgid "Struktur analysieren"
+msgstr "Analyze structure"
+
+msgid "Anforderungen formulieren"
+msgstr "Formulate requirements"
+
+msgid "Qualitaets-Check"
+msgstr "Quality check"
+
+msgid "Produkt/System"
+msgstr "Product/System"
+
+msgid "Nennen Sie das zu betrachtende Produkt/System"
+msgstr "Name the product/system to be considered"
+
+msgid "Kontext (Optional)"
+msgstr "Context (optional)"
+
+msgid "Bestehende Anforderungslisten und/oder weiterfuehrende Informationen zur Produktbeschreibung (z.B. Pflichten-/Lastenheft) hochladen & Bestehende Anforderungen ueberarbeiten oder erweitern"
+msgstr "Upload existing requirement lists and/or additional product description info (e.g. specification) & revise or extend existing requirements"
+
+msgid "Dateityp auswaehlen"
+msgstr "Select file type"
+
+msgid "Kein Upload (optional)"
+msgstr "No upload (optional)"
+
+msgid "PDF"
+msgstr "PDF"
+
+msgid "EXCEL"
+msgstr "Excel"
+
+msgid "EXCEL & PDF"
+msgstr "Excel & PDF"
+
+msgid "PDF-Datei hier ablegen oder klicken"
+msgstr "Drop PDF file here or click"
+
+msgid "Unterstuetzt .pdf Dateien"
+msgstr "Supports .pdf files"
+
+msgid "Excel-Datei hier ablegen oder klicken"
+msgstr "Drop Excel file here or click"
+
+msgid "Unterstuetzt .xlsx und .xls Dateien"
+msgstr "Supports .xlsx and .xls files"
+
+msgid "Produkt-/Systembeschreibung"
+msgstr "Product/system description"
+
+msgid "Beschreiben Sie Ihr Produkt/System."
+msgstr "Describe your product/system."
+
+msgid "Generierungs-Modus"
+msgstr "Generation mode"
+
+msgid "Neugenerierung:"
+msgstr "New generation:"
+
+msgid "innovativ & kreativ"
+msgstr "innovative & creative"
+
+msgid "Erweiterung:"
+msgstr "Extension:"
+
+msgid "geaenderte oder neue, ergaenzende Anforderungen"
+msgstr "changed or new, additional requirements"
+
+msgid "Ueberpruefung/Verbesserung der Anforderungsqualitaet:"
+msgstr "Review/improve requirement quality:"
+
+msgid "z.B. widerspruchsfrei, qualitativ hochwertige Formulierungen, quantifizierbare/messbare Anforderungen"
+msgstr "e.g. consistent, high-quality wording, quantifiable/measurable requirements"
+
+msgid "Beschreibe dein Vorhaben detailliert..."
+msgstr "Describe your project in detail..."
+
+msgid "Anzahl der Anforderungen"
+msgstr "Number of requirements"
+
+msgid "Mindestens"
+msgstr "At least"
+
+msgid "Hoechstens"
+msgstr "At most"
+
+msgid "Automatisch"
+msgstr "Automatic"
+
+msgid "\"Automatisch\": KI schaetzt und entscheidet selbst, basierend auf dem bereitgestellten Kontext."
+msgstr "\"Automatic\": AI estimates and decides based on the provided context."
+
+msgid "Ausgabeformat"
+msgstr "Output format"
+
+msgid "Sprache und Tabellenspalten festlegen"
+msgstr "Set language and table columns"
+
+msgid "Ausgabe-Sprache"
+msgstr "Output language"
+
+msgid "Deutsch"
+msgstr "German"
+
+msgid "Englisch"
+msgstr "English"
+
+msgid "Arabisch"
+msgstr "Arabic"
+
+msgid "Französisch"
+msgstr "French"
+
+msgid "Die KI formuliert alle Anforderungen in der gewaehlten Sprache."
+msgstr "The AI formulates all requirements in the selected language."
+
+msgid "Tabellenspalten"
+msgstr "Table columns"
+
+msgid "Schema der Ausgabe"
+msgstr "Output schema"
+
+msgid "ID"
+msgstr "ID"
+
+msgid "Standard"
+msgstr "Standard"
+
+msgid "Spalte hinzufuegen"
+msgstr "Add column"
+
+msgid "Gewuenschtes LLM auswaehlen"
+msgstr "Select desired LLM"
+
+msgid "GPT-4o Mini (OpenAI)"
+msgstr "GPT-4o Mini (OpenAI)"
+
+msgid "Experten-Einstellungen"
+msgstr "Expert settings"
+
+msgid "Zusaetzliche Parameter (Key-Value)"
+msgstr "Additional parameters (key-value)"
+
+msgid "Key (z.B. Sprache)"
+msgstr "Key (e.g. Language)"
+
+msgid "Value (z.B. Deutsch)"
+msgstr "Value (e.g. German)"
+
+msgid "Parameter hinzufuegen"
+msgstr "Add parameter"
+
+msgid "Anforderungsliste generieren"
+msgstr "Generate requirement list"
+
+msgid "Analysiere Datei:"
+msgstr "Analyzing file:"
+
+msgid "Analysiere Beschreibung..."
+msgstr "Analyzing description..."
+
+msgid "Hinweis:"
+msgstr "Note:"
+
+msgid "Bitte Produkt/System angeben, bevor die Anforderungsliste generiert wird."
+msgstr "Please specify a product/system before generating the requirement list."
+
+msgid "Bitte einen Generierungs-Modus auswaehlen."
+msgstr "Please choose a generation mode."
+
+msgid "Bitte ein LLM auswaehlen, bevor generiert wird."
+msgstr "Please choose an LLM before generating."
+
+msgid "Bitte eine Anzahl fuer die Generierung angeben."
+msgstr "Please specify a number for generation."
+
+msgid "Antwortformat ist kein JSON."
+msgstr "Response format is not JSON."
+
+msgid "Erfolg!"
+msgstr "Success!"
+
+msgid "Sie werden in Kuerze zum Projekt weitergeleitet..."
+msgstr "You will be redirected to the project shortly..."
+
+msgid "Anforderungen wurden erfolgreich generiert und gespeichert."
+msgstr "Requirements were successfully generated and saved."
+
+msgid "Anforderungen wurden erfolgreich verbessert und gespeichert (keine neuen erstellt)."
+msgstr "Requirements were successfully improved and saved (no new ones created)."
+
+msgid "Neue Anforderungen wurden basierend auf dem Bestand erfolgreich erstellt und hinzugefuegt."
+msgstr "New requirements were created based on the existing set and added successfully."
+
+msgid "Key"
+msgstr "Key"
+
+msgid "Value"
+msgstr "Value"
+
+msgid "Neue Spalte hinzufuegen"
+msgstr "Add new column"
+
+msgid "Erstellt:"
+msgstr "Created:"
+
+msgid "Bearbeitet:"
+msgstr "Edited:"

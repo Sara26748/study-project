@@ -34,7 +34,7 @@ Diese Anwendung ermöglicht es Benutzern, Software-Anforderungen zu erstellen, z
 
 - Erstellung von Anforderungen mit Titel, Beschreibung und Kategorie
 - Versionsverwaltung (A, B, C, ...)
-- Status-Tracking (Offen, In Arbeit, Fertig)
+- Status-Tracking (Entwurf, In Bearbeitung, Freigabe...)
 - Soft-Delete Funktionalität mit Papierkorb
 
 ### 🤖 KI-Integration
@@ -73,116 +73,6 @@ Diese Anwendung ermöglicht es Benutzern, Software-Anforderungen zu erstellen, z
 - **Jinja2**: Template-Engine
 - **JavaScript**: Interaktive Funktionen
 
-### Datenbankmodell
-
-- **User**: Benutzerkonten
-- **Project**: Projekte mit dynamischen Spalten
-- **Requirement**: Anforderungen mit Soft-Delete
-- **RequirementVersion**: Versionierte Anforderungsdaten
-
-ER-Diagramm (aus den SQLAlchemy-Models abgeleitet):
-
-```mermaid
-erDiagram
-	USER {
-		int id PK
-		string email
-		string password_hash
-		datetime created_at
-	}
-
-	PROJECT {
-		int id PK
-		int user_id FK
-		string name
-		datetime created_at
-		text custom_columns
-	}
-
-	REQUIREMENT {
-		int id PK
-		int project_id FK
-		string key
-		datetime created_at
-		bool is_deleted
-		bool funktional
-	}
-
-	REQUIREMENT_VERSION {
-		int id PK
-		int requirement_id FK
-		string revision
-		int version_index
-		string version_label
-		string title
-		string description
-		string category
-		string status
-		datetime created_at
-		text custom_data
-		int created_by_id FK
-		int last_modified_by_id FK
-		int blocked_by_id FK
-		bool is_blocked
-		datetime blocked_at
-	}
-
-	REQUIREMENT_VERSION_HISTORY {
-		int id PK
-		int version_id FK
-		int changed_by_id FK
-		datetime created_at
-		string change_type
-		text changes
-	}
-
-	REQUIREMENT_COMMENT {
-		int id PK
-		int version_id FK
-		int author_id FK
-		int parent_comment_id FK
-		text text
-		datetime created_at
-		datetime updated_at
-		bool is_deleted
-	}
-
-	NOTIFICATION {
-		int id PK
-		int user_id FK
-		string notification_type
-		string title
-		text message
-		string related_type
-		int related_id
-		text notification_data
-		bool is_read
-		datetime read_at
-		datetime created_at
-	}
-
-	ACTIVE_SESSION {
-		int id PK
-		int user_id FK
-		int project_id FK
-		datetime last_seen
-	}
-
-	USER ||--o{ PROJECT : owns
-	USER }o--o{ PROJECT : shared_with
-	PROJECT ||--o{ REQUIREMENT : has
-	REQUIREMENT ||--o{ REQUIREMENT_VERSION : has
-	REQUIREMENT_VERSION ||--o{ REQUIREMENT_VERSION_HISTORY : history
-	REQUIREMENT_VERSION ||--o{ REQUIREMENT_COMMENT : comments
-	REQUIREMENT_COMMENT ||--o{ REQUIREMENT_COMMENT : replies
-	USER ||--o{ REQUIREMENT_COMMENT : author
-	USER ||--o{ NOTIFICATION : receives
-	USER ||--o{ ACTIVE_SESSION : sessions
-	PROJECT ||--o{ ACTIVE_SESSION : sessions
-	USER ||--o{ REQUIREMENT_VERSION : created_by
-	USER ||--o{ REQUIREMENT_VERSION : last_modified_by
-	USER ||--o{ REQUIREMENT_VERSION : blocked_by
-```
 
 ## 📦 Installation
 
@@ -257,15 +147,15 @@ Die Anwendung verwendet SQLite und erstellt automatisch alle Tabellen beim erste
 ### Projekt-Sharing
 
 - Projekte können mit anderen registrierten Benutzern geteilt werden
-- Shared User haben Lese-/Schreibzugriff auf geteilte Projekte
+
 
 ### Anforderungslebenszyklus
 
 1. **Erstellung**: Neue Anforderung mit KI-Unterstützung
 2. **Bearbeitung**: Versionierung und Status-Updates
 3. **Archivierung**: Soft-Delete in Papierkorb
-4. **Wiederherstellung**: Aus Papierkorb zurückholen
-5. **Endgültige Löschung**: Permanente Entfernung
+4. **Endgültige Löschung**: Permanente Entfernung
+
 
 ## 🧪 Tests
 
@@ -320,25 +210,8 @@ interface_for_mbse_models/
 - XSS-Schutz durch Jinja2 Auto-Escaping
 - Sichere Session-Verwaltung
 
-## 🤝 Beitragen
 
-1. Fork des Projekts
-2. Feature-Branch erstellen (`git checkout -b feature/AmazingFeature`)
-3. Änderungen committen (`git commit -m 'Add some AmazingFeature'`)
-4. Branch pushen (`git push origin feature/AmazingFeature`)
-5. Pull Request erstellen
 
-## 📝 Lizenz
-
-Dieses Projekt ist unter der MIT-Lizenz lizenziert - siehe die [LICENSE](LICENSE) Datei für Details.
-
-## 📞 Support
-
-Bei Fragen oder Problemen:
-
-- GitHub Issues erstellen
-- Dokumentation konsultieren
-- Code-Kommentare prüfen
 
 ## 🔄 Migration und Updates
 

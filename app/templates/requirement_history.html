@@ -486,7 +486,7 @@
     if (hours < 24) return `vor ${hours} Std.`;
     const days = Math.floor(hours / 24);
     if (days < 7) return `vor ${days} Tag${days > 1 ? "en" : ""}`;
-    return date.toLocaleDateString("de-DE");
+    return date.toLocaleDateString(window.APP_LOCALE || "de");
   }
 
   function addComment(parentId = null) {

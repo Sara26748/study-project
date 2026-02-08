@@ -1,4 +1,4 @@
-{% extends "base.html" %} {% block title %}Meine Projekte{% endblock %} {% block
+{% extends "base.html" %} {% block title %}{{ _('Meine Projekte') }}{% endblock %} {% block
 content %}
 
 <style>
@@ -42,10 +42,10 @@ content %}
       <div class="row align-items-center">
         <div class="col-md-8">
           <span class="text-secondary text-uppercase fw-bold small ls-1"
-            >Dashboard</span
+            >{{ _('Dashboard') }}</span
           >
           <h1 class="display-6 fw-bold text-dark mt-1 mb-0">
-            Willkommen zurück, <br />
+            {{ _('Willkommen zurück,') }} <br />
             <span class="text-primary"
               >{{ current_user.email.split('@')[0] }}</span
             >
@@ -57,7 +57,7 @@ content %}
             href="{{ url_for('main.create') }}"
             class="btn btn-primary btn-lg shadow-sm rounded-pill px-4"
           >
-            <i class="bi bi-plus-lg me-2"></i> Neues Projekt
+            <i class="bi bi-plus-lg me-2"></i> {{ _('Neues Projekt') }}
           </a>
         </div>
       </div>
@@ -70,7 +70,7 @@ content %}
   <div class="row mb-4 align-items-center">
     <div class="col-md-6">
       <h4 class="fw-bold mb-0 text-secondary">
-        Meine Projekte
+        {{ _('Meine Projekte') }}
         <span
           class="badge bg-light text-muted border rounded-pill align-middle ms-2 fs-6"
           >{{ projects|length }}</span
@@ -86,7 +86,7 @@ content %}
           type="text"
           id="projectSearch"
           class="form-control border-start-0 ps-0"
-          placeholder="Projekt suchen..."
+          placeholder="{{ _('Projekt suchen...') }}"
         />
       </div>
     </div>
@@ -125,7 +125,7 @@ content %}
                 <span>
                   {% if p.shared_with %}
                   <i class="bi bi-people-fill me-1"></i> {{ p.shared_with|length
-                  }} geteilt {% else %} <i class="bi bi-person me-1"></i> Privat
+                  }} {{ _('geteilt') }} {% else %} <i class="bi bi-person me-1"></i> {{ _('Privat') }}
                   {% endif %}
                 </span>
               </div>
@@ -142,7 +142,7 @@ content %}
               class="small text-muted text-uppercase fw-bold"
               style="font-size: 0.7rem"
             >
-              Anforderungen
+              {{ _('Anforderungen') }}
             </div>
             <div class="fs-5 fw-bold text-dark">
               {{ p.requirements|length }}
@@ -153,17 +153,6 @@ content %}
           <div
             class="col-auto p-3 border-start d-flex align-items-center gap-2"
           >
-            <!-- Direct AI Button -->
-            <a
-              href="{{ url_for('agent.agent_page', project_id=p.id) }}"
-              class="btn btn-primary btn-sm rounded-pill action-btn d-flex align-items-center shadow-sm"
-              onclick="event.stopPropagation()"
-              title="KI-Agent öffnen"
-            >
-              <i class="bi bi-stars"></i>
-              <span class="d-none d-lg-inline ms-2">KI-Agent</span>
-            </a>
-
             <!-- Direct Delete Button -->
             <form
               action="{{ url_for('main.delete_project', project_id=p.id) }}"
@@ -174,8 +163,8 @@ content %}
               <button
                 type="button"
                 class="btn btn-light btn-sm rounded-circle action-btn text-danger"
-                onclick="event.stopPropagation(); showConfirmModal('Möchten Sie das Projekt {{ p.name }} wirklich löschen? Alle Daten gehen verloren.', function () { document.getElementById('delete-project-form-{{ p.id }}').submit(); })"
-                title="Projekt löschen"
+                onclick="event.stopPropagation(); showConfirmModal('{{ _('Möchten Sie das Projekt %(name)s wirklich löschen? Alle Daten gehen verloren.', name=p.name) | e }}', function () { document.getElementById('delete-project-form-{{ p.id }}').submit(); })"
+                title="{{ _('Projekt löschen') }}"
               >
                 <i class="bi bi-trash"></i>
               </button>
@@ -194,12 +183,12 @@ content %}
       </div>
       <h3>Keine Projekte gefunden</h3>
       <p class="text-muted mb-4">
-        Starten Sie jetzt mit Ihrem ersten Projekt durch.
+        {{ _('Starten Sie jetzt mit Ihrem ersten Projekt durch.') }}
       </p>
       <a
         href="{{ url_for('main.create') }}"
         class="btn btn-primary px-4 rounded-pill"
-        >Jetzt starten</a
+        >{{ _('Jetzt starten') }}</a
       >
     </div>
     {% endif %}
@@ -210,7 +199,7 @@ content %}
       style="display: none"
     >
       <i class="bi bi-search display-6 d-block mb-3 opacity-50"></i>
-      Keine Projekte gefunden, die Ihrer Suche entsprechen.
+      {{ _('Keine Projekte gefunden, die Ihrer Suche entsprechen.') }}
     </div>
   </div>
 </div>
