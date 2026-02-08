@@ -1,4 +1,4 @@
-{% extends "base.html" %} {% block title %}KI-Cockpit - {{ project.name }}{%
+{% extends "base.html" %} {% block title %}{{ _('KI-Cockpit') }} - {{ project.name }}{%
 endblock %} {% block content %}
 
 <style>
@@ -330,14 +330,14 @@ endblock %} {% block content %}
         class="btn btn-outline-primary border-0 bg-light text-primary shadow-sm btn-sm mb-2 d-inline-flex align-items-center"
         style="transition: all 0.2s ease"
       >
-        <i class="bi bi-arrow-left me-2"></i> Zurück
+        <i class="bi bi-arrow-left me-2"></i> {{ _('Zurück') }}
       </a>
       <h1 class="fw-bold">
-        <i class="bi bi-robot me-2 text-primary"></i> Requirements Engineering mit KI-Agent
+        <i class="bi bi-robot me-2 text-primary"></i> {{ _('Requirements Engineering mit KI-Agent') }}
       </h1>
       <p class="text-muted">
-        Generiere professionelle Anforderungen für das Projekt: 
-        <strong>{{ project.name if project and project.name else 'Unbenanntes Projekt' }}</strong>
+        {{ _('Generiere professionelle Anforderungen für das Projekt:') }} 
+        <strong>{{ project.name if project and project.name else _('Unbenanntes Projekt') }}</strong>
       </p>
     </div>
   </div>
@@ -356,7 +356,7 @@ endblock %} {% block content %}
               ></div>
             </div>
             <h4 class="fw-bold mb-3 animate-fade-in">
-              KI analysiert Ihre Anforderungen...
+              {{ _('KI analysiert Ihre Anforderungen...') }}
             </h4>
 
             <div
@@ -376,18 +376,16 @@ endblock %} {% block content %}
               style="max-width: 300px"
             >
               <div id="step-1" class="mb-2 text-truncate">
-                <i class="bi bi-circle me-2 text-primary"></i> Kontext verstehen
+                <i class="bi bi-circle me-2 text-primary"></i> {{ _('Kontext verstehen') }}
               </div>
               <div id="step-2" class="mb-2">
-                <i class="bi bi-circle me-2 text-primary"></i> Struktur
-                analysieren
+                <i class="bi bi-circle me-2 text-primary"></i> {{ _('Struktur analysieren') }}
               </div>
               <div id="step-3" class="mb-2">
-                <i class="bi bi-circle me-2 text-primary"></i> Anforderungen
-                formulieren
+                <i class="bi bi-circle me-2 text-primary"></i> {{ _('Anforderungen formulieren') }}
               </div>
               <div id="step-4">
-                <i class="bi bi-circle me-2 text-primary"></i> Qualitäts-Check
+                <i class="bi bi-circle me-2 text-primary"></i> {{ _('Qualitaets-Check') }}
               </div>
             </div>
           </div>
@@ -400,9 +398,9 @@ endblock %} {% block content %}
                   <i class="bi bi-box-seam"></i>
                 </div>
                 <div>
-                  <h3 class="config-card-title">Produkt/System</h3>
+                  <h3 class="config-card-title">{{ _('Produkt/System') }}</h3>
                   <p class="config-card-subtitle">
-                    Nennen Sie das zu betrachtende Produkt/System
+                    {{ _('Nennen Sie das zu betrachtende Produkt/System') }}
                   </p>
                 </div>
               </div>
@@ -429,21 +427,21 @@ endblock %} {% block content %}
                 </div>
                 <div>
                   <h3 class="config-card-title">
-                    Kontext (Optional)
+                    {{ _('Kontext (Optional)') }}
                   </h3>
                   <p class="config-card-subtitle">
-                    Bestehende Anforderungslisten und/oder weiterführende Informationen zur Produktbeschreibung (z.B. Pflichten-/Lastenheft) hochladen & Bestehende Anforderungen überarbeiten oder erweitern
+                    {{ _('Bestehende Anforderungslisten und/oder weiterfuehrende Informationen zur Produktbeschreibung (z.B. Pflichten-/Lastenheft) hochladen & Bestehende Anforderungen ueberarbeiten oder erweitern') }}
                   </p>
                 </div>
               </div>
               <div class="context-upload" id="context-upload">
                 <div class="mb-3">
-                  <label for="context_file_type" class="form-label">Dateityp auswählen</label>
+                  <label for="context_file_type" class="form-label">{{ _('Dateityp auswaehlen') }}</label>
                   <select id="context_file_type" name="context_file_type" class="form-select">
-                    <option value="none" selected>Kein Upload (optional)</option>
-                    <option value="pdf">PDF</option>
-                    <option value="excel">EXCEL</option>
-                    <option value="both">EXCEL & PDF</option>
+                    <option value="none" selected>{{ _('Kein Upload (optional)') }}</option>
+                    <option value="pdf">{{ _('PDF') }}</option>
+                    <option value="excel">{{ _('EXCEL') }}</option>
+                    <option value="both">{{ _('EXCEL & PDF') }}</option>
                   </select>
                 </div>
                 <div class="drop-zone-wrapper d-none" id="pdf-drop-wrapper">
@@ -457,8 +455,8 @@ endblock %} {% block content %}
                     />
                     <div class="drop-zone-content mt-2">
                       <i class="bi bi-cloud-upload"></i>
-                      <p>PDF-Datei hier ablegen oder klicken</p>
-                      <small class="text-muted">Unterstützt .pdf Dateien</small>
+                      <p>{{ _('PDF-Datei hier ablegen oder klicken') }}</p>
+                      <small class="text-muted">{{ _('Unterstuetzt .pdf Dateien') }}</small>
                     </div>
                     <div id="pdf-file-name-display" class="d-none mt-3">
                       <span class="file-info">
@@ -479,8 +477,8 @@ endblock %} {% block content %}
                     />
                     <div class="drop-zone-content mt-2">
                       <i class="bi bi-cloud-upload"></i>
-                      <p>Excel-Datei hier ablegen oder klicken</p>
-                      <small class="text-muted">Unterstützt .xlsx und .xls Dateien</small>
+                      <p>{{ _('Excel-Datei hier ablegen oder klicken') }}</p>
+                      <small class="text-muted">{{ _('Unterstuetzt .xlsx und .xls Dateien') }}</small>
                     </div>
                     <div id="excel-file-name-display" class="d-none mt-3">
                       <span class="file-info">
@@ -496,15 +494,15 @@ endblock %} {% block content %}
                   <i class="bi bi-chat-left-text"></i>
                 </div>
                 <div>
-                  <h3 class="config-card-title">Produkt-/Systembeschreibung</h3>
-                  <p class="config-card-subtitle mb-0">Beschreiben Sie Ihr Produkt/System.</p>
+                  <h3 class="config-card-title">{{ _('Produkt-/Systembeschreibung') }}</h3>
+                  <p class="config-card-subtitle mb-0">{{ _('Beschreiben Sie Ihr Produkt/System.') }}</p>
                 </div>
               </div>
 
               <!-- Generierungs-Modus Auswahl direkt bei der Produktbeschreibung -->
               <div class="mb-4">
                 <label class="form-label fw-bold mb-3">
-                  <i class="bi bi-arrows-angle-expand me-1 text-primary"></i>Generierungs-Modus
+                  <i class="bi bi-arrows-angle-expand me-1 text-primary"></i>{{ _('Generierungs-Modus') }}
                 </label>
                 <div class="d-flex flex-column gap-2">
                   <div class="form-check">
@@ -516,7 +514,7 @@ endblock %} {% block content %}
                       value="standard"
                     />
                     <label class="form-check-label" for="mode_standard">
-                      <strong>Neugenerierung:</strong> innovativ & kreativ
+                      <strong>{{ _('Neugenerierung:') }}</strong> {{ _('innovativ & kreativ') }}
                     </label>
                   </div>
 
@@ -529,7 +527,7 @@ endblock %} {% block content %}
                       value="extend"
                     />
                     <label class="form-check-label" for="mode_extend">
-                      <strong>Erweiterung:</strong> geänderte oder neue, ergänzende Anforderungen
+                      <strong>{{ _('Erweiterung:') }}</strong> {{ _('geaenderte oder neue, ergaenzende Anforderungen') }}
                     </label>
                   </div>
 
@@ -542,7 +540,7 @@ endblock %} {% block content %}
                       value="improve"
                     />
                     <label class="form-check-label" for="mode_improve">
-                      <strong>Überprüfung/Verbesserung der Anforderungsqualität:</strong> z.B. widerspruchsfrei, qualitativ hochwertige Formulierungen, quantifizierbare/messbare Anforderungen
+                      <strong>{{ _('Ueberpruefung/Verbesserung der Anforderungsqualitaet:') }}</strong> {{ _('z.B. widerspruchsfrei, qualitativ hochwertige Formulierungen, quantifizierbare/messbare Anforderungen') }}
                     </label>
                   </div>
                 </div>
@@ -558,6 +556,7 @@ endblock %} {% block content %}
                 name="user_description"
                 rows="5"
                 placeholder="Beschreibe dein Vorhaben detailliert..."
+                placeholder="{{ _('Beschreibe dein Vorhaben detailliert...') }}"
               ></textarea>
 
               <!--
@@ -599,7 +598,7 @@ endblock %} {% block content %}
               <!-- Number of Requirements -->
               <div class="mb-4">
                 <label class="form-label fw-bold mb-2">
-                  <i class="bi bi-list-ol me-1 text-primary"></i>Anzahl der Anforderungen
+                  <i class="bi bi-list-ol me-1 text-primary"></i>{{ _('Anzahl der Anforderungen') }}
                 </label>
                 <div class="number-input-group">
                   <select
@@ -609,9 +608,9 @@ endblock %} {% block content %}
                     style="max-width: 200px"
                   >
              
-                    <option value="min">Mindestens</option>
-                    <option value="max">Höchstens</option>
-                    <option value="auto" selected>Automatisch</option>
+                    <option value="min">{{ _('Mindestens') }}</option>
+                    <option value="max">{{ _('Hoechstens') }}</option>
+                    <option value="auto" selected>{{ _('Automatisch') }}</option>
                   </select>
                   <input
                     type="number"
@@ -619,7 +618,7 @@ endblock %} {% block content %}
                     id="num_requirements_value"
                     name="num_requirements_value"
                     value=""
-                    placeholder="Automatisch"
+                    placeholder="{{ _('Automatisch') }}"
                     min="1"
                     max="20"
                     disabled
@@ -627,7 +626,7 @@ endblock %} {% block content %}
                 </div>
                 <small class="text-muted mt-2 d-block">
                   <i class="bi bi-info-circle me-1 text-primary"></i>
-                  "Automatisch": KI schätzt und entscheidet selbst, basierend auf dem bereitgestellten Kontext.
+                  {{ _('"Automatisch": KI schaetzt und entscheidet selbst, basierend auf dem bereitgestellten Kontext.') }}
                 </small>
               </div>
                 </small>
@@ -638,9 +637,9 @@ endblock %} {% block content %}
       <i class="bi bi-layout-text-sidebar-reverse"></i>
     </div>
     <div>
-      <h3 class="config-card-title">Ausgabeformat</h3>
+      <h3 class="config-card-title">{{ _('Ausgabeformat') }}</h3>
       <p class="config-card-subtitle">
-        Sprache und Tabellenspalten festlegen
+        {{ _('Sprache und Tabellenspalten festlegen') }}
       </p>
     </div>
   </div>
@@ -648,7 +647,7 @@ endblock %} {% block content %}
   <!-- Output Language -->
   <div class="mb-4">
     <label class="form-label fw-semibold mb-2">
-      <i class="bi bi-translate me-1 text-primary"></i>Ausgabe-Sprache
+      <i class="bi bi-translate me-1 text-primary"></i>{{ _('Ausgabe-Sprache') }}
     </label>
     <select
       class="form-select"
@@ -656,43 +655,43 @@ endblock %} {% block content %}
       name="output_language"
       style="max-width: 240px"
     >
-      <option value="Deutsch" selected>Deutsch</option>
-      <option value="Englisch">Englisch</option>
-      <option value="Arabisch">Arabisch</option>
-      <option value="Französisch">Französisch</option>
+      <option value="Deutsch" selected>{{ _('Deutsch') }}</option>
+      <option value="Englisch">{{ _('Englisch') }}</option>
+      <option value="Arabisch">{{ _('Arabisch') }}</option>
+      <option value="Französisch">{{ _('Französisch') }}</option>
     </select>
     <small class="text-muted mt-2 d-block">
       <i class="bi bi-info-circle me-1 text-primary"></i>
-      Die KI formuliert alle Anforderungen in der gewählten Sprache.
+      {{ _('Die KI formuliert alle Anforderungen in der gewaehlten Sprache.') }}
     </small>
   </div>
 
   <!-- Table Columns Schema -->
   <div class="mb-3">
     <label class="form-label fw-semibold mb-2">
-      <i class="bi bi-table me-1 text-primary"></i>Tabellenspalten
-      (Schema der Ausgabe)
+      <i class="bi bi-table me-1 text-primary"></i>{{ _('Tabellenspalten') }}
+      ({{ _('Schema der Ausgabe') }})
     </label>
     <div id="columns-display" class="mb-3">
             <span class="column-badge standard">
         <i class="bi bi-star-fill me-1" style="color: white"></i
-        >ID
-        <small class="ms-1 opacity-75">(Standard)</small>
+        >{{ _('ID') }}
+        <small class="ms-1 opacity-75">({{ _('Standard') }})</small>
       </span>
       <span class="column-badge standard">
         <i class="bi bi-star-fill me-1" style="color: white"></i
-        >Name
-        <small class="ms-1 opacity-75">(Standard)</small>
+        >{{ _('Name') }}
+        <small class="ms-1 opacity-75">({{ _('Standard') }})</small>
       </span>
       <span class="column-badge standard">
         <i class="bi bi-star-fill me-1" style="color: white"></i
-        >Anforderung
-        <small class="ms-1 opacity-75">(Standard)</small>
+        >{{ _('Anforderung') }}
+        <small class="ms-1 opacity-75">({{ _('Standard') }})</small>
       </span>
       <span class="column-badge standard">
         <i class="bi bi-star-fill me-1" style="color: white"></i
-        >Kategorie
-        <small class="ms-1 opacity-75">(Standard)</small>
+        >{{ _('Kategorie') }}
+        <small class="ms-1 opacity-75">({{ _('Standard') }})</small>
       </span>
       <!-- Custom columns will be added here dynamically -->
     </div>
@@ -701,14 +700,14 @@ endblock %} {% block content %}
         type="text"
         class="form-control"
         id="new_column_input"
-        placeholder="Neue Spalte"
+        placeholder="{{ _('Neue Spalte') }}"
       />
       <button
         type="button"
         class="btn btn-outline-primary"
         id="add-column-btn"
       >
-        <i class="bi bi-plus-circle me-1"></i>Spalte hinzufügen
+        <i class="bi bi-plus-circle me-1"></i>{{ _('Spalte hinzufuegen') }}
       </button>
     </div>
   </div>
@@ -723,7 +722,7 @@ endblock %} {% block content %}
                   <i class="bi bi-cpu"></i>
                 </div>
                 <div>
-                  <h3 class="config-card-title">Gewünschtes LLM auswählen</h3>
+                  <h3 class="config-card-title">{{ _('Gewuenschtes LLM auswaehlen') }}</h3>
                   <!--
                   <p class="config-card-subtitle">
                     Wählen Sie das passende LLM für Ihre Aufgabe
@@ -732,10 +731,10 @@ endblock %} {% block content %}
                 </div>
               </div>
               <div class="mb-2">
-                <label class="form-label fw-semibold" for="ai_model">Modell</label>
+                <label class="form-label fw-semibold" for="ai_model">{{ _('Modell') }}</label>
                 <select class="form-select" id="ai_model" name="ai_model">
-                  <option value="" selected>Kein</option>
-                  <option value="gpt-4o-mini">GPT-4o Mini (OpenAI)</option>
+                  <option value="" selected>{{ _('Kein') }}</option>
+                  <option value="gpt-4o-mini">{{ _('GPT-4o Mini (OpenAI)') }}</option>
                 </select>
               </div>
             </div>
@@ -748,7 +747,7 @@ endblock %} {% block content %}
                 data-bs-target="#expertSettings"
               >
                 <i class="bi bi-gear-fill me-2 text-primary"></i>
-                Experten-Einstellungen
+                {{ _('Experten-Einstellungen') }}
                 <i
                   class="bi bi-chevron-down ms-auto expert-caret text-primary"
                 ></i>
@@ -761,20 +760,20 @@ endblock %} {% block content %}
                 >
                   <label
                     class="form-label small text-muted text-uppercase fw-bold"
-                    >Zusätzliche Parameter (Key-Value)</label
+                    >{{ _('Zusaetzliche Parameter (Key-Value)') }}</label
                   >
                   <div id="inputs-container">
                     <div class="input-group mb-2">
                       <input
                         type="text"
                         class="form-control"
-                        placeholder="Key (z.B. 'Sprache')"
+                        placeholder="{{ _('Key (z.B. Sprache)') }}"
                         name="key[]"
                       />
                       <input
                         type="text"
                         class="form-control"
-                        placeholder="Value (z.B. 'Deutsch')"
+                        placeholder="{{ _('Value (z.B. Deutsch)') }}"
                         name="value[]"
                       />
                       <button
@@ -790,7 +789,7 @@ endblock %} {% block content %}
                     class="btn btn-sm btn-outline-primary mt-2 w-100"
                     id="add-input"
                   >
-                    <i class="bi bi-plus-circle me-1"></i>Parameter hinzufügen
+                    <i class="bi bi-plus-circle me-1"></i>{{ _('Parameter hinzufuegen') }}
                   </button>
                 </div>
               </div>
@@ -810,7 +809,7 @@ endblock %} {% block content %}
                   aria-hidden="true"
                 ></span>
                 <i class="bi bi-table me-2"></i>
-                <i class="bi bi-stars me-2"></i> Anforderungsliste generieren
+                <i class="bi bi-stars me-2"></i> {{ _('Anforderungsliste generieren') }}
               </button>
             </div>
           </form>
@@ -825,6 +824,25 @@ endblock %} {% block content %}
 <script>
   // Custom columns management
   const customColumns = [];
+  const i18n = {
+    analyzeFile: {{ _('Analysiere Datei:') | tojson }},
+    analyzeDescription: {{ _('Analysiere Beschreibung...') | tojson }},
+    hint: {{ _('Hinweis:') | tojson }},
+    hintProduct: {{ _('Bitte Produkt/System angeben, bevor die Anforderungsliste generiert wird.') | tojson }},
+    hintMode: {{ _('Bitte einen Generierungs-Modus auswaehlen.') | tojson }},
+    hintModel: {{ _('Bitte ein LLM auswaehlen, bevor generiert wird.') | tojson }},
+    hintCount: {{ _('Bitte eine Anzahl fuer die Generierung angeben.') | tojson }},
+    responseNotJson: {{ _('Antwortformat ist kein JSON.') | tojson }},
+    success: {{ _('Erfolg!') | tojson }},
+    redirectNotice: {{ _('Sie werden in Kuerze zum Projekt weitergeleitet...') | tojson }},
+    generatedSaved: {{ _('Anforderungen wurden erfolgreich generiert und gespeichert.') | tojson }},
+    improvedSaved: {{ _('Anforderungen wurden erfolgreich verbessert und gespeichert (keine neuen erstellt).') | tojson }},
+    extendedSaved: {{ _('Neue Anforderungen wurden basierend auf dem Bestand erfolgreich erstellt und hinzugefuegt.') | tojson }},
+    errorPrefix: {{ _('Fehler:') | tojson }},
+    networkError: {{ _('Netzwerkfehler:') | tojson }},
+    keyPlaceholder: {{ _('Key') | tojson }},
+    valuePlaceholder: {{ _('Value') | tojson }}
+  };
 
   // Drag & Drop Handling für Kontext-Upload (PDF/Excel)
   const contextTypeSelect = document.getElementById("context_file_type");
@@ -1075,9 +1093,9 @@ endblock %} {% block content %}
     const contextFile = getContextFile();
     const step1Text = document.getElementById("step-1");
     if (contextFile) {
-      step1Text.innerHTML = `<i class="bi bi-circle me-2"></i> Analysiere Datei: <strong>${contextFile.name}</strong>`;
+      step1Text.innerHTML = `<i class="bi bi-circle me-2"></i> ${i18n.analyzeFile} <strong>${contextFile.name}</strong>`;
     } else {
-      step1Text.innerHTML = `<i class="bi bi-circle me-2"></i> Analysiere Beschreibung...`;
+      step1Text.innerHTML = `<i class="bi bi-circle me-2"></i> ${i18n.analyzeDescription}`;
     }
 
     let width = 0;
@@ -1142,8 +1160,8 @@ endblock %} {% block content %}
     const div = document.createElement("div");
     div.className = "input-group mb-2 animate-fade-in";
     div.innerHTML = `
-    <input type="text" class="form-control" placeholder="Key" name="key[]">
-    <input type="text" class="form-control" placeholder="Value" name="value[]">
+    <input type="text" class="form-control" placeholder="${i18n.keyPlaceholder}" name="key[]">
+    <input type="text" class="form-control" placeholder="${i18n.valuePlaceholder}" name="value[]">
     <button type="button" class="btn btn-outline-danger remove-input"><i class="bi bi-trash"></i></button>
   `;
     container.appendChild(div);
@@ -1182,7 +1200,7 @@ endblock %} {% block content %}
       if (!productSystemInput.value.trim()) {
         messageDiv.className = "alert alert-danger mt-3 shadow-sm";
         messageDiv.innerHTML =
-          "<strong>Hinweis:</strong> Bitte Produkt/System angeben, bevor die Anforderungsliste generiert wird.";
+          `<strong>${i18n.hint}</strong> ${i18n.hintProduct}`;
         messageDiv.classList.remove("d-none");
         productSystemInput.classList.add("is-invalid");
         productSystemInput.focus();
@@ -1193,7 +1211,7 @@ endblock %} {% block content %}
       if (!modeEl) {
         messageDiv.className = "alert alert-danger mt-3 shadow-sm";
         messageDiv.innerHTML =
-          "<strong>Hinweis:</strong> Bitte einen Generierungs-Modus auswählen.";
+          `<strong>${i18n.hint}</strong> ${i18n.hintMode}`;
         messageDiv.classList.remove("d-none");
         if (modeRadios.length > 0) {
           modeRadios[0].focus();
@@ -1206,7 +1224,7 @@ endblock %} {% block content %}
       if (!modelSelect.value) {
         messageDiv.className = "alert alert-danger mt-3 shadow-sm";
         messageDiv.innerHTML =
-          "<strong>Hinweis:</strong> Bitte ein LLM auswählen, bevor generiert wird.";
+          `<strong>${i18n.hint}</strong> ${i18n.hintModel}`;
         messageDiv.classList.remove("d-none");
         modelSelect.classList.add("is-invalid");
         modelSelect.focus();
@@ -1216,7 +1234,7 @@ endblock %} {% block content %}
       if (numReqMode.value !== "auto" && !numReqValue.value) {
         messageDiv.className = "alert alert-danger mt-3 shadow-sm";
         messageDiv.innerHTML =
-          "<strong>Hinweis:</strong> Bitte eine Anzahl fuer die Generierung angeben.";
+          `<strong>${i18n.hint}</strong> ${i18n.hintCount}`;
         messageDiv.classList.remove("d-none");
         numReqValue.classList.add("is-invalid");
         numReqValue.focus();
@@ -1269,7 +1287,7 @@ endblock %} {% block content %}
           if (contentType.includes("application/json")) {
             return JSON.parse(rawText || "{}");
           }
-          throw new Error("Antwortformat ist kein JSON.");
+          throw new Error(i18n.responseNotJson);
         })
         .then((result) => {
           messageDiv.classList.remove("d-none");
@@ -1278,17 +1296,17 @@ endblock %} {% block content %}
             // Success
             messageDiv.className = "alert alert-success mt-3 shadow-sm";
             
-            let actionText = "Requirement(s) wurden erfolgreich generiert und gespeichert.";
+            let actionText = i18n.generatedSaved;
             if (result.was_improved) {
-                actionText = "Requirement(s) wurden erfolgreich verbessert und gespeichert (keine neuen erstellt).";
+              actionText = i18n.improvedSaved;
             } else if (result.was_extended) {
-                actionText = "NEUE Requirement(s) wurden basierend auf dem Bestand erfolgreich erstellt und hinzugefügt.";
+              actionText = i18n.extendedSaved;
             }
                 
             messageDiv.innerHTML = `
         <i class="bi bi-check-circle-fill me-2"></i>
-        <strong>Erfolg!</strong> ${result.count} ${actionText}
-        <br><span class="small text-muted ms-4">Sie werden in Kürze zum Projekt weitergeleitet...</span>
+        <strong>${i18n.success}</strong> ${result.count} ${actionText}
+        <br><span class="small text-muted ms-4">${i18n.redirectNotice}</span>
       `;
 
             // Redirect after 2 seconds
@@ -1298,7 +1316,7 @@ endblock %} {% block content %}
           } else {
             // Error from backend
             messageDiv.className = "alert alert-danger mt-3 shadow-sm";
-            messageDiv.innerHTML = `<strong>Fehler:</strong> ${result.error}`;
+            messageDiv.innerHTML = `<strong>${i18n.errorPrefix}</strong> ${result.error}`;
             btn.disabled = false;
             spinner.classList.add("d-none");
             // Show form again
@@ -1310,7 +1328,7 @@ endblock %} {% block content %}
           // Network or parsing error
           messageDiv.classList.remove("d-none");
           messageDiv.className = "alert alert-danger mt-3 shadow-sm";
-          messageDiv.innerHTML = `<strong>Netzwerkfehler:</strong> ${error.message}`;
+          messageDiv.innerHTML = `<strong>${i18n.networkError}</strong> ${error.message}`;
           btn.disabled = false;
           spinner.classList.add("d-none");
           // Show form again

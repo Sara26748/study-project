@@ -1,0 +1,612 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: requirements-tool\n"
+"Language: es\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "Benachrichtigungen"
+msgstr "Notificaciones"
+
+msgid "Alle als gelesen markieren"
+msgstr "Marcar todo como leido"
+
+msgid "Lade Benachrichtigungen..."
+msgstr "Cargando notificaciones..."
+
+msgid "Alle anzeigen"
+msgstr "Ver todo"
+
+msgid "Startseite"
+msgstr "Inicio"
+
+msgid "Projekt erstellen"
+msgstr "Crear proyecto"
+
+msgid "Gelöschte Anforderungen"
+msgstr "Requisitos eliminados"
+
+msgid "Abmelden"
+msgstr "Cerrar sesion"
+
+msgid "Anmelden"
+msgstr "Iniciar sesion"
+
+msgid "Registrieren"
+msgstr "Registrarse"
+
+msgid "Vorgang wird ausgeführt"
+msgstr "Procesando"
+
+msgid "Bitte warten, Seite wird aktualisiert."
+msgstr "Espere, la pagina se esta actualizando."
+
+msgid "Bestätigung erforderlich"
+msgstr "Confirmacion requerida"
+
+msgid "Möchten Sie diese Aktion wirklich ausführen?"
+msgstr "Desea realmente realizar esta accion?"
+
+msgid "Abbrechen"
+msgstr "Cancelar"
+
+msgid "Bestätigen"
+msgstr "Confirmar"
+
+msgid "Alle Rechte vorbehalten."
+msgstr "Todos los derechos reservados."
+
+msgid "Keine Benachrichtigungen"
+msgstr "No hay notificaciones"
+
+msgid "Meine Projekte"
+msgstr "Mis proyectos"
+
+msgid "Dashboard"
+msgstr "Panel"
+
+msgid "Willkommen zurück,"
+msgstr "Bienvenido de nuevo,"
+
+msgid "Neues Projekt"
+msgstr "Nuevo proyecto"
+
+msgid "Projekt suchen..."
+msgstr "Buscar proyecto..."
+
+msgid "geteilt"
+msgstr "compartido"
+
+msgid "Privat"
+msgstr "Privado"
+
+msgid "Anforderungen"
+msgstr "Requisitos"
+
+msgid "Möchten Sie das Projekt %(name)s wirklich löschen? Alle Daten gehen verloren."
+msgstr "Desea realmente eliminar el proyecto %(name)s? Se perderan todos los datos."
+
+msgid "Projekt löschen"
+msgstr "Eliminar proyecto"
+
+msgid "Starten Sie jetzt mit Ihrem ersten Projekt durch."
+msgstr "Empiece ahora con su primer proyecto."
+
+msgid "Jetzt starten"
+msgstr "Empezar"
+
+msgid "Keine Projekte gefunden, die Ihrer Suche entsprechen."
+msgstr "No se encontraron proyectos que coincidan con su busqueda."
+
+msgid "E-Mail"
+msgstr "Correo"
+
+msgid "Passwort"
+msgstr "Contrasena"
+
+msgid "Noch kein Konto? Registrieren"
+msgstr "No tienes cuenta? Registrate"
+
+msgid "Bereits ein Konto? Anmelden"
+msgstr "Ya tienes cuenta? Inicia sesion"
+
+msgid "Projekt verwalten"
+msgstr "Gestionar proyecto"
+
+msgid "Neues Projekt erstellen"
+msgstr "Crear nuevo proyecto"
+
+msgid "Hier kannst du neue Projekte erstellen."
+msgstr "Aqui puedes crear nuevos proyectos."
+
+msgid "Projektname"
+msgstr "Nombre del proyecto"
+
+msgid "Zurueck zur Startseite"
+msgstr "Volver al inicio"
+
+msgid "Zurueck zur Uebersicht"
+msgstr "Volver al resumen"
+
+msgid "Teilen"
+msgstr "Compartir"
+
+msgid "Gefundene Widersprueche (KI-Analyse)"
+msgstr "Conflictos detectados (analisis IA)"
+
+msgid "Laden..."
+msgstr "Cargando..."
+
+msgid "KI analysiert alle Anforderungen auf logische Brueche..."
+msgstr "La IA analiza todos los requisitos para inconsistencias logicas..."
+
+msgid "Schliessen"
+msgstr "Cerrar"
+
+msgid "Folgende potenzielle Konflikte wurden gefunden:"
+msgstr "Se encontraron los siguientes conflictos potenciales:"
+
+msgid "Hoch"
+msgstr "Alto"
+
+msgid "Keine logischen Widersprueche gefunden."
+msgstr "No se encontraron conflictos logicos."
+
+msgid "Fehler bei der Analyse:"
+msgstr "Error en el analisis:"
+
+msgid "Konflikt zwischen Req"
+msgstr "Conflicto entre Req"
+
+msgid "Suche..."
+msgstr "Buscar..."
+
+msgid "Status"
+msgstr "Estado"
+
+msgid "Entwurf"
+msgstr "Borrador"
+
+msgid "In Bearbeitung"
+msgstr "En progreso"
+
+msgid "Freigabe"
+msgstr "Aprobacion"
+
+msgid "Verworfen"
+msgstr "Rechazado"
+
+msgid "Kategorie"
+msgstr "Categoria"
+
+msgid "SysML v2 Code"
+msgstr "Codigo SysML v2"
+
+msgid "Liste als Excel exportieren"
+msgstr "Exportar lista a Excel"
+
+msgid "Export"
+msgstr "Exportar"
+
+msgid "Excel-Datei importieren"
+msgstr "Importar archivo Excel"
+
+msgid "Import"
+msgstr "Importar"
+
+msgid "Neue Spalte hinzufuegen:"
+msgstr "Agregar nueva columna:"
+
+msgid "Name (z.B. Prioritaet)"
+msgstr "Nombre (p. ej. Prioridad)"
+
+msgid "Hinzufuegen"
+msgstr "Agregar"
+
+msgid "Die KI wird diese Spalte bei zukuenftigen Generierungen beruecksichtigen."
+msgstr "La IA tendra en cuenta esta columna en futuras generaciones."
+
+msgid "Anforderungsliste"
+msgstr "Lista de requisitos"
+
+msgid "Kanban Board"
+msgstr "Tablero Kanban"
+
+msgid "Widersprueche pruefen"
+msgstr "Comprobar conflictos"
+
+msgid "Neue Anforderung hinzufuegen"
+msgstr "Agregar nuevo requisito"
+
+msgid "Spalten verwalten"
+msgstr "Gestionar columnas"
+
+msgid "+ Einfuegen"
+msgstr "+ Insertar"
+
+msgid "Neue Spalte"
+msgstr "Nueva columna"
+
+msgid "Neue Anforderung"
+msgstr "Nuevo requisito"
+
+msgid "Alle ausblenden"
+msgstr "Ocultar todo"
+
+msgid "Spalten anzeigen"
+msgstr "Mostrar columnas"
+
+msgid "Revision"
+msgstr "Revision"
+
+msgid "Version"
+msgstr "Version"
+
+msgid "Funktional"
+msgstr "Funcional"
+
+msgid "Quantifizierbar"
+msgstr "Cuantificable"
+
+msgid "Hinzugefuegte Spalten"
+msgstr "Columnas agregadas"
+
+msgid "Hinzugefuegte Spalten verwalten"
+msgstr "Gestionar columnas agregadas"
+
+msgid "Spalte %(name)s wirklich loeschen?"
+msgstr "Eliminar realmente la columna %(name)s?"
+
+msgid "Spalte loeschen"
+msgstr "Eliminar columna"
+
+msgid "Keine hinzugefuegten Spalten"
+msgstr "No hay columnas agregadas"
+
+msgid "Name"
+msgstr "Nombre"
+
+msgid "Anforderung"
+msgstr "Requisito"
+
+msgid "Funktional: Diese Anforderung ist funktional (Checkbox zum Umschalten)"
+msgstr "Funcional: este requisito es funcional (casilla para alternar)"
+
+msgid "Quantifizierbar: Diese Anforderung kann quantitativ gemessen werden (z.B. Performance-Werte, Zeitlimits, etc.)"
+msgstr "Cuantificable: este requisito puede medirse cuantitativamente (p. ej. valores de rendimiento, limites de tiempo, etc.)"
+
+msgid "Aktionen"
+msgstr "Acciones"
+
+msgid "Vollstaendige Anforderung"
+msgstr "Requisito completo"
+
+msgid "Funktional - Klicken zum Deaktivieren"
+msgstr "Funcional - clic para desactivar"
+
+msgid "Nicht funktional - Klicken zum Aktivieren"
+msgstr "No funcional - clic para activar"
+
+msgid "Quantifizierbar - Klicken zum Deaktivieren"
+msgstr "Cuantificable - clic para desactivar"
+
+msgid "Nicht quantifizierbar - Klicken zum Aktivieren"
+msgstr "No cuantificable - clic para activar"
+
+msgid "Freigeben"
+msgstr "Aprobar"
+
+msgid "Blockieren"
+msgstr "Bloquear"
+
+msgid "Bearbeiten"
+msgstr "Editar"
+
+msgid "Revidieren"
+msgstr "Revisar"
+
+msgid "Verwerfen"
+msgstr "Rechazar"
+
+msgid "Anforderung wirklich loeschen? Diese Aktion verschiebt sie in den Papierkorb."
+msgstr "Eliminar realmente el requisito? Esta accion lo mueve a la papelera."
+
+msgid "Loeschen"
+msgstr "Eliminar"
+
+msgid "Testfaelle generieren"
+msgstr "Generar casos de prueba"
+
+msgid "Neu generieren (KI)"
+msgstr "Regenerar (IA)"
+
+msgid "Noch keine Anforderungen vorhanden."
+msgstr "Aun no hay requisitos."
+
+msgid "Erste Anforderung generieren"
+msgstr "Generar el primer requisito"
+
+msgid "Erstellt automatisch den SysML v2 Code aus den aktuellen Anforderungen."
+msgstr "Genera automaticamente el codigo SysML v2 a partir de los requisitos actuales."
+
+msgid "Generiere SysML v2 Code"
+msgstr "Generar codigo SysML v2"
+
+msgid "Generierte Testfaelle"
+msgstr "Casos de prueba generados"
+
+msgid "KI generiert Testfaelle..."
+msgstr "La IA genera casos de prueba..."
+
+msgid "Kopieren"
+msgstr "Copiar"
+
+msgid "Projekt teilen"
+msgstr "Compartir proyecto"
+
+msgid "E-Mail-Adresse"
+msgstr "Correo electronico"
+
+msgid "Excel importieren"
+msgstr "Importar Excel"
+
+msgid "Importieren"
+msgstr "Importar"
+
+msgid "Anforderung bearbeiten"
+msgstr "Editar requisito"
+
+msgid "Diese Anforderung kann quantitativ gemessen werden (z.B. Performance-Werte, Zeitlimits, etc.)"
+msgstr "Este requisito puede medirse cuantitativamente (p. ej. valores de rendimiento, limites de tiempo, etc.)"
+
+msgid "Diese Anforderung ist funktional (z.B. beschreibt eine Funktion oder ein Verhalten)."
+msgstr "Este requisito es funcional (p. ej. describe una funcion o un comportamiento)."
+
+msgid "Revidiert"
+msgstr "Revisado"
+
+msgid "Erstellen"
+msgstr "Crear"
+
+msgid "Vollstaendige Beschreibung"
+msgstr "Descripcion completa"
+
+msgid "Fehler:"
+msgstr "Error:"
+
+msgid "Unbekannter Fehler"
+msgstr "Error desconocido"
+
+msgid "Netzwerkfehler:"
+msgstr "Error de red:"
+
+msgid "KI-Cockpit"
+msgstr "Panel de IA"
+
+msgid "Zurück"
+msgstr "Volver"
+
+msgid "Requirements Engineering mit KI-Agent"
+msgstr "Ingenieria de requisitos con agente de IA"
+
+msgid "Generiere professionelle Anforderungen für das Projekt:"
+msgstr "Generar requisitos profesionales para el proyecto:"
+
+msgid "Unbenanntes Projekt"
+msgstr "Proyecto sin nombre"
+
+msgid "KI analysiert Ihre Anforderungen..."
+msgstr "La IA analiza sus requisitos..."
+
+msgid "Kontext verstehen"
+msgstr "Entender contexto"
+
+msgid "Struktur analysieren"
+msgstr "Analizar estructura"
+
+msgid "Anforderungen formulieren"
+msgstr "Formular requisitos"
+
+msgid "Qualitaets-Check"
+msgstr "Control de calidad"
+
+msgid "Produkt/System"
+msgstr "Producto/Sistema"
+
+msgid "Nennen Sie das zu betrachtende Produkt/System"
+msgstr "Indique el producto/sistema a considerar"
+
+msgid "Kontext (Optional)"
+msgstr "Contexto (opcional)"
+
+msgid "Bestehende Anforderungslisten und/oder weiterfuehrende Informationen zur Produktbeschreibung (z.B. Pflichten-/Lastenheft) hochladen & Bestehende Anforderungen ueberarbeiten oder erweitern"
+msgstr "Suba listas de requisitos existentes y/o informacion adicional sobre el producto (p. ej. especificacion) y revise o amplie los requisitos existentes"
+
+msgid "Dateityp auswaehlen"
+msgstr "Seleccionar tipo de archivo"
+
+msgid "Kein Upload (optional)"
+msgstr "Sin carga (opcional)"
+
+msgid "PDF"
+msgstr "PDF"
+
+msgid "EXCEL"
+msgstr "Excel"
+
+msgid "EXCEL & PDF"
+msgstr "Excel y PDF"
+
+msgid "PDF-Datei hier ablegen oder klicken"
+msgstr "Suelte el archivo PDF aqui o haga clic"
+
+msgid "Unterstuetzt .pdf Dateien"
+msgstr "Admite archivos .pdf"
+
+msgid "Excel-Datei hier ablegen oder klicken"
+msgstr "Suelte el archivo Excel aqui o haga clic"
+
+msgid "Unterstuetzt .xlsx und .xls Dateien"
+msgstr "Admite archivos .xlsx y .xls"
+
+msgid "Produkt-/Systembeschreibung"
+msgstr "Descripcion del producto/sistema"
+
+msgid "Beschreiben Sie Ihr Produkt/System."
+msgstr "Describa su producto/sistema."
+
+msgid "Generierungs-Modus"
+msgstr "Modo de generacion"
+
+msgid "Neugenerierung:"
+msgstr "Nueva generacion:"
+
+msgid "innovativ & kreativ"
+msgstr "innovador y creativo"
+
+msgid "Erweiterung:"
+msgstr "Extension:"
+
+msgid "geaenderte oder neue, ergaenzende Anforderungen"
+msgstr "requisitos modificados o nuevos, complementarios"
+
+msgid "Ueberpruefung/Verbesserung der Anforderungsqualitaet:"
+msgstr "Revision/mejora de la calidad de los requisitos:"
+
+msgid "z.B. widerspruchsfrei, qualitativ hochwertige Formulierungen, quantifizierbare/messbare Anforderungen"
+msgstr "p. ej. sin contradicciones, formulaciones de alta calidad, requisitos cuantificables/medibles"
+
+msgid "Beschreibe dein Vorhaben detailliert..."
+msgstr "Describe tu proyecto en detalle..."
+
+msgid "Anzahl der Anforderungen"
+msgstr "Numero de requisitos"
+
+msgid "Mindestens"
+msgstr "Al menos"
+
+msgid "Hoechstens"
+msgstr "Como maximo"
+
+msgid "Automatisch"
+msgstr "Automatico"
+
+msgid "\"Automatisch\": KI schaetzt und entscheidet selbst, basierend auf dem bereitgestellten Kontext."
+msgstr "\"Automatico\": la IA estima y decide segun el contexto proporcionado."
+
+msgid "Ausgabeformat"
+msgstr "Formato de salida"
+
+msgid "Sprache und Tabellenspalten festlegen"
+msgstr "Definir idioma y columnas de la tabla"
+
+msgid "Ausgabe-Sprache"
+msgstr "Idioma de salida"
+
+msgid "Deutsch"
+msgstr "Aleman"
+
+msgid "Englisch"
+msgstr "Ingles"
+
+msgid "Arabisch"
+msgstr "Arabe"
+
+msgid "Französisch"
+msgstr "Frances"
+
+msgid "Die KI formuliert alle Anforderungen in der gewaehlten Sprache."
+msgstr "La IA formula todos los requisitos en el idioma seleccionado."
+
+msgid "Tabellenspalten"
+msgstr "Columnas de la tabla"
+
+msgid "Schema der Ausgabe"
+msgstr "Esquema de salida"
+
+msgid "ID"
+msgstr "ID"
+
+msgid "Standard"
+msgstr "Estandar"
+
+msgid "Spalte hinzufuegen"
+msgstr "Agregar columna"
+
+msgid "Gewuenschtes LLM auswaehlen"
+msgstr "Seleccionar el LLM deseado"
+
+msgid "GPT-4o Mini (OpenAI)"
+msgstr "GPT-4o Mini (OpenAI)"
+
+msgid "Experten-Einstellungen"
+msgstr "Configuracion avanzada"
+
+msgid "Zusaetzliche Parameter (Key-Value)"
+msgstr "Parametros adicionales (clave-valor)"
+
+msgid "Key (z.B. Sprache)"
+msgstr "Clave (p. ej. Idioma)"
+
+msgid "Value (z.B. Deutsch)"
+msgstr "Valor (p. ej. Aleman)"
+
+msgid "Parameter hinzufuegen"
+msgstr "Agregar parametro"
+
+msgid "Anforderungsliste generieren"
+msgstr "Generar lista de requisitos"
+
+msgid "Analysiere Datei:"
+msgstr "Analizando archivo:"
+
+msgid "Analysiere Beschreibung..."
+msgstr "Analizando descripcion..."
+
+msgid "Hinweis:"
+msgstr "Aviso:"
+
+msgid "Bitte Produkt/System angeben, bevor die Anforderungsliste generiert wird."
+msgstr "Indique un producto/sistema antes de generar la lista de requisitos."
+
+msgid "Bitte einen Generierungs-Modus auswaehlen."
+msgstr "Seleccione un modo de generacion."
+
+msgid "Bitte ein LLM auswaehlen, bevor generiert wird."
+msgstr "Seleccione un LLM antes de generar."
+
+msgid "Bitte eine Anzahl fuer die Generierung angeben."
+msgstr "Indique un numero para la generacion."
+
+msgid "Antwortformat ist kein JSON."
+msgstr "El formato de respuesta no es JSON."
+
+msgid "Erfolg!"
+msgstr "Exito!"
+
+msgid "Sie werden in Kuerze zum Projekt weitergeleitet..."
+msgstr "Sera redirigido al proyecto en breve..."
+
+msgid "Anforderungen wurden erfolgreich generiert und gespeichert."
+msgstr "Los requisitos se generaron y guardaron correctamente."
+
+msgid "Anforderungen wurden erfolgreich verbessert und gespeichert (keine neuen erstellt)."
+msgstr "Los requisitos se mejoraron y guardaron correctamente (no se crearon nuevos)."
+
+msgid "Neue Anforderungen wurden basierend auf dem Bestand erfolgreich erstellt und hinzugefuegt."
+msgstr "Se crearon nuevos requisitos basados en los existentes y se agregaron correctamente."
+
+msgid "Key"
+msgstr "Clave"
+
+msgid "Value"
+msgstr "Valor"
+
+msgid "Neue Spalte hinzufuegen"
+msgstr "Agregar nueva columna"
+
+msgid "Erstellt:"
+msgstr "Creado:"
+
+msgid "Bearbeitet:"
+msgstr "Editado:"

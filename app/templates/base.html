@@ -1,5 +1,7 @@
+{% set current_lang_code = current_locale[:2] if current_locale else 'de' %}
+{% set current_lang = (language_options | selectattr('code', 'equalto', current_lang_code) | list | first) %}
 <!doctype html>
-<html lang="de">
+<html lang="{{ current_lang_code }}">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -110,13 +112,13 @@
                 <h6
                   class="dropdown-header d-flex justify-content-between align-items-center"
                 >
-                  <span>Benachrichtigungen</span>
+                  <span>{{ _('Benachrichtigungen') }}</span>
                   <button
                     class="btn btn-link text-decoration-none p-0 small"
                     id="markAllReadBtn"
                     style="color: #0d6efd"
                   >
-                    Alle als gelesen markieren
+                    {{ _('Alle als gelesen markieren') }}
                   </button>
                 </h6>
               </li>
@@ -124,7 +126,7 @@
               <li>
                 <div id="notificationsList" class="px-2">
                   <div class="text-center text-muted py-4 small">
-                    Lade Benachrichtigungen...
+                    {{ _('Lade Benachrichtigungen...') }}
                   </div>
                 </div>
               </li>
@@ -135,7 +137,7 @@
                   href="#"
                   id="viewAllNotifications"
                 >
-                  Alle anzeigen
+                  {{ _('Alle anzeigen') }}
                 </a>
               </li>
             </ul>
@@ -152,12 +154,12 @@
             >
               <span class="me-2 d-flex align-items-center"
                 ><img
-                  src="https://flagcdn.com/de.svg"
+                  src="https://flagcdn.com/{{ current_lang.flag if current_lang else 'de' }}.svg"
                   width="22"
-                  alt="Deutsch"
+                  alt="{{ current_lang.label if current_lang else 'Deutsch' }}"
                   style="border-radius: 3px"
               /></span>
-              <span style="min-width: 70px; text-align: left">Deutsch</span>
+              <span style="min-width: 70px; text-align: left">{{ current_lang.label if current_lang else 'Deutsch' }}</span>
               <span class="ms-2"
                 ><i class="bi bi-chevron-down" style="font-size: 1rem"></i
               ></span>
@@ -166,46 +168,21 @@
               class="dropdown-menu dropdown-menu-end"
               aria-labelledby="languageDropdown"
             >
+              {% for opt in language_options %}
               <li>
-                <a class="dropdown-item d-flex align-items-center" href="#"
-                  ><img
-                    src="https://flagcdn.com/de.svg"
+                <a
+                  class="dropdown-item d-flex align-items-center {% if opt.code == current_lang_code %}active{% endif %}"
+                  href="{{ url_for('main.set_language', lang=opt.code) }}"
+                >
+                  <img
+                    src="https://flagcdn.com/{{ opt.flag }}.svg"
                     width="22"
                     class="me-2"
-                    alt="Deutsch"
-                  />Deutsch</a
-                >
+                    alt="{{ opt.label }}"
+                  />{{ opt.label }}
+                </a>
               </li>
-              <li>
-                <a class="dropdown-item d-flex align-items-center" href="#"
-                  ><img
-                    src="https://flagcdn.com/gb.svg"
-                    width="22"
-                    class="me-2"
-                    alt="English"
-                  />English</a
-                >
-              </li>
-              <li>
-                <a class="dropdown-item d-flex align-items-center" href="#"
-                  ><img
-                    src="https://flagcdn.com/fr.svg"
-                    width="22"
-                    class="me-2"
-                    alt="Français"
-                  />Français</a
-                >
-              </li>
-              <li>
-                <a class="dropdown-item d-flex align-items-center" href="#"
-                  ><img
-                    src="https://flagcdn.com/es.svg"
-                    width="22"
-                    class="me-2"
-                    alt="Español"
-                  />Español</a
-                >
-              </li>
+              {% endfor %}
             </ul>
             <style>
               .language-btn {
@@ -304,7 +281,7 @@
                   class="dropdown-item d-flex align-items-center {% if request.endpoint == 'main.home' %}active bg-primary bg-opacity-10 text-primary{% endif %}"
                   href="{{ url_for('main.home') }}"
                 >
-                  <i class="bi bi-house-door me-2"></i>Startseite
+                  <i class="bi bi-house-door me-2"></i>{{ _('Startseite') }}
                 </a>
               </li>
 
@@ -313,7 +290,7 @@
                   class="dropdown-item d-flex align-items-center {% if request.endpoint == 'main.create' %}active bg-primary bg-opacity-10 text-primary{% endif %}"
                   href="{{ url_for('main.create') }}"
                 >
-                  <i class="bi bi-folder-plus me-2"></i>Projekt erstellen
+                  <i class="bi bi-folder-plus me-2"></i>{{ _('Projekt erstellen') }}
                 </a>
               </li>
 
@@ -322,8 +299,7 @@
                   class="dropdown-item d-flex align-items-center"
                   href="{{ url_for('main.deleted_requirements_overview') }}"
                 >
-                  <i class="bi bi-trash me-2 text-muted"></i>Gelöschte
-                  Anforderungen
+                  <i class="bi bi-trash me-2 text-muted"></i>{{ _('Gelöschte Anforderungen') }}
                 </a>
               </li>
 
@@ -335,7 +311,7 @@
                   class="dropdown-item d-flex align-items-center text-danger"
                   href="{{ url_for('auth.logout') }}"
                 >
-                  <i class="bi bi-box-arrow-right me-2"></i>Abmelden
+                  <i class="bi bi-box-arrow-right me-2"></i>{{ _('Abmelden') }}
                 </a>
               </li>
             </ul>
@@ -348,14 +324,14 @@
               href="{{ url_for('auth.login') }}"
               style="padding: 0.375rem 0.75rem"
             >
-              Anmelden
+              {{ _('Anmelden') }}
             </a>
             <a
               class="btn btn-primary"
               href="{{ url_for('auth.register') }}"
               style="padding: 0.375rem 0.75rem"
             >
-              Registrieren
+              {{ _('Registrieren') }}
             </a>
           </div>
           {% endif %}
@@ -405,9 +381,9 @@
     <div class="action-overlay" id="actionOverlay" aria-hidden="true">
       <div class="action-card">
         <div class="action-spinner"></div>
-        <div class="action-title">Vorgang wird ausgefuehrt</div>
+        <div class="action-title">{{ _('Vorgang wird ausgeführt') }}</div>
         <div class="action-subtitle">
-          Bitte warten, Seite wird aktualisiert.
+          {{ _('Bitte warten, Seite wird aktualisiert.') }}
         </div>
       </div>
     </div>
@@ -426,7 +402,7 @@
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title" id="confirmModalLabel">
-              Bestätigung erforderlich
+              {{ _('Bestätigung erforderlich') }}
             </h5>
             <button
               type="button"
@@ -436,7 +412,7 @@
             ></button>
           </div>
           <div class="modal-body" id="confirmModalBody">
-            Möchten Sie diese Aktion wirklich ausführen?
+            {{ _('Möchten Sie diese Aktion wirklich ausführen?') }}
           </div>
           <div class="modal-footer">
             <button
@@ -444,14 +420,14 @@
               class="btn btn-secondary"
               data-bs-dismiss="modal"
             >
-              Abbrechen
+              {{ _('Abbrechen') }}
             </button>
             <button
               type="button"
               class="btn btn-danger"
               id="confirmModalButton"
             >
-              Bestätigen
+              {{ _('Bestätigen') }}
             </button>
           </div>
         </div>
@@ -461,6 +437,7 @@
     <script>
       // Global confirmation modal handler
       let confirmCallback = null;
+      window.APP_LOCALE = "{{ current_lang_code }}";
 
       function showConfirmModal(
         message,
@@ -592,7 +569,7 @@
             const list = document.getElementById("notificationsList");
             if (data.notifications.length === 0) {
               list.innerHTML =
-                '<div class="text-center text-muted py-4 small">Keine Benachrichtigungen</div>';
+                '<div class="text-center text-muted py-4 small">{{ _('Keine Benachrichtigungen') }}</div>';
             } else {
               list.innerHTML = data.notifications
                 .map((notif) => {
@@ -632,30 +609,28 @@
       }
 
       function getTimeAgo(dateString) {
-        // Parse ISO date string properly
-        if (!dateString) return "gerade eben";
+        if (!dateString) return "";
 
         const date = new Date(dateString);
         const now = new Date();
-
-        // Check if date is valid
         if (isNaN(date.getTime())) {
-          return "gerade eben";
+          return "";
         }
 
         const seconds = Math.floor((now - date) / 1000);
+        const rtf = new Intl.RelativeTimeFormat(window.APP_LOCALE || "de", {
+          numeric: "auto",
+        });
 
-        // Handle timezone issues - if date is in the future (due to timezone), show "gerade eben"
-        // Also show "gerade eben" for anything less than 10 seconds
-        if (seconds < 0 || seconds < 10) return "gerade eben";
-        if (seconds < 60) return "gerade eben";
+        if (seconds < 0 || seconds < 10) return rtf.format(0, "second");
+        if (seconds < 60) return rtf.format(-Math.max(seconds, 1), "second");
         const minutes = Math.floor(seconds / 60);
-        if (minutes < 60) return `vor ${minutes} Min.`;
+        if (minutes < 60) return rtf.format(-minutes, "minute");
         const hours = Math.floor(minutes / 60);
-        if (hours < 24) return `vor ${hours} Std.`;
+        if (hours < 24) return rtf.format(-hours, "hour");
         const days = Math.floor(hours / 24);
-        if (days < 7) return `vor ${days} Tag${days > 1 ? "en" : ""}`;
-        return date.toLocaleDateString("de-DE");
+        if (days < 7) return rtf.format(-days, "day");
+        return date.toLocaleDateString(window.APP_LOCALE || "de");
       }
 
       function escapeHtml(text) {
@@ -736,8 +711,7 @@
     <footer class="bg-light border-top text-center py-3 mt-5">
       <p class="mb-0 text-muted small">
         <i class="bi bi-c-circle me-1"></i
-        ><span id="currentYear"></span> Requirements Tool. Alle Rechte
-        vorbehalten.
+        ><span id="currentYear"></span> Requirements Tool. {{ _('Alle Rechte vorbehalten.') }}
       </p>
     </footer>
     <script>

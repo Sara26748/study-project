@@ -1,4 +1,4 @@
-{% extends "base.html" %} {% block title %}Manage Project{% endblock %} {% block
+{% extends "base.html" %} {% block title %}{{ _('Projekt verwalten') }}{% endblock %} {% block
 
 content %} 
 <style>
@@ -9,8 +9,8 @@ content %}
 
 
 {% if not project %}
-<h1 class="mt-5 pt-3">Neues Projekt erstellen</h1>
-<p>Hier kannst du neue Projekte erstellen.</p>
+<h1 class="mt-5 pt-3">{{ _('Neues Projekt erstellen') }}</h1>
+<p>{{ _('Hier kannst du neue Projekte erstellen.') }}</p>
 
 <form method="POST" class="mb-4">
   <div class="row">
@@ -19,18 +19,18 @@ content %}
         type="text"
         name="project_name"
         class="form-control"
-        placeholder="Projektname"
+        placeholder="{{ _('Projektname') }}"
         required
       />
     </div>
     <div class="col-md-3">
-      <button type="submit" class="btn btn-primary">Projekt erstellen</button>
+      <button type="submit" class="btn btn-primary">{{ _('Projekt erstellen') }}</button>
     </div>
   </div>
 </form>
 
 <a href="{{ url_for('main.home') }}" class="btn btn-outline-primary border-0 bg-light text-primary shadow-sm d-inline-flex align-items-center" style="transition: all 0.2s ease;">
-  <i class="bi bi-arrow-left me-2"></i>Zurück zur Startseite
+  <i class="bi bi-arrow-left me-2"></i>{{ _('Zurueck zur Startseite') }}
 </a>
 
 {% else %}
@@ -39,18 +39,18 @@ content %}
 <div class="d-flex justify-content-between align-items-center mb-4 mt-3 animate-fade-in">
     <div>
         <a href="{{ url_for('main.home') }}" class="text-decoration-none text-primary small mb-1 d-inline-flex align-items-center fw-medium" style="transition: color 0.2s ease;" onmouseover="this.style.color='#0a58ca'" onmouseout="this.style.color='#0d6efd'">
-            <i class="bi bi-arrow-left me-1"></i> Zurück zur Übersicht
+            <i class="bi bi-arrow-left me-1"></i> {{ _('Zurueck zur Uebersicht') }}
         </a>
         <div class="d-flex align-items-center gap-2 flex-wrap">
-          <h2 class="fw-bold m-0">Projektname: {{ project.name }}</h2>
+          <h2 class="fw-bold m-0">{{ _('Projektname') }}: {{ project.name }}</h2>
           <button
             class="btn btn-outline-primary btn-uniform btn-modern d-flex align-items-center share-btn ms-2"
             type="button"
             data-bs-toggle="modal"
             data-bs-target="#shareProjectModal"
-            title="teilen"
+            title="{{ _('Teilen') }}"
           >
-            <i class="bi bi-share me-2"></i> <span class="share-btn-text">Teilen</span>
+            <i class="bi bi-share me-2"></i> <span class="share-btn-text">{{ _('Teilen') }}</span>
           </button>
           <style>
           .share-btn:hover, .share-btn:focus {
@@ -89,7 +89,7 @@ content %}
         <!--a href="{{ url_for('main.kanban_view', project_id=project.id) }}" class="btn btn-white border shadow-sm text-secondary" title="Kanban Board">
             <i class="bi bi-kanban"></i> 
         </a>
-        <button class="btn btn-white border shadow-sm text-warning" id="check-conflicts-btn" title="Widersprüche prüfen">
+        <button class="btn btn-white border shadow-sm text-warning" id="check-conflicts-btn" title="{{ _('Widersprueche pruefen') }}">
             <i class="bi bi-exclamation-triangle"></i>
         </button>
          Projekt teilen Button wurde nach oben verschoben -->
@@ -104,20 +104,20 @@ content %}
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title">Gefundene Widersprüche (KI-Analyse)</h5>
+        <h5 class="modal-title">{{ _('Gefundene Widersprueche (KI-Analyse)') }}</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
         <div id="conflict-loader" class="text-center py-4 d-none">
            <div class="spinner-border text-primary" role="status">
-             <span class="visually-hidden">Loading...</span>
+             <span class="visually-hidden">{{ _('Laden...') }}</span>
            </div>
-           <p class="mt-2 text-muted">KI analysiert alle Anforderungen auf logische Brüche...</p>
+           <p class="mt-2 text-muted">{{ _('KI analysiert alle Anforderungen auf logische Brueche...') }}</p>
         </div>
         <div id="conflict-results"></div>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Schließen</button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ _('Schliessen') }}</button>
       </div>
     </div>
   </div>
@@ -133,6 +133,14 @@ document.addEventListener('DOMContentLoaded', function() {
     const resultsDiv = document.getElementById('conflict-results');
     const loader = document.getElementById('conflict-loader');
     
+    const i18n = {
+      conflictsFound: {{ _('Folgende potenzielle Konflikte wurden gefunden:') | tojson }},
+      severityHigh: {{ _('Hoch') | tojson }},
+      noConflicts: {{ _('Keine logischen Widersprueche gefunden.') | tojson }},
+      analysisError: {{ _('Fehler bei der Analyse:') | tojson }},
+      conflictBetween: {{ _('Konflikt zwischen Req') | tojson }}
+    };
+
     btn.addEventListener('click', function() {
         modal.show();
         resultsDiv.innerHTML = '';
@@ -142,15 +150,15 @@ document.addEventListener('DOMContentLoaded', function() {
           .then(response => response.json())
           .then(data => {
               loader.classList.add('d-none');
-              if (data.conflicts && data.conflicts.length > 0) {
-                  let html = '<div class="alert alert-warning">Folgende potenzielle Konflikte wurden gefunden:</div>';
+                if (data.conflicts && data.conflicts.length > 0) {
+                  let html = `<div class="alert alert-warning">${i18n.conflictsFound}</div>`;
                   html += '<div class="list-group">';
                   data.conflicts.forEach(c => {
                       html += `
                       <div class="list-group-item">
                           <div class="d-flex w-100 justify-content-between">
-                              <h6 class="mb-1 text-danger"><i class="bi bi-lightning-fill"></i> Konflikt zwischen Req #${c.req_id_1} & #${c.req_id_2}</h6>
-                              <span class="badge bg-danger">${c.severity || 'Hoch'}</span>
+                              <h6 class="mb-1 text-danger"><i class="bi bi-lightning-fill"></i> ${i18n.conflictBetween} #${c.req_id_1} & #${c.req_id_2}</h6>
+                        <span class="badge bg-danger">${c.severity || i18n.severityHigh}</span>
                           </div>
                           <p class="mb-1">${c.description}</p>
                       </div>`;
@@ -158,12 +166,12 @@ document.addEventListener('DOMContentLoaded', function() {
                   html += '</div>';
                   resultsDiv.innerHTML = html;
               } else {
-                  resultsDiv.innerHTML = '<div class="alert alert-success"><i class="bi bi-check-circle"></i> Keine logischen Widersprüche gefunden.</div>';
+                  resultsDiv.innerHTML = `<div class="alert alert-success"><i class="bi bi-check-circle"></i> ${i18n.noConflicts}</div>`;
               }
           })
           .catch(err => {
               loader.classList.add('d-none');
-              resultsDiv.innerHTML = `<div class="alert alert-danger">Fehler bei der Analyse: ${err}</div>`;
+                resultsDiv.innerHTML = `<div class="alert alert-danger">${i18n.analysisError} ${err}</div>`;
           });
     });
 });
@@ -184,37 +192,37 @@ document.addEventListener('DOMContentLoaded', function() {
             <div class="col-md-3">
                 <div class="input-group">
                     <span class="input-group-text bg-white border-end-0 text-muted"><i class="bi bi-search"></i></span>
-                    <input type="text" class="form-control border-start-0 ps-0" id="filterText" placeholder="Suche...">
+                    <input type="text" class="form-control border-start-0 ps-0" id="filterText" placeholder="{{ _('Suche...') }}">
                 </div>
             </div>
             
             <!-- Filters -->
             <div class="col-md-2">
                  <select class="form-select border-0 bg-light" id="filterStatus">
-                    <option value="">Status</option>
-                    <option value="Entwurf">Entwurf</option>
-                    <option value="In Bearbeitung">In Bearbeitung</option>
-                    <option value="Freigabe">Freigabe</option>
-                    <option value="Verworfen">Verworfen</option>
+                    <option value="">{{ _('Status') }}</option>
+                    <option value="Entwurf">{{ _('Entwurf') }}</option>
+                    <option value="In Bearbeitung">{{ _('In Bearbeitung') }}</option>
+                    <option value="Freigabe">{{ _('Freigabe') }}</option>
+                    <option value="Verworfen">{{ _('Verworfen') }}</option>
                  </select>
             </div>
             <div class="col-md-2">
                  <select class="form-select border-0 bg-light" id="filterCategory">
-                    <option value="">Kategorie</option>
+                    <option value="">{{ _('Kategorie') }}</option>
                  </select>
             </div>
             
             <!-- Actions -->
             <div class="col-md-5 text-end d-flex gap-2 justify-content-md-end justify-content-start align-items-center flex-wrap">
                 <!-- Export/Import Buttons (Larger & Labeled) -->
-                <button id="scrollToSyslmBtn" class="btn btn-outline-primary btn-modern px-3 d-flex align-items-center shadow-sm" type="button" title="SysML v2 code">
-                  <i class="bi bi-lightning-charge-fill me-2"></i> SysML v2 code
+                <button id="scrollToSyslmBtn" class="btn btn-outline-primary btn-modern px-3 d-flex align-items-center shadow-sm" type="button" title="{{ _('SysML v2 Code') }}">
+                  <i class="bi bi-lightning-charge-fill me-2"></i> {{ _('SysML v2 Code') }}
                 </button>
-                <a href="{{ url_for('main.export_excel', project_id=project.id) }}" class="btn btn-outline-success btn-modern px-3 d-flex align-items-center shadow-sm" title="Liste als Excel exportieren">
-                    <i class="bi bi-file-earmark-arrow-up me-2 fw-bold"></i> Export
+                <a href="{{ url_for('main.export_excel', project_id=project.id) }}" class="btn btn-outline-success btn-modern px-3 d-flex align-items-center shadow-sm" title="{{ _('Liste als Excel exportieren') }}">
+                    <i class="bi bi-file-earmark-arrow-up me-2 fw-bold"></i> {{ _('Export') }}
                 </a>
-                <button class="btn btn-outline-primary btn-modern btn-import px-3 d-flex align-items-center shadow-sm" type="button" data-bs-toggle="modal" data-bs-target="#importExcelModal" title="Excel-Datei importieren">
-                    <i class="bi bi-file-earmark-arrow-down me-2 fw-bold"></i> Import
+                <button class="btn btn-outline-primary btn-modern btn-import px-3 d-flex align-items-center shadow-sm" type="button" data-bs-toggle="modal" data-bs-target="#importExcelModal" title="{{ _('Excel-Datei importieren') }}">
+                    <i class="bi bi-file-earmark-arrow-down me-2 fw-bold"></i> {{ _('Import') }}
                 </button>
 
                 <div class="d-inline-block">
@@ -255,7 +263,7 @@ document.addEventListener('DOMContentLoaded', function() {
           aria-expanded="false"
           aria-controls="addColumnForm"
         >
-          Neue Spalte hinzufügen
+          {{ _('Neue Spalte hinzufuegen') }}
         </button>
         <div class="collapse mt-3 border-top pt-3" id="addColumnForm">
           <form
@@ -264,22 +272,22 @@ document.addEventListener('DOMContentLoaded', function() {
             class="row g-3 align-items-center"
           >
             <div class="col-auto">
-                <span class="fw-bold small">Neue Spalte hinzufügen:</span>
+                <span class="fw-bold small">{{ _('Neue Spalte hinzufuegen:') }}</span>
             </div>
             <div class="col-auto">
               <input
                 type="text"
                 class="form-control form-control-sm"
                 name="column_name"
-                placeholder="Name (z.B. 'Priorität')"
+                placeholder="{{ _('Name (z.B. Prioritaet)') }}"
                 required
               />
             </div>
             <div class="col-auto">
-              <button type="submit" class="btn btn-primary btn-sm">Hinzufügen</button>
+              <button type="submit" class="btn btn-primary btn-sm">{{ _('Hinzufuegen') }}</button>
             </div>
             <div class="col-auto">
-                <small class="text-muted">Die KI wird diese Spalte bei zukünftigen Generierungen berücksichtigen.</small>
+                <small class="text-muted">{{ _('Die KI wird diese Spalte bei zukuenftigen Generierungen beruecksichtigen.') }}</small>
             </div>
           </form>
         </div>
@@ -289,14 +297,14 @@ document.addEventListener('DOMContentLoaded', function() {
 <!-- Main Requirements Table -->
 <div class="card-header bg-white py-3 border-0 d-flex align-items-center justify-content-between">
     <div class="d-flex align-items-center gap-2">
-      <h5 class="mb-0 fw-bold text-secondary">Anforderungsliste</h5>
-      <a href="{{ url_for('main.kanban_view', project_id=project.id) }}" class="btn btn-modern d-flex align-items-center ms-2 gap-2" title="Kanban Board" style="border: 1.5px solid #dee2e6; background: #f8f9fa; color: #6c757d; transition: background 0.2s, color 0.2s;">
+      <h5 class="mb-0 fw-bold text-secondary">{{ _('Anforderungsliste') }}</h5>
+      <a href="{{ url_for('main.kanban_view', project_id=project.id) }}" class="btn btn-modern d-flex align-items-center ms-2 gap-2" title="{{ _('Kanban Board') }}" style="border: 1.5px solid #dee2e6; background: #f8f9fa; color: #6c757d; transition: background 0.2s, color 0.2s;">
         <i class="bi bi-kanban" style="color: #6c757d;"></i>
-        <span style="color: #6c757d;">Kanban Board</span>
+        <span style="color: #6c757d;">{{ _('Kanban Board') }}</span>
       </a>
-      <button class="btn btn-modern d-flex align-items-center ms-2 gap-2" id="check-conflicts-btn" title="Widersprüche prüfen" style="border: 1.5px solid #ffe066; background: #fffbe6; color: #ffc107; transition: background 0.2s, color 0.2s;">
+      <button class="btn btn-modern d-flex align-items-center ms-2 gap-2" id="check-conflicts-btn" title="{{ _('Widersprueche pruefen') }}" style="border: 1.5px solid #ffe066; background: #fffbe6; color: #ffc107; transition: background 0.2s, color 0.2s;">
         <i class="bi bi-exclamation-triangle" style="color: #ffc107;"></i>
-        <span style="color: #ffc107;">Widersprüche prüfen</span>
+        <span style="color: #ffc107;">{{ _('Widersprueche pruefen') }}</span>
       </button>
       <style>
       #check-conflicts-btn:hover {
@@ -324,73 +332,73 @@ document.addEventListener('DOMContentLoaded', function() {
         <span class="me-2 d-flex align-items-center">
           <i class="bi bi-plus-circle-fill" style="font-size: 0.9rem; animation: pulseAdd 1.2s infinite alternate;"></i>
         </span>
-        Neue Anforderung hinzufügen
+        {{ _('Neue Anforderung hinzufuegen') }}
       </button>
       <div class="dropdown d-inline-block ms-1">
         <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
            <i class="bi bi-layout-three-columns"></i>
         </button>
         <ul class="dropdown-menu dropdown-menu-end">
-            <li><h6 class="dropdown-header">Spalten verwalten</h6></li>
+            <li><h6 class="dropdown-header">{{ _('Spalten verwalten') }}</h6></li>
 
             <li class="px-3 py-1 bg-light">
-              <small class="text-muted fw-bold">+ Einfügen</small>
+              <small class="text-muted fw-bold">{{ _('+ Einfuegen') }}</small>
             </li>
             <li>
               <a class="dropdown-item" href="#" id="insertNewColumn">
-                <i class="bi bi-table me-2"></i> Neue Spalte
+                <i class="bi bi-table me-2"></i> {{ _('Neue Spalte') }}
               </a>
             </li>
             <li>
               <a class="dropdown-item" href="#" id="insertNewRequirement">
-                <i class="bi bi-plus-circle me-2"></i> Neue Anforderung
+                <i class="bi bi-plus-circle me-2"></i> {{ _('Neue Anforderung') }}
               </a>
             </li>
             <li><hr class="dropdown-divider"></li>
 
         <li class="px-3 py-2">
           <div class="d-flex gap-2">
-            <button type="button" class="btn btn-sm btn-outline-secondary w-100" id="showAllColumnsBtn">Alle anzeigen</button>
-            <button type="button" class="btn btn-sm btn-outline-secondary w-100" id="hideAllColumnsBtn">Alle ausblenden</button>
+            <button type="button" class="btn btn-sm btn-outline-secondary w-100" id="showAllColumnsBtn">{{ _('Alle anzeigen') }}</button>
+            <button type="button" class="btn btn-sm btn-outline-secondary w-100" id="hideAllColumnsBtn">{{ _('Alle ausblenden') }}</button>
           </div>
         </li>
         <li><hr class="dropdown-divider"></li>
 
         <li class="px-3 py-1 bg-light">
-          <small class="text-muted fw-bold">Spalten anzeigen</small>
+          <small class="text-muted fw-bold">{{ _('Spalten anzeigen') }}</small>
         </li>
         <li class="d-flex justify-content-between align-items-center px-3 py-2">
-          <span class="small">Revision</span>
+          <span class="small">{{ _('Revision') }}</span>
           <div class="form-check form-switch m-0">
             <input class="form-check-input col-toggle" type="checkbox" role="switch" data-col-key="revision" checked>
           </div>
         </li>
         <li class="d-flex justify-content-between align-items-center px-3 py-2">
-          <span class="small">Version</span>
+          <span class="small">{{ _('Version') }}</span>
           <div class="form-check form-switch m-0">
             <input class="form-check-input col-toggle" type="checkbox" role="switch" data-col-key="version" checked>
           </div>
         </li>
         <li class="d-flex justify-content-between align-items-center px-3 py-2">
-          <span class="small">Kategorie</span>
+          <span class="small">{{ _('Kategorie') }}</span>
           <div class="form-check form-switch m-0">
             <input class="form-check-input col-toggle" type="checkbox" role="switch" data-col-key="category" checked>
           </div>
         </li>
         <li class="d-flex justify-content-between align-items-center px-3 py-2">
-          <span class="small">Status</span>
+          <span class="small">{{ _('Status') }}</span>
           <div class="form-check form-switch m-0">
             <input class="form-check-input col-toggle" type="checkbox" role="switch" data-col-key="status" checked>
           </div>
         </li>
         <li class="d-flex justify-content-between align-items-center px-3 py-2">
-          <span class="small">Funktional</span>
+          <span class="small">{{ _('Funktional') }}</span>
           <div class="form-check form-switch m-0">
             <input class="form-check-input col-toggle" type="checkbox" role="switch" data-col-key="funktional" checked>
           </div>
         </li>
         <li class="d-flex justify-content-between align-items-center px-3 py-2">
-          <span class="small">Quantifizierbar</span>
+          <span class="small">{{ _('Quantifizierbar') }}</span>
           <div class="form-check form-switch m-0">
             <input class="form-check-input col-toggle" type="checkbox" role="switch" data-col-key="quantifizierbar" checked>
           </div>
@@ -399,7 +407,7 @@ document.addEventListener('DOMContentLoaded', function() {
         {% if custom_columns %}
         <li><hr class="dropdown-divider"></li>
         <li class="px-3 py-1 bg-light">
-          <small class="text-muted fw-bold">Hinzugefugte-Splaten</small>
+          <small class="text-muted fw-bold">{{ _('Hinzugefuegte Spalten') }}</small>
         </li>
         {% for column in custom_columns %}
         <li class="d-flex justify-content-between align-items-center px-3 py-2">
@@ -414,13 +422,13 @@ document.addEventListener('DOMContentLoaded', function() {
         {% if custom_columns %}
         <li><hr class="dropdown-divider"></li>
         <li class="px-3 py-1 bg-light">
-          <small class="text-muted fw-bold">Hinzugefugte Spalten verwalten</small>
+          <small class="text-muted fw-bold">{{ _('Hinzugefuegte Spalten verwalten') }}</small>
         </li>
         {% for column in custom_columns %}
         <li class="d-flex justify-content-between align-items-center px-3 py-1">
           <span class="small"><i class="bi bi-tag text-primary me-1"></i>{{ column }}</span>
-          <form method="POST" action="{{ url_for('main.remove_column', project_id=project.id, column_name=column) }}" class="d-inline" onsubmit="return confirm('Spalte {{ column }} wirklich löschen?')">
-            <button type="submit" class="btn btn-link text-danger p-0 ms-2" title="Spalte löschen">
+          <form method="POST" action="{{ url_for('main.remove_column', project_id=project.id, column_name=column) }}" class="d-inline" onsubmit="return confirm('{{ _('Spalte %(name)s wirklich loeschen?', name=column) | e }}')">
+            <button type="submit" class="btn btn-link text-danger p-0 ms-2" title="{{ _('Spalte loeschen') }}">
               <i class="bi bi-trash"></i>
             </button>
           </form>
@@ -428,7 +436,7 @@ document.addEventListener('DOMContentLoaded', function() {
         {% endfor %}
         {% else %}
         <li><hr class="dropdown-divider"></li>
-        <li><span class="text-muted small px-3">keine hinzugefugte Spalten</span></li>
+        <li><span class="text-muted small px-3">{{ _('Keine hinzugefuegten Spalten') }}</span></li>
         {% endif %}
       </ul>
       </div>
@@ -439,27 +447,27 @@ document.addEventListener('DOMContentLoaded', function() {
       <table class="table table-hover align-middle mb-0">
         <thead class="bg-secondary bg-opacity-10 text-dark">
           <tr>
-            <th class="ps-4 py-3" style="width: 5%" data-col-key="revision">Revision</th>
-            <th class="py-3" style="width: 5%" data-col-key="version">Version</th>
+            <th class="ps-4 py-3" style="width: 5%" data-col-key="revision">{{ _('Revision') }}</th>
+            <th class="py-3" style="width: 5%" data-col-key="version">{{ _('Version') }}</th>
             <th class="py-3" style="width: 5%">ID</th>
-            <th class="py-3" style="width: 20%">Name</th>
-            <th class="py-3" style="width: 25%">Anforderung</th>
+            <th class="py-3" style="width: 20%">{{ _('Name') }}</th>
+            <th class="py-3" style="width: 25%">{{ _('Anforderung') }}</th>
             {% for column in custom_columns %}
             <th class="py-3" style="width: 10%" data-col-key="custom-{{ column|replace(' ', '-')|replace('/', '-')|lower }}">{{ column }}</th>
             {% endfor %}
-            <th class="py-3" style="width: 10%" data-col-key="category">Kategorie</th>
-            <th class="py-3" style="width: 10%" data-col-key="status">Status</th>
+            <th class="py-3" style="width: 10%" data-col-key="category">{{ _('Kategorie') }}</th>
+            <th class="py-3" style="width: 10%" data-col-key="status">{{ _('Status') }}</th>
             <th class="py-3 text-center" style="width: 8%" data-col-key="funktional">
-              <span title="Funktional: Diese Anforderung ist funktional (Checkbox zum Umschalten)">
-                Funktional
+              <span title="{{ _('Funktional: Diese Anforderung ist funktional (Checkbox zum Umschalten)') }}">
+                {{ _('Funktional') }}
               </span>
             </th>
             <th class="py-3 text-center quantifiable-col" style="width: 8%" data-col-key="quantifizierbar">
-              <span title="Quantifizierbar: Diese Anforderung kann quantitativ gemessen werden (z.B. Performance-Werte, Zeitlimits, etc.)">
-                Quantifizierbar
+              <span title="{{ _('Quantifizierbar: Diese Anforderung kann quantitativ gemessen werden (z.B. Performance-Werte, Zeitlimits, etc.)') }}">
+                {{ _('Quantifizierbar') }}
               </span>
             </th>
-            <th class="text-end pe-4 py-3" style="width: 8%" data-col-key="actions">Aktionen</th>
+            <th class="text-end pe-4 py-3" style="width: 8%" data-col-key="actions">{{ _('Aktionen') }}</th>
           </tr>
         </thead>
         <tbody>
@@ -513,10 +521,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 <br>
                 <small class="text-muted user-cell">
                      {% if selected_version.created_by %}
-                     <i class="bi bi-person-plus-fill text-success"></i> Erstellt: {{ selected_version.created_by.email.split('@')[0] }}
+                     <i class="bi bi-person-plus-fill text-success"></i> {{ _('Erstellt:') }} {{ selected_version.created_by.email.split('@')[0] }}
                      {% endif %}
                      {% if selected_version.last_modified_by and selected_version.last_modified_by.id != selected_version.created_by.id %}
-                     <br><i class="bi bi-pencil-fill text-primary"></i> Bearbeitet: {{ selected_version.last_modified_by.email.split('@')[0] }}
+                     <br><i class="bi bi-pencil-fill text-primary"></i> {{ _('Bearbeitet:') }} {{ selected_version.last_modified_by.email.split('@')[0] }}
                      {% endif %}
                 </small>
             </td>
@@ -529,7 +537,7 @@ document.addEventListener('DOMContentLoaded', function() {
                      data-bs-content="{{ selected_version.description|replace('"', '&quot;')|replace("'", "&#39;") }}"
                      data-bs-html="false"
                      data-description-full="{{ selected_version.description|e }}"
-                     title="Vollständige Anforderung">
+                     title="{{ _('Vollstaendige Anforderung') }}">
                     {{ selected_version.description }}
                 </div>
             </td>
@@ -549,7 +557,7 @@ document.addEventListener('DOMContentLoaded', function() {
             <td class="text-center" data-col-key="funktional" onclick="event.stopPropagation();">
               <form method="POST" action="{{ url_for('main.toggle_funktional', req_id=req.id) }}" class="d-inline toggle-funktional-form">
                 <input type="hidden" name="funktional" value="{{ '0' if req.funktional else '1' }}">
-                <button type="submit" class="btn btn-sm btn-link p-0 border-0" title="{% if req.funktional %}Funktional - Klicken zum Deaktivieren{% else %}Nicht funktional - Klicken zum Aktivieren{% endif %}" {% if selected_version.status == 'Verworfen' %}disabled{% endif %}>
+                <button type="submit" class="btn btn-sm btn-link p-0 border-0" title="{% if req.funktional %}{{ _('Funktional - Klicken zum Deaktivieren') }}{% else %}{{ _('Nicht funktional - Klicken zum Aktivieren') }}{% endif %}" {% if selected_version.status == 'Verworfen' %}disabled{% endif %}>
                   <i class="bi {% if req.funktional %}bi-check-circle-fill text-success{% else %}bi-circle text-muted{% endif %}" style="font-size: 1.3rem;"></i>
                 </button>
               </form>
@@ -558,7 +566,7 @@ document.addEventListener('DOMContentLoaded', function() {
               {% set custom_data = versions[-1].get_custom_data() %}
               {% set is_quantifiable = selected_version.get_custom_data().get('is_quantifiable', 'false') == 'true' or selected_version.get_custom_data().get('is_quantifiable', False) == True %}
               <form method="POST" action="{{ url_for('main.toggle_quantifiable', version_id=selected_version.id) }}" class="d-inline toggle-quantifiable-form">
-                <button type="submit" class="btn btn-sm btn-link p-0 border-0" title="{% if is_quantifiable %}Quantifizierbar - Klicken zum Deaktivieren{% else %}Nicht quantifizierbar - Klicken zum Aktivieren{% endif %}" {% if selected_version.status == 'Verworfen' %}disabled{% endif %}>
+                <button type="submit" class="btn btn-sm btn-link p-0 border-0" title="{% if is_quantifiable %}{{ _('Quantifizierbar - Klicken zum Deaktivieren') }}{% else %}{{ _('Nicht quantifizierbar - Klicken zum Aktivieren') }}{% endif %}" {% if selected_version.status == 'Verworfen' %}disabled{% endif %}>
                   <i class="bi {% if is_quantifiable %}bi-check-circle-fill text-success{% else %}bi-circle text-muted{% endif %}" style="font-size: 1.3rem;"></i>
                 </button>
               </form>
@@ -568,7 +576,7 @@ document.addEventListener('DOMContentLoaded', function() {
               <div class="d-flex justify-content-end align-items-center">
                     <!-- Direct Lock Button -->
                     <form method="POST" action="{{ url_for('main.toggle_block_requirement', version_id=selected_version.id) }}" class="d-inline me-1">
-                      <button type="submit" class="btn btn-sm btn-icon rounded-circle toggle-lock-btn {% if selected_version.is_blocked %}text-danger{% else %}text-success{% endif %}" title="{% if selected_version.is_blocked %}Freigeben{% else %}Blockieren{% endif %}" {% if selected_version.status == 'Verworfen' %}disabled{% endif %}>
+                      <button type="submit" class="btn btn-sm btn-icon rounded-circle toggle-lock-btn {% if selected_version.is_blocked %}text-danger{% else %}text-success{% endif %}" title="{% if selected_version.is_blocked %}{{ _('Freigeben') }}{% else %}{{ _('Blockieren') }}{% endif %}" {% if selected_version.status == 'Verworfen' %}disabled{% endif %}>
                         <i class="bi {% if selected_version.is_blocked %}bi-lock-fill{% else %}bi-unlock{% endif %}"></i>
                         </button>
                     </form>
@@ -585,7 +593,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                     data-version-id="{{ selected_version.id }}"
                                     style="margin-bottom:0.25rem;"
                                     {% if selected_version.is_blocked or has_released or selected_version.status == 'Verworfen' %}disabled{% endif %}>
-                                    <i class="bi bi-pencil me-2"></i> Bearbeiten
+                                    <i class="bi bi-pencil me-2"></i> {{ _('Bearbeiten') }}
                                 </button>
                                 <button class="btn btn-outline-secondary status-btn-vertical action-btn w-100 revision-requirement-btn" 
                                     type="button"
@@ -593,12 +601,12 @@ document.addEventListener('DOMContentLoaded', function() {
                                   data-version-id="{{ latest_released.id if latest_released else selected_version.id }}"
                                   style="margin-bottom:0.25rem;"
                                     {% if not has_released or selected_version.status == 'Verworfen' %}disabled{% endif %}>
-                                    <i class="bi bi-arrow-counterclockwise me-2"></i> Revidieren
+                                    <i class="bi bi-arrow-counterclockwise me-2"></i> {{ _('Revidieren') }}
                                 </button>
                                 <form method="POST" action="{{ url_for('main.update_status', version_id=selected_version.id) }}">
                                   <input type="hidden" name="status" value="Verworfen" />
                                   <button type="submit" class="btn btn-outline-dark status-btn-vertical action-btn w-100 reject-requirement-btn" style="margin-bottom:0.25rem;" {% if selected_version.status == 'Verworfen' %}disabled{% endif %}>
-                                    <i class="bi bi-x-circle me-2"></i> Verwerfen
+                                    <i class="bi bi-x-circle me-2"></i> {{ _('Verwerfen') }}
                                   </button>
                                 </form>
                                 <form method="POST" action="{{ url_for('main.delete_requirement_version', version_id=selected_version.id) }}" class="delete-version-form" id="delete-requirement-form-{{ selected_version.id }}">
@@ -606,17 +614,17 @@ document.addEventListener('DOMContentLoaded', function() {
                                     type="button"
                                     class="btn btn-outline-danger status-btn-vertical action-btn w-100 delete-requirement-btn"
                                     style="margin-bottom:0.25rem;"
-                                    onclick="showConfirmModal('Anforderung wirklich loeschen? Diese Aktion verschiebt sie in den Papierkorb.', function () { document.getElementById('delete-requirement-form-{{ selected_version.id }}').submit(); })"
+                                    onclick="showConfirmModal('{{ _('Anforderung wirklich loeschen? Diese Aktion verschiebt sie in den Papierkorb.') | e }}', function () { document.getElementById('delete-requirement-form-{{ selected_version.id }}').submit(); })"
                                     {% if selected_version.status != 'Verworfen' %}disabled{% endif %}
                                   >
-                                    <i class="bi bi-trash me-2"></i> Loeschen
+                                    <i class="bi bi-trash me-2"></i> {{ _('Loeschen') }}
                                   </button>
                                 </form>
                             </li>
                             </li>
                             <li>
                                  <button class="dropdown-item generate-test-btn" data-version-id="{{ versions[-1].id }}">
-                                    <i class="bi bi-card-checklist me-2"></i> Testfälle generieren
+                                    <i class="bi bi-card-checklist me-2"></i> {{ _('Testfaelle generieren') }}
                                  </button>
                             </li>
                             <li><hr class="dropdown-divider"></li>
@@ -625,7 +633,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             <li>
                                <form method="POST" action="{{ url_for('main.regenerate_requirement', req_id=req.id) }}">
                                     <button type="submit" class="dropdown-item text-success regenerate-requirement-btn" {% if versions[-1].is_blocked or selected_version.status == 'Verworfen' %}disabled{% endif %}>
-                                        <i class="bi bi-magic me-2"></i> Neu generieren (KI)
+                                        <i class="bi bi-magic me-2"></i> {{ _('Neu generieren (KI)') }}
                                     </button>
                                </form>
                             </li>
@@ -661,9 +669,9 @@ document.addEventListener('DOMContentLoaded', function() {
             <td colspan="{{ 9 + custom_columns|length }}" class="text-center py-5">
               <div class="text-muted">
                   <i class="bi bi-inbox fs-1 d-block mb-3"></i>
-                  <p>Noch keine Anforderungen vorhanden.</p>
+                    <p>{{ _('Noch keine Anforderungen vorhanden.') }}</p>
                   <a href="{{ url_for('agent.agent_page', project_id=project.id) }}" class="btn btn-primary mt-2">
-                      Erste Anforderung generieren
+                      {{ _('Erste Anforderung generieren') }}
                   </a>
               </div>
             </td>
@@ -679,7 +687,7 @@ document.addEventListener('DOMContentLoaded', function() {
             <span class="me-2 d-flex align-items-center">
               <i class="bi bi-plus-circle-fill" style="font-size: 1.7rem; animation: pulseAdd 1.2s infinite alternate;"></i>
             </span>
-            Neue Anforderung hinzufügen
+            {{ _('Neue Anforderung hinzufuegen') }}
           </button>
           <style>
           @keyframes pulseAdd {
@@ -697,13 +705,13 @@ document.addEventListener('DOMContentLoaded', function() {
           <div class="col-12 col-md-7 col-lg-5">
             <div class="card border-0 shadow-sm h-100">
               <div class="card-body p-4">
-                <h5 class="fw-bold mb-2">SysML v2 Code</h5>
-                <p class="text-muted mb-4">Erstellt automatisch den SysML v2 Code aus den aktuellen Anforderungen.</p>
+                <h5 class="fw-bold mb-2">{{ _('SysML v2 Code') }}</h5>
+                <p class="text-muted mb-4">{{ _('Erstellt automatisch den SysML v2 Code aus den aktuellen Anforderungen.') }}</p>
                 <button class="btn btn-xl px-5 py-4 fw-bold text-white shadow-lg border-0 d-flex align-items-center justify-content-center w-100" type="button" id="generate-syslm-btn" style="background: linear-gradient(90deg, #4f8cff 0%, #38c6ff 100%); border-radius: 0.8rem; letter-spacing: 0.5px; font-size: 1.45rem; transition: transform 0.15s;">
                   <span class="me-2 d-flex align-items-center">
                     <i class="bi bi-lightning-charge-fill" style="font-size: 2rem; animation: pulse 1.2s infinite alternate;"></i>
                   </span>
-                  Generiere SysML v2 code
+                  {{ _('Generiere SysML v2 Code') }}
                 </button>
                 <style>
                 @keyframes pulse {
@@ -729,20 +737,20 @@ document.addEventListener('DOMContentLoaded', function() {
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title">Generierte Testfälle</h5>
+        <h5 class="modal-title">{{ _('Generierte Testfaelle') }}</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
       <div class="modal-body">
         <div id="test-loader" class="text-center py-5 d-none">
              <div class="spinner-border text-info" role="status"></div>
-             <p class="mt-2">KI generiert Testfälle...</p>
+             <p class="mt-2">{{ _('KI generiert Testfaelle...') }}</p>
         </div>
         <textarea id="test-case-result" class="form-control" rows="15" readonly></textarea>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Schließen</button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ _('Schliessen') }}</button>
         <button type="button" class="btn btn-primary" onclick="navigator.clipboard.writeText(document.getElementById('test-case-result').value)">
-            <i class="bi bi-clipboard"></i> Kopieren
+          <i class="bi bi-clipboard"></i> {{ _('Kopieren') }}
         </button>
       </div>
     </div>
@@ -753,7 +761,7 @@ document.addEventListener('DOMContentLoaded', function() {
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title">Projekt teilen</h5>
+        <h5 class="modal-title">{{ _('Projekt teilen') }}</h5>
         <button
           type="button"
           class="btn-close"
@@ -766,7 +774,7 @@ document.addEventListener('DOMContentLoaded', function() {
       >
         <div class="modal-body">
           <div class="mb-3">
-            <label for="shareEmail" class="form-label">E-Mail-Adresse</label>
+            <label for="shareEmail" class="form-label">{{ _('E-Mail-Adresse') }}</label>
             <input
               type="email"
               class="form-control"
@@ -782,9 +790,9 @@ document.addEventListener('DOMContentLoaded', function() {
             class="btn btn-secondary"
             data-bs-dismiss="modal"
           >
-            Abbrechen
+            {{ _('Abbrechen') }}
           </button>
-          <button type="submit" class="btn btn-primary">Teilen</button>
+          <button type="submit" class="btn btn-primary">{{ _('Teilen') }}</button>
         </div>
       </form>
     </div>
@@ -795,7 +803,7 @@ document.addEventListener('DOMContentLoaded', function() {
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title">Excel importieren</h5>
+        <h5 class="modal-title">{{ _('Excel importieren') }}</h5>
         <button
           type="button"
           class="btn-close"
@@ -822,9 +830,9 @@ document.addEventListener('DOMContentLoaded', function() {
             class="btn btn-secondary"
             data-bs-dismiss="modal"
           >
-            Abbrechen
+            {{ _('Abbrechen') }}
           </button>
-          <button type="submit" class="btn btn-primary">Importieren</button>
+          <button type="submit" class="btn btn-primary">{{ _('Importieren') }}</button>
         </div>
       </form>
     </div>
@@ -835,7 +843,7 @@ document.addEventListener('DOMContentLoaded', function() {
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title">Anforderung bearbeiten</h5>
+        <h5 class="modal-title">{{ _('Anforderung bearbeiten') }}</h5>
         <button
           type="button"
           class="btn-close"
@@ -855,7 +863,7 @@ document.addEventListener('DOMContentLoaded', function() {
           <input type="hidden" id="editStatus" name="status" value="" />
           <input type="hidden" id="editMode" name="mode" value="edit" />
           <div class="mb-3">
-            <label for="editTitle" class="form-label">Name *</label>
+            <label for="editTitle" class="form-label">{{ _('Name') }} *</label>
             <input
               type="text"
               class="form-control"
@@ -866,7 +874,7 @@ document.addEventListener('DOMContentLoaded', function() {
           </div>
           <div class="mb-3">
             <label for="editDescription" class="form-label"
-              >Anforderung *</label
+              >{{ _('Anforderung') }} *</label
             >
             <textarea
               class="form-control"
@@ -877,7 +885,7 @@ document.addEventListener('DOMContentLoaded', function() {
             ></textarea>
           </div>
           <div class="mb-3">
-            <label for="editCategory" class="form-label">Kategorie</label>
+            <label for="editCategory" class="form-label">{{ _('Kategorie') }}</label>
             <input
               type="text"
               class="form-control"
@@ -894,8 +902,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 name="is_quantifiable"
               />
               <label class="form-check-label" for="editQuantifiable">
-                <strong>Quantifizierbar</strong>
-                <small class="text-muted d-block">Diese Anforderung kann quantitativ gemessen werden (z.B. Performance-Werte, Zeitlimits, etc.)</small>
+                <strong>{{ _('Quantifizierbar') }}</strong>
+                <small class="text-muted d-block">{{ _('Diese Anforderung kann quantitativ gemessen werden (z.B. Performance-Werte, Zeitlimits, etc.)') }}</small>
               </label>
             </div>
           </div>
@@ -908,8 +916,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 name="funktional"
               />
               <label class="form-check-label" for="editFunktional">
-                <strong>Funktional</strong>
-                <small class="text-muted d-block">Diese Anforderung ist funktional (z.B. beschreibt eine Funktion oder ein Verhalten).</small>
+                <strong>{{ _('Funktional') }}</strong>
+                <small class="text-muted d-block">{{ _('Diese Anforderung ist funktional (z.B. beschreibt eine Funktion oder ein Verhalten).') }}</small>
               </label>
             </div>
           </div>
@@ -921,7 +929,7 @@ document.addEventListener('DOMContentLoaded', function() {
             class="btn btn-secondary"
             data-bs-dismiss="modal"
           >
-            Abbrechen
+            {{ _('Abbrechen') }}
           </button>
           <div id="editActionButtons" class="d-flex gap-2">
             <button
@@ -930,7 +938,7 @@ document.addEventListener('DOMContentLoaded', function() {
               onclick="document.getElementById('editSaveType').value='intermediate'"
               id="editSaveIntermediateBtn"
             >
-              Bearbeiten
+              {{ _('Bearbeiten') }}
             </button>
             <button
               type="submit"
@@ -938,7 +946,7 @@ document.addEventListener('DOMContentLoaded', function() {
               onclick="document.getElementById('editSaveType').value='final'"
               id="editSaveFinalBtn"
             >
-              Freigeben
+              {{ _('Freigeben') }}
             </button>
           </div>
           <div id="revisionActionButton" class="d-none">
@@ -948,7 +956,7 @@ document.addEventListener('DOMContentLoaded', function() {
               id="revisionSubmit"
               disabled
             >
-              Revidiert
+              {{ _('Revidiert') }}
             </button>
             <button
               type="submit"
@@ -956,7 +964,7 @@ document.addEventListener('DOMContentLoaded', function() {
               id="revisionFinalizeBtn"
               disabled
             >
-              Freigeben
+              {{ _('Freigeben') }}
             </button>
           </div>
         </div>
@@ -970,29 +978,29 @@ document.addEventListener('DOMContentLoaded', function() {
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title">Neue Anforderung hinzufügen</h5>
+        <h5 class="modal-title">{{ _('Neue Anforderung hinzufuegen') }}</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
       <form id="manualRequirementForm" method="POST" action="{{ url_for('main.create_manual_requirement', project_id=project.id) }}">
         <div class="modal-body">
           <div class="mb-3">
-            <label for="manualTitle" class="form-label">Name *</label>
+            <label for="manualTitle" class="form-label">{{ _('Name') }} *</label>
             <input type="text" class="form-control" id="manualTitle" name="title" required />
           </div>
           <div class="mb-3">
-            <label for="manualDescription" class="form-label">Anforderung *</label>
+            <label for="manualDescription" class="form-label">{{ _('Anforderung') }} *</label>
             <textarea class="form-control" id="manualDescription" name="description" rows="4" required></textarea>
           </div>
           <div class="mb-3">
-            <label for="manualCategory" class="form-label">Kategorie</label>
+            <label for="manualCategory" class="form-label">{{ _('Kategorie') }}</label>
             <input type="text" class="form-control" id="manualCategory" name="category" />
           </div>
           <div class="mb-3">
             <div class="form-check">
               <input class="form-check-input" type="checkbox" id="manualQuantifiable" name="is_quantifiable" />
               <label class="form-check-label" for="manualQuantifiable">
-                <strong>Quantifizierbar</strong>
-                <small class="text-muted d-block">Diese Anforderung kann quantitativ gemessen werden (z.B. Performance-Werte, Zeitlimits, etc.)</small>
+                <strong>{{ _('Quantifizierbar') }}</strong>
+                <small class="text-muted d-block">{{ _('Diese Anforderung kann quantitativ gemessen werden (z.B. Performance-Werte, Zeitlimits, etc.)') }}</small>
               </label>
             </div>
           </div>
@@ -1000,16 +1008,16 @@ document.addEventListener('DOMContentLoaded', function() {
             <div class="form-check">
               <input class="form-check-input" type="checkbox" id="manualFunktional" name="funktional" />
               <label class="form-check-label" for="manualFunktional">
-                <strong>Funktional</strong>
-                <small class="text-muted d-block">Diese Anforderung ist funktional (z.B. beschreibt eine Funktion oder ein Verhalten).</small>
+                <strong>{{ _('Funktional') }}</strong>
+                <small class="text-muted d-block">{{ _('Diese Anforderung ist funktional (z.B. beschreibt eine Funktion oder ein Verhalten).') }}</small>
               </label>
             </div>
           </div>
           <div id="manualDynamicColumnsContainer"></div>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Abbrechen</button>
-          <button type="submit" class="btn btn-success">Erstellen</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ _('Abbrechen') }}</button>
+          <button type="submit" class="btn btn-success">{{ _('Erstellen') }}</button>
         <script>
         // Scroll-Button oben: Scrollt zum Bereich unter der Tabelle
         document.addEventListener('DOMContentLoaded', function() {
@@ -1056,7 +1064,7 @@ document.addEventListener('DOMContentLoaded', function() {
           html: false,
           placement: 'top',
           content: fullDescription,
-          title: 'Vollständige Beschreibung'
+          title: {{ _('Vollstaendige Beschreibung') | tojson }}
         });
       }
     });
@@ -1081,6 +1089,11 @@ document.addEventListener('DOMContentLoaded', function() {
     const testModal = new bootstrap.Modal(testModalEl);
     const testResult = document.getElementById('test-case-result');
     const testLoader = document.getElementById('test-loader');
+  const i18nTest = {
+    errorPrefix: {{ _('Fehler:') | tojson }},
+    unknownError: {{ _('Unbekannter Fehler') | tojson }},
+    networkError: {{ _('Netzwerkfehler:') | tojson }}
+  };
     
     // Use event delegation for buttons that might be dynamically loaded or in table
     document.body.addEventListener('click', function(e) {
@@ -1108,13 +1121,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (data.result) {
                     testResult.value = data.result;
                 } else {
-                    testResult.value = "Fehler: " + (data.error || "Unbekannter Fehler");
+                  testResult.value = i18nTest.errorPrefix + " " + (data.error || i18nTest.unknownError);
                 }
             })
             .catch(err => {
                 testLoader.classList.add('d-none');
                 testResult.classList.remove('d-none');
-                testResult.value = "Netzwerkfehler: " + err;
+                testResult.value = i18nTest.networkError + " " + err;
             });
         }
     });

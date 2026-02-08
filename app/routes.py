@@ -1,7 +1,8 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash, abort, jsonify, session
+from flask import Blueprint, render_template, request, redirect, url_for, flash, abort, jsonify, session, current_app
 from flask_login import login_required, current_user
 from sqlalchemy import func, and_
 from datetime import datetime
+from urllib.parse import urlparse
 import json
 from . import db
 from .models import Project, Requirement, RequirementVersion, RequirementComment, Notification, User
@@ -218,6 +219,24 @@ def home():
     projects = owned_projects + shared_projects
     
     return render_template("start.html", projects=projects)
+
+
+@bp.route("/set_language/<lang>")
+@login_required
+def set_language(lang):
+    supported = current_app.config.get("BABEL_SUPPORTED_LOCALES", [])
+    if lang in supported:
+        session["lang"] = lang
+
+    referrer = request.referrer or url_for("main.home")
+    try:
+        parsed = urlparse(referrer)
+        if parsed.netloc and parsed.netloc != request.host:
+            return redirect(url_for("main.home"))
+    except Exception:
+        return redirect(url_for("main.home"))
+
+    return redirect(referrer)
 
 
 @bp.route("/project/<int:project_id>/mention_suggestions")
