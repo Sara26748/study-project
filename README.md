@@ -7,6 +7,7 @@ Um Umgebungsvariablen aus der Datei `.env` auch im VS Code-Terminal zu verwenden
 ```
 
 Diese Option findest du in den VS Code Einstellungen (`settings.json`).
+
 # Interface für MBSE-Modelle (Requirements Management Tool)
 
 Eine moderne Flask-basierte Webanwendung für das Management von Software-Anforderungen mit KI-Unterstützung.
@@ -78,6 +79,110 @@ Diese Anwendung ermöglicht es Benutzern, Software-Anforderungen zu erstellen, z
 - **Project**: Projekte mit dynamischen Spalten
 - **Requirement**: Anforderungen mit Soft-Delete
 - **RequirementVersion**: Versionierte Anforderungsdaten
+
+ER-Diagramm (aus den SQLAlchemy-Models abgeleitet):
+
+```mermaid
+erDiagram
+	USER {
+		int id PK
+		string email
+		string password_hash
+		datetime created_at
+	}
+
+	PROJECT {
+		int id PK
+		int user_id FK
+		string name
+		datetime created_at
+		text custom_columns
+	}
+
+	REQUIREMENT {
+		int id PK
+		int project_id FK
+		string key
+		datetime created_at
+		bool is_deleted
+		bool funktional
+	}
+
+	REQUIREMENT_VERSION {
+		int id PK
+		int requirement_id FK
+		string revision
+		int version_index
+		string version_label
+		string title
+		string description
+		string category
+		string status
+		datetime created_at
+		text custom_data
+		int created_by_id FK
+		int last_modified_by_id FK
+		int blocked_by_id FK
+		bool is_blocked
+		datetime blocked_at
+	}
+
+	REQUIREMENT_VERSION_HISTORY {
+		int id PK
+		int version_id FK
+		int changed_by_id FK
+		datetime created_at
+		string change_type
+		text changes
+	}
+
+	REQUIREMENT_COMMENT {
+		int id PK
+		int version_id FK
+		int author_id FK
+		int parent_comment_id FK
+		text text
+		datetime created_at
+		datetime updated_at
+		bool is_deleted
+	}
+
+	NOTIFICATION {
+		int id PK
+		int user_id FK
+		string notification_type
+		string title
+		text message
+		string related_type
+		int related_id
+		text notification_data
+		bool is_read
+		datetime read_at
+		datetime created_at
+	}
+
+	ACTIVE_SESSION {
+		int id PK
+		int user_id FK
+		int project_id FK
+		datetime last_seen
+	}
+
+	USER ||--o{ PROJECT : owns
+	USER }o--o{ PROJECT : shared_with
+	PROJECT ||--o{ REQUIREMENT : has
+	REQUIREMENT ||--o{ REQUIREMENT_VERSION : has
+	REQUIREMENT_VERSION ||--o{ REQUIREMENT_VERSION_HISTORY : history
+	REQUIREMENT_VERSION ||--o{ REQUIREMENT_COMMENT : comments
+	REQUIREMENT_COMMENT ||--o{ REQUIREMENT_COMMENT : replies
+	USER ||--o{ REQUIREMENT_COMMENT : author
+	USER ||--o{ NOTIFICATION : receives
+	USER ||--o{ ACTIVE_SESSION : sessions
+	PROJECT ||--o{ ACTIVE_SESSION : sessions
+	USER ||--o{ REQUIREMENT_VERSION : created_by
+	USER ||--o{ REQUIREMENT_VERSION : last_modified_by
+	USER ||--o{ REQUIREMENT_VERSION : blocked_by
+```
 
 ## 📦 Installation
 

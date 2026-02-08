@@ -207,8 +207,8 @@ document.addEventListener('DOMContentLoaded', function() {
             <!-- Actions -->
             <div class="col-md-5 text-end d-flex gap-2 justify-content-md-end justify-content-start align-items-center flex-wrap">
                 <!-- Export/Import Buttons (Larger & Labeled) -->
-                <button id="scrollToSyslmBtn" class="btn btn-outline-primary btn-modern px-3 d-flex align-items-center shadow-sm" type="button" title="SysLM v2 code">
-                  <i class="bi bi-lightning-charge-fill me-2"></i> SysLM v2 code
+                <button id="scrollToSyslmBtn" class="btn btn-outline-primary btn-modern px-3 d-flex align-items-center shadow-sm" type="button" title="SysML v2 code">
+                  <i class="bi bi-lightning-charge-fill me-2"></i> SysML v2 code
                 </button>
                 <a href="{{ url_for('main.export_excel', project_id=project.id) }}" class="btn btn-outline-success btn-modern px-3 d-flex align-items-center shadow-sm" title="Liste als Excel exportieren">
                     <i class="bi bi-file-earmark-arrow-up me-2 fw-bold"></i> Export
@@ -672,7 +672,7 @@ document.addEventListener('DOMContentLoaded', function() {
         </tbody>
       </table>
 
-      <!-- Bereich unter der Tabelle: SysLM-Karte rechts + Vollbreite-Anforderung -->
+      <!-- Bereich unter der Tabelle: SysML-Karte rechts + Vollbreite-Anforderung -->
       <div class="mt-5" id="bottom-action-section">
         <div class="mt-4" id="manual-add-section">
           <button class="btn btn-lg px-5 py-3 fw-bold text-white shadow-lg border-0 d-flex align-items-center justify-content-center w-100" type="button" id="manual-add-btn" data-bs-toggle="modal" data-bs-target="#manualRequirementModal" style="background: linear-gradient(90deg, #6c757d 0%, #adb5bd 100%); border-radius: 1rem; letter-spacing: 0.5px; font-size: 1.25rem; transition: transform 0.15s;">
@@ -697,13 +697,13 @@ document.addEventListener('DOMContentLoaded', function() {
           <div class="col-12 col-md-7 col-lg-5">
             <div class="card border-0 shadow-sm h-100">
               <div class="card-body p-4">
-                <h5 class="fw-bold mb-2">SysLM v2 Code</h5>
-                <p class="text-muted mb-4">Erstellt automatisch den SysLM v2 Code aus den aktuellen Anforderungen.</p>
+                <h5 class="fw-bold mb-2">SysML v2 Code</h5>
+                <p class="text-muted mb-4">Erstellt automatisch den SysML v2 Code aus den aktuellen Anforderungen.</p>
                 <button class="btn btn-xl px-5 py-4 fw-bold text-white shadow-lg border-0 d-flex align-items-center justify-content-center w-100" type="button" id="generate-syslm-btn" style="background: linear-gradient(90deg, #4f8cff 0%, #38c6ff 100%); border-radius: 0.8rem; letter-spacing: 0.5px; font-size: 1.45rem; transition: transform 0.15s;">
                   <span class="me-2 d-flex align-items-center">
                     <i class="bi bi-lightning-charge-fill" style="font-size: 2rem; animation: pulse 1.2s infinite alternate;"></i>
                   </span>
-                  Generiere SysLM v2 code
+                  Generiere SysML v2 code
                 </button>
                 <style>
                 @keyframes pulse {
