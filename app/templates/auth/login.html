@@ -1,5 +1,5 @@
-{% extends "base.html" %} {% block title %}{{ _('Anmelden') }}{% endblock %} {% block content
-%}
+{% extends "base.html" %} {% block title %}{{ _('Anmelden') }}{% endblock %} {%
+block content %}
 <div class="container mt-5">
   <div class="row justify-content-center">
     <div class="col-md-6">
@@ -25,7 +25,9 @@
             required
           />
         </div>
-        <button type="submit" class="btn btn-primary w-100">{{ _('Anmelden') }}</button>
+        <button type="submit" class="btn btn-primary w-100">
+          {{ _('Anmelden') }}
+        </button>
       </form>
       <div class="text-center mt-3">
         <a href="{{ url_for('auth.register') }}"

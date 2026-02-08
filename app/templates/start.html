@@ -1,5 +1,5 @@
-{% extends "base.html" %} {% block title %}{{ _('Meine Projekte') }}{% endblock %} {% block
-content %}
+{% extends "base.html" %} {% block title %}{{ _('Meine Projekte') }}{% endblock
+%} {% block content %}
 
 <style>
   .project-card-row {
@@ -125,8 +125,9 @@ content %}
                 <span>
                   {% if p.shared_with %}
                   <i class="bi bi-people-fill me-1"></i> {{ p.shared_with|length
-                  }} {{ _('geteilt') }} {% else %} <i class="bi bi-person me-1"></i> {{ _('Privat') }}
-                  {% endif %}
+                  }} {{ _('geteilt') }} {% else %}
+                  <i class="bi bi-person me-1"></i> {{ _('Privat') }} {% endif
+                  %}
                 </span>
               </div>
             </div>

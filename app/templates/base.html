@@ -1,5 +1,6 @@
-{% set current_lang_code = current_locale[:2] if current_locale else 'de' %}
-{% set current_lang = (language_options | selectattr('code', 'equalto', current_lang_code) | list | first) %}
+{% set current_lang_code = current_locale[:2] if current_locale else 'de' %} {%
+set current_lang = (language_options | selectattr('code', 'equalto',
+current_lang_code) | list | first) %}
 <!doctype html>
 <html lang="{{ current_lang_code }}">
   <head>
@@ -159,7 +160,9 @@
                   alt="{{ current_lang.label if current_lang else 'Deutsch' }}"
                   style="border-radius: 3px"
               /></span>
-              <span style="min-width: 70px; text-align: left">{{ current_lang.label if current_lang else 'Deutsch' }}</span>
+              <span style="min-width: 70px; text-align: left"
+                >{{ current_lang.label if current_lang else 'Deutsch' }}</span
+              >
               <span class="ms-2"
                 ><i class="bi bi-chevron-down" style="font-size: 1rem"></i
               ></span>
@@ -290,7 +293,8 @@
                   class="dropdown-item d-flex align-items-center {% if request.endpoint == 'main.create' %}active bg-primary bg-opacity-10 text-primary{% endif %}"
                   href="{{ url_for('main.create') }}"
                 >
-                  <i class="bi bi-folder-plus me-2"></i>{{ _('Projekt erstellen') }}
+                  <i class="bi bi-folder-plus me-2"></i>{{ _('Projekt
+                  erstellen') }}
                 </a>
               </li>
 
@@ -299,7 +303,8 @@
                   class="dropdown-item d-flex align-items-center"
                   href="{{ url_for('main.deleted_requirements_overview') }}"
                 >
-                  <i class="bi bi-trash me-2 text-muted"></i>{{ _('Gelöschte Anforderungen') }}
+                  <i class="bi bi-trash me-2 text-muted"></i>{{ _('Gelöschte
+                  Anforderungen') }}
                 </a>
               </li>
 
@@ -711,7 +716,8 @@
     <footer class="bg-light border-top text-center py-3 mt-5">
       <p class="mb-0 text-muted small">
         <i class="bi bi-c-circle me-1"></i
-        ><span id="currentYear"></span> Requirements Tool. {{ _('Alle Rechte vorbehalten.') }}
+        ><span id="currentYear"></span> Requirements Tool. {{ _('Alle Rechte
+        vorbehalten.') }}
       </p>
     </footer>
     <script>
