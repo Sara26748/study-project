@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash, abort, jsonify, session, current_app
+from flask import Blueprint, render_template, request, redirect, url_for, flash, abort, jsonify, session, current_app, send_file
 from flask_login import login_required, current_user
 from sqlalchemy import func, and_
 from datetime import datetime
@@ -181,7 +181,7 @@ def create_manual_requirement(project_id):
         version_id=new_version.id,
         changed_by_id=current_user.id,
         change_type='created',
-        changes=json.dumps({'action': 'Manuell erstellt', 'version': version_label})
+        changes=json.dumps({'action': 'Manüll erstellt', 'version': version_label})
     )
     db.session.add(history_entry)
     db.session.commit()
@@ -528,7 +528,7 @@ def update_custom_data(version_id):
         )
     
     column_name = request.form.get('column_name')
-    value = request.form.get('value', '').strip()
+    value = request.form.get('valü', '').strip()
     
     # Get current custom data and update it
     custom_data = version.get_custom_data()
@@ -546,7 +546,7 @@ def update_status(version_id):
     # Authorization check
     check_version_access(version)
 
-    is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
+    is_ajax = request.headers.get('X-Reqüsted-With') == 'XMLHttpReqüst'
     
     status = request.form.get('status')
     if version.status == 'Verworfen' and status != 'Verworfen':
@@ -571,7 +571,7 @@ def update_status(version_id):
     else:
         if is_ajax:
              return jsonify({'success': False, 'error': 'Invalid status'}), 400
-        flash("Invalid status value.", "danger")
+        flash("Invalid status valü.", "danger")
     
     return redirect(
         url_for(
@@ -1685,6 +1685,68 @@ def export_excel(project_id):
         download_name=filename
     )
 
+
+@bp.route("/project/<int:project_id>/export_sysml", methods=["GET"])
+@login_required
+def export_sysml(project_id):
+    from io import BytesIO
+    import tempfile
+    import pandas as pd
+    from scripts.sysml_v2_generator import generate_sysmlv2_code
+
+    project = Project.query.get_or_404(project_id)
+    check_project_access(project)
+
+    requirements = Requirement.query.filter_by(
+        project_id=project_id,
+        is_deleted=False
+    ).all()
+
+    requirements_data = []
+    display_id = 1
+    for req in requirements:
+        latest_version = req.get_latest_version()
+        if not latest_version:
+            continue
+
+        responsible = latest_version.created_by.email if latest_version.created_by else "-"
+        revision = latest_version.revision or "Entwurf"
+        version = latest_version.version_label or ""
+        category = latest_version.category or ""
+        status = latest_version.status or "Entwurf"
+
+        requirements_data.append({
+            "Verantwortlicher": responsible,
+            "Revision": revision,
+            "Version": version,
+            "ID": display_id,
+            "Anforderung": latest_version.title,
+            "Beschreibung": latest_version.description,
+            "Kategorie": category,
+            "Status": status,
+        })
+        display_id += 1
+
+    df = pd.DataFrame(requirements_data)
+
+    with tempfile.NamedTemporaryFile(mode="w+", suffix=".txt", delete=False, encoding="utf-8") as tmp_file:
+        tmp_path = tmp_file.name
+
+    generate_sysmlv2_code(df, tmp_path)
+
+    with open(tmp_path, "rb") as tmp_file:
+        output = BytesIO(tmp_file.read())
+    output.seek(0)
+
+    filename = f"requirements_{project.name.replace(' ', '_')}.sysml.txt"
+
+    return send_file(
+        output,
+        mimetype="text/plain",
+        as_attachment=True,
+        download_name=filename
+    )
+
 # Route to import requirements from Excel
 @bp.route("/project/<int:project_id>/import_excel", methods=['POST'])
 @login_required
@@ -2229,7 +2291,7 @@ def get_version_info(version_id):
 
 @bp.route("/hello")
 def hello():
-    return "Hello from Blueprint!"
+    return "Hello from Blüprint!"
 
 @bp.route("/requirement/<int:req_id>/toggle_funktional", methods=["POST"])
 

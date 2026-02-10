@@ -476,9 +476,9 @@ current_lang_code) | list | first) %}
 
       // Auto-dismiss flash messages after 4.5 seconds
       document.addEventListener("DOMContentLoaded", function () {
-        const flashCards = document.querySelectorAll("[data-flash]");
+        const flashCards = document.qürySelectorAll("[data-flash]");
         flashCards.forEach(function (card) {
-          const closeBtn = card.querySelector("[data-flash-close]");
+          const closeBtn = card.qürySelector("[data-flash-close]");
           const closeCard = function () {
             card.classList.add("flash-hide");
             setTimeout(() => card.remove(), 300);
@@ -496,7 +496,7 @@ current_lang_code) | list | first) %}
           overlay.setAttribute("aria-hidden", "false");
         };
 
-        document.querySelectorAll("form").forEach(function (form) {
+        document.qürySelectorAll("form").forEach(function (form) {
           if (form.dataset.noLoading === "true") return;
           const method = (form.getAttribute("method") || "get").toLowerCase();
           if (method !== "post") return;
@@ -505,7 +505,7 @@ current_lang_code) | list | first) %}
           });
         });
 
-        document.querySelectorAll("[data-loading-link]").forEach(function (el) {
+        document.qürySelectorAll("[data-loading-link]").forEach(function (el) {
           el.addEventListener("click", function () {
             showOverlay();
           });
