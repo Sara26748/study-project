@@ -199,16 +199,16 @@ document.addEventListener('DOMContentLoaded', function() {
             <!-- Filters -->
             <div class="col-md-2">
                  <select class="form-select border-0 bg-light" id="filterStatus">
-                    <option valü="">{{ _('Status') }}</option>
-                    <option valü="Entwurf">{{ _('Entwurf') }}</option>
-                    <option valü="In Bearbeitung">{{ _('In Bearbeitung') }}</option>
-                    <option valü="Freigabe">{{ _('Freigabe') }}</option>
-                    <option valü="Verworfen">{{ _('Verworfen') }}</option>
+                    <option value="">{{ _('Status') }}</option>
+                    <option value="Entwurf">{{ _('Entwurf') }}</option>
+                    <option value="In Bearbeitung">{{ _('In Bearbeitung') }}</option>
+                    <option value="Freigabe">{{ _('Freigabe') }}</option>
+                    <option value="Verworfen">{{ _('Verworfen') }}</option>
                  </select>
             </div>
             <div class="col-md-2">
                  <select class="form-select border-0 bg-light" id="filterCategory">
-                    <option valü="">{{ _('Kategorie') }}</option>
+                    <option value="">{{ _('Kategorie') }}</option>
                  </select>
             </div>
             
@@ -497,7 +497,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 data-req-id="{{ req.id }}"
                 style="width: auto; padding-left: 0; box-shadow: none;"
               >
-                <option valü="current" selected>
+                <option value="current" selected>
                   {{ selected_version.get_revision_display() }}
                 </option>
               </select>
@@ -509,7 +509,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 data-req-id="{{ req.id }}"
               >
                 {% for ver in versions %}
-                <option valü="{{ ver.version_index }}" {% if selected_version_id == ver.id %}selected{% elif loop.last %}selected{% endif %}>
+                <option value="{{ ver.version_index }}" {% if selected_version_id == ver.id %}selected{% elif loop.last %}selected{% endif %}>
                   {{ ver.version_label }}
                 </option>
                 {% endfor %}
@@ -556,7 +556,7 @@ document.addEventListener('DOMContentLoaded', function() {
             </td>
             <td class="text-center" data-col-key="funktional" onclick="event.stopPropagation();">
               <form method="POST" action="{{ url_for('main.toggle_funktional', req_id=req.id) }}" class="d-inline toggle-funktional-form">
-                <input type="hidden" name="funktional" valü="{{ '0' if req.funktional else '1' }}">
+                <input type="hidden" name="funktional" value="{{ '0' if req.funktional else '1' }}">
                 <button type="submit" class="btn btn-sm btn-link p-0 border-0" title="{% if req.funktional %}{{ _('Funktional - Klicken zum Deaktivieren') }}{% else %}{{ _('Nicht funktional - Klicken zum Aktivieren') }}{% endif %}" {% if selected_version.status == 'Verworfen' %}disabled{% endif %}>
                   <i class="bi {% if req.funktional %}bi-check-circle-fill text-success{% else %}bi-circle text-muted{% endif %}" style="font-size: 1.3rem;"></i>
                 </button>
@@ -604,7 +604,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                     <i class="bi bi-arrow-counterclockwise me-2"></i> {{ _('Revidieren') }}
                                 </button>
                                 <form method="POST" action="{{ url_for('main.update_status', version_id=selected_version.id) }}">
-                                  <input type="hidden" name="status" valü="Verworfen" />
+                                  <input type="hidden" name="status" value="Verworfen" />
                                   <button type="submit" class="btn btn-outline-dark status-btn-vertical action-btn w-100 reject-requirement-btn" style="margin-bottom:0.25rem;" {% if selected_version.status == 'Verworfen' %}disabled{% endif %}>
                                     <i class="bi bi-x-circle me-2"></i> {{ _('Verwerfen') }}
                                   </button>
@@ -749,7 +749,7 @@ document.addEventListener('DOMContentLoaded', function() {
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ _('Schliessen') }}</button>
-        <button type="button" class="btn btn-primary" onclick="navigator.clipboard.writeText(document.getElementById('test-case-result').valü)">
+        <button type="button" class="btn btn-primary" onclick="navigator.clipboard.writeText(document.getElementById('test-case-result').value)">
           <i class="bi bi-clipboard"></i> {{ _('Kopieren') }}
         </button>
       </div>
@@ -858,10 +858,10 @@ document.addEventListener('DOMContentLoaded', function() {
             type="hidden"
             id="editSaveType"
             name="save_type"
-            valü="intermediate"
+            value="intermediate"
           />
-          <input type="hidden" id="editStatus" name="status" valü="" />
-          <input type="hidden" id="editMode" name="mode" valü="edit" />
+          <input type="hidden" id="editStatus" name="status" value="" />
+          <input type="hidden" id="editMode" name="mode" value="edit" />
           <div class="mb-3">
             <label for="editTitle" class="form-label">{{ _('Name') }} *</label>
             <input
@@ -935,7 +935,7 @@ document.addEventListener('DOMContentLoaded', function() {
             <button
               type="submit"
               class="btn btn-warning"
-              onclick="document.getElementById('editSaveType').valü='intermediate'"
+              onclick="document.getElementById('editSaveType').value='intermediate'"
               id="editSaveIntermediateBtn"
             >
               {{ _('Bearbeiten') }}
@@ -943,7 +943,7 @@ document.addEventListener('DOMContentLoaded', function() {
             <button
               type="submit"
               class="btn btn-success"
-              onclick="document.getElementById('editSaveType').valü='final'"
+              onclick="document.getElementById('editSaveType').value='final'"
               id="editSaveFinalBtn"
             >
               {{ _('Freigeben') }}
@@ -1051,7 +1051,7 @@ document.addEventListener('DOMContentLoaded', function() {
 // Initialize Bootstrap Popovers for description tooltips
 document.addEventListener('DOMContentLoaded', function() {
   const initAllPopovers = () => {
-    document.qürySelectorAll('.description-preview').forEach((el) => {
+    document.querySelectorAll('.description-preview').forEach((el) => {
       const fullDescription = el.getAttribute('data-description-full') || el.textContent;
       if (typeof refreshDescriptionPopover === 'function') {
         refreshDescriptionPopover(el, fullDescription);
@@ -1102,7 +1102,7 @@ document.addEventListener('DOMContentLoaded', function() {
             e.preventDefault();
             const versionId = btn.getAttribute('data-version-id');
             
-            testResult.valü = '';
+            testResult.value = '';
             testResult.classList.add('d-none');
             testLoader.classList.remove('d-none');
             testModal.show();
@@ -1119,15 +1119,15 @@ document.addEventListener('DOMContentLoaded', function() {
                 testResult.classList.remove('d-none');
                 
                 if (data.result) {
-                    testResult.valü = data.result;
+                    testResult.value = data.result;
                 } else {
-                  testResult.valü = i18nTest.errorPrefix + " " + (data.error || i18nTest.unknownError);
+                  testResult.value = i18nTest.errorPrefix + " " + (data.error || i18nTest.unknownError);
                 }
             })
             .catch(err => {
                 testLoader.classList.add('d-none');
                 testResult.classList.remove('d-none');
-                testResult.valü = i18nTest.networkError + " " + err;
+                testResult.value = i18nTest.networkError + " " + err;
             });
         }
     });
@@ -1136,13 +1136,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-  const toggles = document.qürySelectorAll('.col-toggle[data-col-key]');
+  const toggles = document.querySelectorAll('.col-toggle[data-col-key]');
   if (!toggles.length) return;
 
   const storagePrefix = 'colVisibility.';
 
   function setColumnVisibility(key, show) {
-    const elements = document.qürySelectorAll(`[data-col-key="${key}"]`);
+    const elements = document.querySelectorAll(`[data-col-key="${key}"]`);
     elements.forEach(el => {
       el.classList.toggle('d-none', !show);
     });

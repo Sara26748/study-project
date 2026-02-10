@@ -108,7 +108,7 @@ def generate(project_id):
 
             user_description = data.get('user_description', '').strip() or None
             inputs_array = data.get('inputs', [])
-            inputs_dict = {item.get('key'): item.get('valü') for item in inputs_array if item.get('key')}
+            inputs_dict = {item.get('key'): item.get('value') for item in inputs_array if item.get('key')}
             product_system = data.get('product_system', '').strip()
             ai_model = data.get('ai_model', '').strip() or None
             improve_only = data.get('improve_only', False)
@@ -121,7 +121,7 @@ def generate(project_id):
                 num_req_mode = 'exact'
             if num_req_mode in {'exact', 'min', 'max'}:
                 try:
-                    num_requirements_value = int(data.get('num_requirements_valü', 5))
+                    num_requirements_value = int(data.get('num_requirements_value', 5))
                 except (ValueError, TypeError):
                     num_requirements_value = None
             num_requirements_mode = num_req_mode
@@ -146,7 +146,7 @@ def generate(project_id):
             num_req_mode = 'exact'
         if num_req_mode in {'exact', 'min', 'max'}:
             try:
-                num_requirements_value = int(request.form.get('num_requirements_valü', 5))
+                num_requirements_value = int(request.form.get('num_requirements_value', 5))
             except (ValueError, TypeError):
                 num_requirements_value = None
         num_requirements_mode = num_req_mode
@@ -156,7 +156,7 @@ def generate(project_id):
             num_requirements = num_requirements_value
 
         keys = request.form.getlist('key[]')
-        values = request.form.getlist('valü[]')
+        values = request.form.getlist('value[]')
         for k, v in zip(keys, values):
             if k and k.strip():
                 inputs_dict[k.strip()] = v.strip()
@@ -181,18 +181,18 @@ def generate(project_id):
                             count += 1
                             continue
                         if count > 50:
-                            excel_context += "... (weitere Zeilen aus Platzgrnden ausgelassen)\n"
+                            excel_context += "... (weitere Zeilen aus Platzgründen ausgelassen)\n"
                             break
                         row_vals = [str(cell) if cell is not None else "" for cell in row]
                         excel_context += " | ".join(row_vals) + "\n"
                         count += 1
                     excel_context += "--- ENDE EXCEL-KONTEXT ---\n"
                     if not improve_only:
-                        excel_context += "\nWICHTIG: Die oben aufgefhrten Anforderungen aus der Excel-Datei sind BESTEHENDE Anforderungen. Du sollst:\n"
+                        excel_context += "\nWICHTIG: Die oben aufgeführten Anforderungen aus der Excel-Datei sind BESTEHENDE Anforderungen. Du sollst:\n"
                         excel_context += "1. Diese bestehenden Anforderungen verbessern, aktualisieren und in deine Ausgabe aufnehmen\n"
                         excel_context += "2. Zusätzlich neue Anforderungen erstellen, die der User explizit anfordert (siehe Beschreibung oben)\n"
                         excel_context += "3. Weitere passende Anforderungen generieren, die zum Gesamtkontext passen\n"
-                        excel_context += "Die bestehenden Anforderungen aus Excel drfen NICHT ignoriert werden!"
+                        excel_context += "Die bestehenden Anforderungen aus Excel dürfen NICHT ignoriert werden!"
                 except Exception as e:
                     print(f"Fehler beim Lesen der Excel-Datei: {e}")
                     # We continue without the excel content if it fails
