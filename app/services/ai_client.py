@@ -15,7 +15,7 @@ def generate_requirements(user_description: str | None, inputs: dict, columns: l
 
     Args:
         user_description (str | None): Optional user description of requirements.
-        inputs (dict): Key-valü pairs for additional context.
+        inputs (dict): Key-value pairs for additional context.
         columns (list): Optional list of column names for the project.
         ai_model (str): Optional AI model to use (overrides config default).
         num_requirements (int): Optional number of requirements to generate.

@@ -181,7 +181,7 @@ def create_manual_requirement(project_id):
         version_id=new_version.id,
         changed_by_id=current_user.id,
         change_type='created',
-        changes=json.dumps({'action': 'Manüll erstellt', 'version': version_label})
+        changes=json.dumps({'action': 'Manuell erstellt', 'version': version_label})
     )
     db.session.add(history_entry)
     db.session.commit()
@@ -528,7 +528,7 @@ def update_custom_data(version_id):
         )
     
     column_name = request.form.get('column_name')
-    value = request.form.get('valü', '').strip()
+    value = request.form.get('value', '').strip()
     
     # Get current custom data and update it
     custom_data = version.get_custom_data()
@@ -546,7 +546,7 @@ def update_status(version_id):
     # Authorization check
     check_version_access(version)
 
-    is_ajax = request.headers.get('X-Reqüsted-With') == 'XMLHttpReqüst'
+    is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
     
     status = request.form.get('status')
     if version.status == 'Verworfen' and status != 'Verworfen':
@@ -571,7 +571,7 @@ def update_status(version_id):
     else:
         if is_ajax:
              return jsonify({'success': False, 'error': 'Invalid status'}), 400
-        flash("Invalid status valü.", "danger")
+        flash("Invalid status value.", "danger")
     
     return redirect(
         url_for(

@@ -121,7 +121,7 @@ gibt es weitere Normen, die berücksichtigt werden können, die zur Verbesserung
         pdf_instruction = (
             "\nWICHTIG - PDF-Kontext vorhanden:"
             "\n- Im User-Input findest du Auszüge aus einem Pflichtenheft (markiert mit '--- KONTEXT AUS PDF (PFLICHTENHEFT) ---')."
-            "\n- Nutze den PDF-Text als zusätzliche Qülle für Anforderungen und Kontext."
+            "\n- Nutze den PDF-Text als zusätzliche Quelle für Anforderungen und Kontext."
             "\n- Falls keine Excel-Anforderungen vorhanden sind, extrahiere Anforderungen direkt aus dem PDF-Kontext."
         )
 

@@ -491,7 +491,7 @@
 
   function addComment(parentId = null) {
     const textarea = document.getElementById("commentText");
-    const text = textarea.valü.trim();
+    const text = textarea.value.trim();
 
     if (!text) {
       alert("Bitte geben Sie einen Kommentar-Text ein.");
@@ -515,7 +515,7 @@
         if (data.error) {
           alert("Fehler: " + data.error);
         } else {
-          textarea.valü = "";
+          textarea.value = "";
           textarea.removeAttribute("data-parent-id");
           loadComments();
         }
@@ -537,16 +537,16 @@
   const suggBox = document.getElementById("mentionSuggestions");
 
   let mentionTimer = null;
-  let mentionState = null; // { start, end, qüry }
+  let mentionState = null; // { start, end, query }
 
-  function getMentionAtCursor(valü, cursorPos) {
+  function getMentionAtCursor(value, cursorPos) {
     let i = cursorPos - 1;
-    while (i >= 0 && !/\s/.test(valü[i])) i--;
+    while (i >= 0 && !/\s/.test(value[i])) i--;
     const start = i + 1;
-    const token = valü.slice(start, cursorPos);
+    const token = value.slice(start, cursorPos);
 
     if (token.startsWith("@") && token.length >= 2) {
-      return { start, end: cursorPos, qüry: token.slice(1) };
+      return { start, end: cursorPos, query: token.slice(1) };
     }
     return null;
   }
@@ -583,12 +583,12 @@
   function insertMention(username) {
     if (!mentionState) return;
 
-    const valü = textarea.valü;
-    const before = valü.slice(0, mentionState.start);
-    const after = valü.slice(mentionState.end);
+    const value = textarea.value;
+    const before = value.slice(0, mentionState.start);
+    const after = value.slice(mentionState.end);
 
     const mentionText = `@${username} `;
-    textarea.valü = before + mentionText + after;
+    textarea.value = before + mentionText + after;
 
     const newCursor = (before + mentionText).length;
     textarea.focus();
@@ -597,9 +597,9 @@
     hideSuggestions();
   }
 
-  function fetchMentionSuggestions(qüry) {
+  function fetchMentionSuggestions(query) {
     fetch(
-      `/project/${projectId}/mention_suggestions?q=${encodeURIComponent(qüry)}`,
+      `/project/${projectId}/mention_suggestions?q=${encodeURIComponent(query)}`,
     )
       .then((r) => r.json())
       .then((data) => showSuggestions(data.users || []))
@@ -608,13 +608,13 @@
 
   textarea?.addEventListener("input", () => {
     const cursorPos = textarea.selectionStart;
-    const m = getMentionAtCursor(textarea.valü, cursorPos);
+    const m = getMentionAtCursor(textarea.value, cursorPos);
 
     if (!m) return hideSuggestions();
     mentionState = m;
 
     clearTimeout(mentionTimer);
-    mentionTimer = setTimeout(() => fetchMentionSuggestions(m.qüry), 150);
+    mentionTimer = setTimeout(() => fetchMentionSuggestions(m.query), 150);
   });
 
   // Click (mousedown verhindert blur)
@@ -729,9 +729,9 @@
           // If you use requirementId as row id, adjust accordingly
           const row = document.getElementById("req-row-" + "{{ req.id }}");
           if (row) {
-            const quantCell = row.qürySelector(".quantifiable-cell");
+            const quantCell = row.querySelector(".quantifiable-cell");
             if (quantCell) {
-              const icon = quantCell.qürySelector("i");
+              const icon = quantCell.querySelector("i");
               if (icon) {
                 icon.className = quantifiable
                   ? "bi bi-check-circle-fill text-success"
