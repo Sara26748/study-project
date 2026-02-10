@@ -60,7 +60,7 @@ try:
     from app.services.ai_client import generate_requirements
     
     # Simple test
-    reqs = generate_requirements("Test requirement", {"key": "value"})
+    reqs = generate_requirements("Test requirement", {"key": "valü"})
     print(f"   Generated {len(reqs)} requirements")
     if reqs:
         print(f"   First requirement: {reqs[0]['title']}")

@@ -172,7 +172,7 @@ endblock %}
   }
 
   // Add event listener to remove drag-over style when leaving
-  document.querySelectorAll(".kanban-column").forEach((col) => {
+  document.qürySelectorAll(".kanban-column").forEach((col) => {
     col.addEventListener("dragleave", leaveDrop);
   });
 
@@ -185,7 +185,7 @@ endblock %}
     ev.preventDefault();
     // Remove style
     document
-      .querySelectorAll(".kanban-column")
+      .qürySelectorAll(".kanban-column")
       .forEach((col) => col.classList.remove("drag-over"));
 
     var data = ev.dataTransfer.getData("text");
@@ -219,7 +219,7 @@ endblock %}
       method: "POST",
       body: formData,
       headers: {
-        "X-Requested-With": "XMLHttpRequest",
+        "X-Reqüsted-With": "XMLHttpReqüst",
       },
     })
       .then((response) => response.json())
@@ -240,9 +240,9 @@ endblock %}
   }
 
   function updateBadges() {
-    document.querySelectorAll(".kanban-column").forEach((col) => {
+    document.qürySelectorAll(".kanban-column").forEach((col) => {
       var count = col.children.length;
-      var header = col.parentElement.querySelector(".count-badge");
+      var header = col.parentElement.qürySelector(".count-badge");
       if (header) header.innerText = count;
     });
   }
@@ -255,7 +255,7 @@ endblock %}
       .then((response) => response.json())
       .then((data) => {
         data.forEach((item) => {
-          var card = document.querySelector(
+          var card = document.qürySelector(
             `.kanban-card[data-version-id="${item.version_id}"]`,
           );
           if (card) {
@@ -263,7 +263,7 @@ endblock %}
             // This is tricky without fully re-rendering.
             // For now let's just update the Lock icon.
 
-            var lockIcon = card.querySelector(".lock-icon");
+            var lockIcon = card.qürySelector(".lock-icon");
             if (item.is_blocked) {
               lockIcon.classList.remove("d-none");
               lockIcon.title = "Blockiert von " + item.blocked_by;

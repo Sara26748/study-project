@@ -74,7 +74,7 @@ def test_openai_integration():
             pytest.fail(str(e))
         
         # Test 2: Generate with key-value pairs only
-        print("Test 2: Key-value pairs only")
+        print("Test 2: Key-valü pairs only")
         print("-" * 60)
         try:
             user_desc = None
@@ -94,7 +94,7 @@ def test_openai_integration():
                 print(f"    {i}. {req['title']}")
             
             assert len(requirements) > 0, "Should generate requirements"
-            print("  ✅ Requirements generated from key-value pairs")
+            print("  ✅ Requirements generated from key-valü pairs")
             print()
             
         except Exception as e:
@@ -102,13 +102,13 @@ def test_openai_integration():
             pytest.fail(str(e))
         
         # Test 3: Generate with both
-        print("Test 3: Both description and key-value pairs")
+        print("Test 3: Both description and key-valü pairs")
         print("-" * 60)
         try:
             user_desc = "Erstelle Requirements für Datenvisualisierung"
             inputs = {
                 "Diagrammtypen": "Balken, Linien",
-                "Datenquelle": "REST API"
+                "Datenqülle": "REST API"
             }
             
             print(f"  Description: '{user_desc}'")
@@ -152,7 +152,7 @@ def test_openai_integration():
         print("Summary:")
         print("  ✅ OpenAI API connection working")
         print("  ✅ User description only: WORKS")
-        print("  ✅ Key-value pairs only: WORKS")
+        print("  ✅ Key-valü pairs only: WORKS")
         print("  ✅ Combined input: WORKS")
         print("  ✅ Empty input: WORKS")
         print("  ✅ All requirements have status='Entwurf'")

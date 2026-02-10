@@ -122,22 +122,22 @@ msgstr "Ici, vous pouvez creer de nouveaux projets."
 msgid "Projektname"
 msgstr "Nom du projet"
 
-msgid "Zurueck zur Startseite"
+msgid "Zurück zur Startseite"
 msgstr "Retour a l'accueil"
 
-msgid "Zurueck zur Uebersicht"
+msgid "Zurück zur Übersicht"
 msgstr "Retour a l'apercu"
 
 msgid "Teilen"
 msgstr "Partager"
 
-msgid "Gefundene Widersprueche (KI-Analyse)"
+msgid "Gefundene Widersprüche (KI-Analyse)"
 msgstr "Conflits detectes (analyse IA)"
 
 msgid "Laden..."
 msgstr "Chargement..."
 
-msgid "KI analysiert alle Anforderungen auf logische Brueche..."
+msgid "KI analysiert alle Anforderungen auf logische Brüche..."
 msgstr "L'IA analyse toutes les exigences pour des incoherences logiques..."
 
 msgid "Schliessen"
@@ -149,7 +149,7 @@ msgstr "Les conflits potentiels suivants ont ete trouves :"
 msgid "Hoch"
 msgstr "Eleve"
 
-msgid "Keine logischen Widersprueche gefunden."
+msgid "Keine logischen Widersprüche gefunden."
 msgstr "Aucun conflit logique trouve."
 
 msgid "Fehler bei der Analyse:"
@@ -194,16 +194,25 @@ msgstr "Importer un fichier Excel"
 msgid "Import"
 msgstr "Importer"
 
-msgid "Neue Spalte hinzufuegen:"
+msgid "Dateien auswählen"
+msgstr "Selectionner des fichiers"
+
+msgid "Keine gewählte Dateien"
+msgstr "Aucun fichier selectionne"
+
+msgid "Bitte auswählen"
+msgstr "Veuillez selectionner"
+
+msgid "Neue Spalte hinzufügen:"
 msgstr "Ajouter une nouvelle colonne :"
 
-msgid "Name (z.B. Prioritaet)"
+msgid "Name (z.B. Priorität)"
 msgstr "Nom (ex. Priorite)"
 
-msgid "Hinzufuegen"
+msgid "Hinzufügen"
 msgstr "Ajouter"
 
-msgid "Die KI wird diese Spalte bei zukuenftigen Generierungen beruecksichtigen."
+msgid "Die KI wird diese Spalte bei zukünftigen Generierungen berücksichtigen."
 msgstr "L'IA prendra cette colonne en compte pour les generations futures."
 
 msgid "Anforderungsliste"
@@ -212,16 +221,16 @@ msgstr "Liste des exigences"
 msgid "Kanban Board"
 msgstr "Tableau Kanban"
 
-msgid "Widersprueche pruefen"
+msgid "Widersprüche prüfen"
 msgstr "Verifier les conflits"
 
-msgid "Neue Anforderung hinzufuegen"
+msgid "Neue Anforderung hinzufügen"
 msgstr "Ajouter une nouvelle exigence"
 
 msgid "Spalten verwalten"
 msgstr "Gerer les colonnes"
 
-msgid "+ Einfuegen"
+msgid "+ Einfügen"
 msgstr "+ Inserer"
 
 msgid "Neue Spalte"
@@ -248,19 +257,19 @@ msgstr "Fonctionnel"
 msgid "Quantifizierbar"
 msgstr "Quantifiable"
 
-msgid "Hinzugefuegte Spalten"
+msgid "Hinzugefügte Spalten"
 msgstr "Colonnes ajoutees"
 
-msgid "Hinzugefuegte Spalten verwalten"
+msgid "Hinzugefügte Spalten verwalten"
 msgstr "Gerer les colonnes ajoutees"
 
-msgid "Spalte %(name)s wirklich loeschen?"
+msgid "Spalte %(name)s wirklich löschen?"
 msgstr "Supprimer vraiment la colonne %(name)s ?"
 
-msgid "Spalte loeschen"
+msgid "Spalte löschen"
 msgstr "Supprimer la colonne"
 
-msgid "Keine hinzugefuegten Spalten"
+msgid "Keine hinzugefügten Spalten"
 msgstr "Aucune colonne ajoutee"
 
 msgid "Name"
@@ -278,7 +287,7 @@ msgstr "Quantifiable : cette exigence peut etre mesuree quantitativement (ex. va
 msgid "Aktionen"
 msgstr "Actions"
 
-msgid "Vollstaendige Anforderung"
+msgid "Vollständige Anforderung"
 msgstr "Exigence complete"
 
 msgid "Funktional - Klicken zum Deaktivieren"
@@ -308,13 +317,13 @@ msgstr "Reviser"
 msgid "Verwerfen"
 msgstr "Rejeter"
 
-msgid "Anforderung wirklich loeschen? Diese Aktion verschiebt sie in den Papierkorb."
+msgid "Anforderung wirklich löschen? Diese Aktion verschiebt sie in den Papierkorb."
 msgstr "Supprimer vraiment l'exigence ? Cette action la deplace dans la corbeille."
 
-msgid "Loeschen"
+msgid "Löschen"
 msgstr "Supprimer"
 
-msgid "Testfaelle generieren"
+msgid "Testfälle generieren"
 msgstr "Generer des cas de test"
 
 msgid "Neu generieren (KI)"
@@ -326,16 +335,16 @@ msgstr "Aucune exigence pour le moment."
 msgid "Erste Anforderung generieren"
 msgstr "Generer la premiere exigence"
 
-msgid "Erstellt automatisch den SysML v2 Code aus den aktuellen Anforderungen."
+msgid "Erstellt automatisch den SysML v2 Code aus den aktüllen Anforderungen."
 msgstr "Genere automatiquement le code SysML v2 a partir des exigences actuelles."
 
 msgid "Generiere SysML v2 Code"
 msgstr "Generer le code SysML v2"
 
-msgid "Generierte Testfaelle"
+msgid "Generierte Testfälle"
 msgstr "Cas de test generes"
 
-msgid "KI generiert Testfaelle..."
+msgid "KI generiert Testfälle..."
 msgstr "L'IA genere des cas de test..."
 
 msgid "Kopieren"
@@ -368,7 +377,7 @@ msgstr "Revise"
 msgid "Erstellen"
 msgstr "Creer"
 
-msgid "Vollstaendige Beschreibung"
+msgid "Vollständige Beschreibung"
 msgstr "Description complete"
 
 msgid "Fehler:"
@@ -407,7 +416,7 @@ msgstr "Analyser la structure"
 msgid "Anforderungen formulieren"
 msgstr "Formuler les exigences"
 
-msgid "Qualitaets-Check"
+msgid "Qualitäts-Check"
 msgstr "Controle qualite"
 
 msgid "Produkt/System"
@@ -419,10 +428,10 @@ msgstr "Indiquez le produit/systeme a etudier"
 msgid "Kontext (Optional)"
 msgstr "Contexte (optionnel)"
 
-msgid "Bestehende Anforderungslisten und/oder weiterfuehrende Informationen zur Produktbeschreibung (z.B. Pflichten-/Lastenheft) hochladen & Bestehende Anforderungen ueberarbeiten oder erweitern"
+msgid "Bestehende Anforderungslisten und/oder weiterführende Informationen zur Produktbeschreibung (z.B. Pflichten-/Lastenheft) hochladen & Bestehende Anforderungen überarbeiten oder erweitern"
 msgstr "Televerser des listes d'exigences existantes et/ou des informations supplementaires sur le produit (ex. cahier des charges) et reviser ou etendre les exigences existantes"
 
-msgid "Dateityp auswaehlen"
+msgid "Dateityp auswählen"
 msgstr "Choisir le type de fichier"
 
 msgid "Kein Upload (optional)"
@@ -440,13 +449,13 @@ msgstr "Excel et PDF"
 msgid "PDF-Datei hier ablegen oder klicken"
 msgstr "Deposez le fichier PDF ici ou cliquez"
 
-msgid "Unterstuetzt .pdf Dateien"
+msgid "Unterstützt .pdf Dateien"
 msgstr "Prend en charge les fichiers .pdf"
 
 msgid "Excel-Datei hier ablegen oder klicken"
 msgstr "Deposez le fichier Excel ici ou cliquez"
 
-msgid "Unterstuetzt .xlsx und .xls Dateien"
+msgid "Unterstützt .xlsx und .xls Dateien"
 msgstr "Prend en charge les fichiers .xlsx et .xls"
 
 msgid "Produkt-/Systembeschreibung"
@@ -467,10 +476,10 @@ msgstr "innovant et creatif"
 msgid "Erweiterung:"
 msgstr "Extension :"
 
-msgid "geaenderte oder neue, ergaenzende Anforderungen"
+msgid "geänderte oder neue, ergänzende Anforderungen"
 msgstr "exigences modifiees ou nouvelles, complementaires"
 
-msgid "Ueberpruefung/Verbesserung der Anforderungsqualitaet:"
+msgid "Überprüfung/Verbesserung der Anforderungsqualität:"
 msgstr "Verification/amelioration de la qualite des exigences :"
 
 msgid "z.B. widerspruchsfrei, qualitativ hochwertige Formulierungen, quantifizierbare/messbare Anforderungen"
@@ -485,13 +494,13 @@ msgstr "Nombre d'exigences"
 msgid "Mindestens"
 msgstr "Au moins"
 
-msgid "Hoechstens"
+msgid "Höchstens"
 msgstr "Au plus"
 
 msgid "Automatisch"
 msgstr "Automatique"
 
-msgid "\"Automatisch\": KI schaetzt und entscheidet selbst, basierend auf dem bereitgestellten Kontext."
+msgid "\"Automatisch\": KI schätzt und entscheidet selbst, basierend auf dem bereitgestellten Kontext."
 msgstr "\"Automatique\" : l'IA estime et decide en fonction du contexte fourni."
 
 msgid "Ausgabeformat"
@@ -515,7 +524,7 @@ msgstr "Arabe"
 msgid "Französisch"
 msgstr "Francais"
 
-msgid "Die KI formuliert alle Anforderungen in der gewaehlten Sprache."
+msgid "Die KI formuliert alle Anforderungen in der gewählten Sprache."
 msgstr "L'IA formule toutes les exigences dans la langue choisie."
 
 msgid "Tabellenspalten"
@@ -530,10 +539,10 @@ msgstr "ID"
 msgid "Standard"
 msgstr "Standard"
 
-msgid "Spalte hinzufuegen"
+msgid "Spalte hinzufügen"
 msgstr "Ajouter une colonne"
 
-msgid "Gewuenschtes LLM auswaehlen"
+msgid "Gewünschtes LLM auswählen"
 msgstr "Choisir le LLM souhaite"
 
 msgid "GPT-4o Mini (OpenAI)"
@@ -542,16 +551,16 @@ msgstr "GPT-4o Mini (OpenAI)"
 msgid "Experten-Einstellungen"
 msgstr "Parametres experts"
 
-msgid "Zusaetzliche Parameter (Key-Value)"
+msgid "Zusätzliche Parameter (Key-Valü)"
 msgstr "Parametres supplementaires (cle-valeur)"
 
 msgid "Key (z.B. Sprache)"
 msgstr "Cle (ex. Langue)"
 
-msgid "Value (z.B. Deutsch)"
+msgid "Valü (z.B. Deutsch)"
 msgstr "Valeur (ex. Allemand)"
 
-msgid "Parameter hinzufuegen"
+msgid "Parameter hinzufügen"
 msgstr "Ajouter un parametre"
 
 msgid "Anforderungsliste generieren"
@@ -569,13 +578,13 @@ msgstr "Remarque :"
 msgid "Bitte Produkt/System angeben, bevor die Anforderungsliste generiert wird."
 msgstr "Veuillez indiquer un produit/systeme avant de generer la liste des exigences."
 
-msgid "Bitte einen Generierungs-Modus auswaehlen."
+msgid "Bitte einen Generierungs-Modus auswählen."
 msgstr "Veuillez choisir un mode de generation."
 
-msgid "Bitte ein LLM auswaehlen, bevor generiert wird."
+msgid "Bitte ein LLM auswählen, bevor generiert wird."
 msgstr "Veuillez choisir un LLM avant de generer."
 
-msgid "Bitte eine Anzahl fuer die Generierung angeben."
+msgid "Bitte eine Anzahl für die Generierung angeben."
 msgstr "Veuillez indiquer un nombre pour la generation."
 
 msgid "Antwortformat ist kein JSON."
@@ -584,7 +593,7 @@ msgstr "Le format de reponse n'est pas JSON."
 msgid "Erfolg!"
 msgstr "Succes !"
 
-msgid "Sie werden in Kuerze zum Projekt weitergeleitet..."
+msgid "Sie werden in Kürze zum Projekt weitergeleitet..."
 msgstr "Vous serez bientot redirige vers le projet..."
 
 msgid "Anforderungen wurden erfolgreich generiert und gespeichert."
@@ -593,16 +602,16 @@ msgstr "Les exigences ont ete generees et enregistrees avec succes."
 msgid "Anforderungen wurden erfolgreich verbessert und gespeichert (keine neuen erstellt)."
 msgstr "Les exigences ont ete ameliorees et enregistrees avec succes (aucune nouvelle creee)."
 
-msgid "Neue Anforderungen wurden basierend auf dem Bestand erfolgreich erstellt und hinzugefuegt."
+msgid "Neue Anforderungen wurden basierend auf dem Bestand erfolgreich erstellt und hinzugefügt."
 msgstr "De nouvelles exigences ont ete creees a partir de l'existant et ajoutees avec succes."
 
 msgid "Key"
 msgstr "Cle"
 
-msgid "Value"
+msgid "Valü"
 msgstr "Valeur"
 
-msgid "Neue Spalte hinzufuegen"
+msgid "Neue Spalte hinzufügen"
 msgstr "Ajouter une nouvelle colonne"
 
 msgid "Erstellt:"

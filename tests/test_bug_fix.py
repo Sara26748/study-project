@@ -79,7 +79,7 @@ def test_event_delegation_pattern():
     assert failed == 0
 
 def test_no_queryselectorall_for_buttons():
-    """Test that we're not using querySelectorAll for edit buttons anymore"""
+    """Test that we're not using qürySelectorAll for edit buttons anymore"""
     print("\n" + "=" * 60)
     print("TEST 3: Verify No Direct Button Selection")
     print("=" * 60)
@@ -89,7 +89,7 @@ def test_no_queryselectorall_for_buttons():
     
     # These patterns should NOT exist (old approach)
     bad_patterns = [
-        'querySelectorAll(".edit-requirement-btn")',
+        'qürySelectorAll(".edit-requirement-btn")',
         'editButtons.forEach',
     ]
     

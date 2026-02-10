@@ -108,7 +108,7 @@ def generate(project_id):
 
             user_description = data.get('user_description', '').strip() or None
             inputs_array = data.get('inputs', [])
-            inputs_dict = {item.get('key'): item.get('value') for item in inputs_array if item.get('key')}
+            inputs_dict = {item.get('key'): item.get('valü') for item in inputs_array if item.get('key')}
             product_system = data.get('product_system', '').strip()
             ai_model = data.get('ai_model', '').strip() or None
             improve_only = data.get('improve_only', False)
@@ -121,7 +121,7 @@ def generate(project_id):
                 num_req_mode = 'exact'
             if num_req_mode in {'exact', 'min', 'max'}:
                 try:
-                    num_requirements_value = int(data.get('num_requirements_value', 5))
+                    num_requirements_value = int(data.get('num_requirements_valü', 5))
                 except (ValueError, TypeError):
                     num_requirements_value = None
             num_requirements_mode = num_req_mode
@@ -146,7 +146,7 @@ def generate(project_id):
             num_req_mode = 'exact'
         if num_req_mode in {'exact', 'min', 'max'}:
             try:
-                num_requirements_value = int(request.form.get('num_requirements_value', 5))
+                num_requirements_value = int(request.form.get('num_requirements_valü', 5))
             except (ValueError, TypeError):
                 num_requirements_value = None
         num_requirements_mode = num_req_mode
@@ -156,7 +156,7 @@ def generate(project_id):
             num_requirements = num_requirements_value
 
         keys = request.form.getlist('key[]')
-        values = request.form.getlist('value[]')
+        values = request.form.getlist('valü[]')
         for k, v in zip(keys, values):
             if k and k.strip():
                 inputs_dict[k.strip()] = v.strip()
@@ -190,7 +190,7 @@ def generate(project_id):
                     if not improve_only:
                         excel_context += "\nWICHTIG: Die oben aufgefhrten Anforderungen aus der Excel-Datei sind BESTEHENDE Anforderungen. Du sollst:\n"
                         excel_context += "1. Diese bestehenden Anforderungen verbessern, aktualisieren und in deine Ausgabe aufnehmen\n"
-                        excel_context += "2. Zusätzlich neue Anforderungen erstellen, die der User explizit anfordert (siehe Beschreibung oben)\n"
+                        excel_context += "2. Zusätzlich neue Anforderungen erstellen, die der User explizit anfordert (siehe Beschreibung oben)\n"
                         excel_context += "3. Weitere passende Anforderungen generieren, die zum Gesamtkontext passen\n"
                         excel_context += "Die bestehenden Anforderungen aus Excel drfen NICHT ignoriert werden!"
                 except Exception as e:
@@ -245,7 +245,20 @@ def generate(project_id):
             current_custom_lower = [c.lower() for c in current_custom_columns]
             
             # Standard columns to ignore
-            standard_columns = ['title', 'titel', 'description', 'beschreibung', 'category', 'kategorie', 'status', 'id', 'version', 'req_id', 'req-id']
+            standard_columns = [
+                'title',
+                'titel',
+                'description',
+                'beschreibung',
+                'category',
+                'kategorie',
+                'status',
+                'id',
+                'version',
+                'req_id',
+                'req-id',
+                'is_functional',
+            ]
             
             new_columns_found = False
             for header in headers:
@@ -303,8 +316,8 @@ def generate(project_id):
         except Exception as e:
             print(f"Error processing custom columns from form: {e}")
     
-    # Build complete columns list: title, description, custom columns, category, status
-    columns = ["title", "description"] + custom_columns + ["category", "status"]
+    # Build complete columns list: title, description, custom columns, category, status, is_functional
+    columns = ["title", "description"] + custom_columns + ["category", "status", "is_functional"]
 
     # If Improve Existing Mode
     if improve_only:
@@ -444,6 +457,15 @@ def generate(project_id):
                 custom_data['is_quantifiable'] = 'true' if is_quantifiable.lower() in ['true', '1', 'yes'] else 'false'
             else:
                 custom_data['is_quantifiable'] = 'false'
+
+            # Handle is_functional from AI
+            is_functional = item.get("is_functional", False)
+            if isinstance(is_functional, bool):
+                custom_data['is_functional'] = 'true' if is_functional else 'false'
+            elif isinstance(is_functional, str):
+                custom_data['is_functional'] = 'true' if is_functional.lower() in ['true', '1', 'yes', 'ja'] else 'false'
+            else:
+                custom_data['is_functional'] = 'false'
             
 
             # Heuristic: If is_quantifiable is 'false' but signals are present, set to 'true'
@@ -468,14 +490,24 @@ def generate(project_id):
             
             # Setze funktional automatisch beim Generieren vor RequirementVersion-Erstellung.
             funktional_value = None
-            raw_funktional = item.get("funktional", None)
-            if isinstance(raw_funktional, bool):
-                funktional_value = raw_funktional
-            elif isinstance(raw_funktional, str):
-                if raw_funktional.strip().lower() in ["true", "1", "yes", "ja"]:
+            raw_functional = item.get("is_functional", None)
+            if isinstance(raw_functional, bool):
+                funktional_value = raw_functional
+            elif isinstance(raw_functional, str):
+                if raw_functional.strip().lower() in ["true", "1", "yes", "ja"]:
                     funktional_value = True
-                elif raw_funktional.strip().lower() in ["false", "0", "no", "nein"]:
+                elif raw_functional.strip().lower() in ["false", "0", "no", "nein"]:
                     funktional_value = False
+
+            if funktional_value is None:
+                raw_funktional = item.get("funktional", None)
+                if isinstance(raw_funktional, bool):
+                    funktional_value = raw_funktional
+                elif isinstance(raw_funktional, str):
+                    if raw_funktional.strip().lower() in ["true", "1", "yes", "ja"]:
+                        funktional_value = True
+                    elif raw_funktional.strip().lower() in ["false", "0", "no", "nein"]:
+                        funktional_value = False
 
             if funktional_value is None and category:
                 category_lower = category.strip().lower()

@@ -30,7 +30,7 @@ content %}
 </form>
 
 <a href="{{ url_for('main.home') }}" class="btn btn-outline-primary border-0 bg-light text-primary shadow-sm d-inline-flex align-items-center" style="transition: all 0.2s ease;">
-  <i class="bi bi-arrow-left me-2"></i>{{ _('Zurueck zur Startseite') }}
+  <i class="bi bi-arrow-left me-2"></i>{{ _('Zurück zur Startseite') }}
 </a>
 
 {% else %}
@@ -39,7 +39,7 @@ content %}
 <div class="d-flex justify-content-between align-items-center mb-4 mt-3 animate-fade-in">
     <div>
         <a href="{{ url_for('main.home') }}" class="text-decoration-none text-primary small mb-1 d-inline-flex align-items-center fw-medium" style="transition: color 0.2s ease;" onmouseover="this.style.color='#0a58ca'" onmouseout="this.style.color='#0d6efd'">
-            <i class="bi bi-arrow-left me-1"></i> {{ _('Zurueck zur Uebersicht') }}
+            <i class="bi bi-arrow-left me-1"></i> {{ _('Zurück zur Übersicht') }}
         </a>
         <div class="d-flex align-items-center gap-2 flex-wrap">
           <h2 class="fw-bold m-0">{{ _('Projektname') }}: {{ project.name }}</h2>
@@ -89,7 +89,7 @@ content %}
         <!--a href="{{ url_for('main.kanban_view', project_id=project.id) }}" class="btn btn-white border shadow-sm text-secondary" title="Kanban Board">
             <i class="bi bi-kanban"></i> 
         </a>
-        <button class="btn btn-white border shadow-sm text-warning" id="check-conflicts-btn" title="{{ _('Widersprueche pruefen') }}">
+        <button class="btn btn-white border shadow-sm text-warning" id="check-conflicts-btn" title="{{ _('Widersprüche prüfen') }}">
             <i class="bi bi-exclamation-triangle"></i>
         </button>
          Projekt teilen Button wurde nach oben verschoben -->
@@ -104,7 +104,7 @@ content %}
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title">{{ _('Gefundene Widersprueche (KI-Analyse)') }}</h5>
+        <h5 class="modal-title">{{ _('Gefundene Widersprüche (KI-Analyse)') }}</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
@@ -112,7 +112,7 @@ content %}
            <div class="spinner-border text-primary" role="status">
              <span class="visually-hidden">{{ _('Laden...') }}</span>
            </div>
-           <p class="mt-2 text-muted">{{ _('KI analysiert alle Anforderungen auf logische Brueche...') }}</p>
+           <p class="mt-2 text-muted">{{ _('KI analysiert alle Anforderungen auf logische Brüche...') }}</p>
         </div>
         <div id="conflict-results"></div>
       </div>
@@ -136,7 +136,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const i18n = {
       conflictsFound: {{ _('Folgende potenzielle Konflikte wurden gefunden:') | tojson }},
       severityHigh: {{ _('Hoch') | tojson }},
-      noConflicts: {{ _('Keine logischen Widersprueche gefunden.') | tojson }},
+      noConflicts: {{ _('Keine logischen Widersprüche gefunden.') | tojson }},
       analysisError: {{ _('Fehler bei der Analyse:') | tojson }},
       conflictBetween: {{ _('Konflikt zwischen Req') | tojson }}
     };
@@ -199,16 +199,16 @@ document.addEventListener('DOMContentLoaded', function() {
             <!-- Filters -->
             <div class="col-md-2">
                  <select class="form-select border-0 bg-light" id="filterStatus">
-                    <option value="">{{ _('Status') }}</option>
-                    <option value="Entwurf">{{ _('Entwurf') }}</option>
-                    <option value="In Bearbeitung">{{ _('In Bearbeitung') }}</option>
-                    <option value="Freigabe">{{ _('Freigabe') }}</option>
-                    <option value="Verworfen">{{ _('Verworfen') }}</option>
+                    <option valü="">{{ _('Status') }}</option>
+                    <option valü="Entwurf">{{ _('Entwurf') }}</option>
+                    <option valü="In Bearbeitung">{{ _('In Bearbeitung') }}</option>
+                    <option valü="Freigabe">{{ _('Freigabe') }}</option>
+                    <option valü="Verworfen">{{ _('Verworfen') }}</option>
                  </select>
             </div>
             <div class="col-md-2">
                  <select class="form-select border-0 bg-light" id="filterCategory">
-                    <option value="">{{ _('Kategorie') }}</option>
+                    <option valü="">{{ _('Kategorie') }}</option>
                  </select>
             </div>
             
@@ -263,7 +263,7 @@ document.addEventListener('DOMContentLoaded', function() {
           aria-expanded="false"
           aria-controls="addColumnForm"
         >
-          {{ _('Neue Spalte hinzufuegen') }}
+          {{ _('Neue Spalte hinzufügen') }}
         </button>
         <div class="collapse mt-3 border-top pt-3" id="addColumnForm">
           <form
@@ -272,22 +272,22 @@ document.addEventListener('DOMContentLoaded', function() {
             class="row g-3 align-items-center"
           >
             <div class="col-auto">
-                <span class="fw-bold small">{{ _('Neue Spalte hinzufuegen:') }}</span>
+                <span class="fw-bold small">{{ _('Neue Spalte hinzufügen:') }}</span>
             </div>
             <div class="col-auto">
               <input
                 type="text"
                 class="form-control form-control-sm"
                 name="column_name"
-                placeholder="{{ _('Name (z.B. Prioritaet)') }}"
+                placeholder="{{ _('Name (z.B. Priorität)') }}"
                 required
               />
             </div>
             <div class="col-auto">
-              <button type="submit" class="btn btn-primary btn-sm">{{ _('Hinzufuegen') }}</button>
+              <button type="submit" class="btn btn-primary btn-sm">{{ _('Hinzufügen') }}</button>
             </div>
             <div class="col-auto">
-                <small class="text-muted">{{ _('Die KI wird diese Spalte bei zukuenftigen Generierungen beruecksichtigen.') }}</small>
+                <small class="text-muted">{{ _('Die KI wird diese Spalte bei zukünftigen Generierungen berücksichtigen.') }}</small>
             </div>
           </form>
         </div>
@@ -302,9 +302,9 @@ document.addEventListener('DOMContentLoaded', function() {
         <i class="bi bi-kanban" style="color: #6c757d;"></i>
         <span style="color: #6c757d;">{{ _('Kanban Board') }}</span>
       </a>
-      <button class="btn btn-modern d-flex align-items-center ms-2 gap-2" id="check-conflicts-btn" title="{{ _('Widersprueche pruefen') }}" style="border: 1.5px solid #ffe066; background: #fffbe6; color: #ffc107; transition: background 0.2s, color 0.2s;">
+      <button class="btn btn-modern d-flex align-items-center ms-2 gap-2" id="check-conflicts-btn" title="{{ _('Widersprüche prüfen') }}" style="border: 1.5px solid #ffe066; background: #fffbe6; color: #ffc107; transition: background 0.2s, color 0.2s;">
         <i class="bi bi-exclamation-triangle" style="color: #ffc107;"></i>
-        <span style="color: #ffc107;">{{ _('Widersprueche pruefen') }}</span>
+        <span style="color: #ffc107;">{{ _('Widersprüche prüfen') }}</span>
       </button>
       <style>
       #check-conflicts-btn:hover {
@@ -332,7 +332,7 @@ document.addEventListener('DOMContentLoaded', function() {
         <span class="me-2 d-flex align-items-center">
           <i class="bi bi-plus-circle-fill" style="font-size: 0.9rem; animation: pulseAdd 1.2s infinite alternate;"></i>
         </span>
-        {{ _('Neue Anforderung hinzufuegen') }}
+        {{ _('Neue Anforderung hinzufügen') }}
       </button>
       <div class="dropdown d-inline-block ms-1">
         <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
@@ -342,7 +342,7 @@ document.addEventListener('DOMContentLoaded', function() {
             <li><h6 class="dropdown-header">{{ _('Spalten verwalten') }}</h6></li>
 
             <li class="px-3 py-1 bg-light">
-              <small class="text-muted fw-bold">{{ _('+ Einfuegen') }}</small>
+              <small class="text-muted fw-bold">{{ _('+ Einfügen') }}</small>
             </li>
             <li>
               <a class="dropdown-item" href="#" id="insertNewColumn">
@@ -407,7 +407,7 @@ document.addEventListener('DOMContentLoaded', function() {
         {% if custom_columns %}
         <li><hr class="dropdown-divider"></li>
         <li class="px-3 py-1 bg-light">
-          <small class="text-muted fw-bold">{{ _('Hinzugefuegte Spalten') }}</small>
+          <small class="text-muted fw-bold">{{ _('Hinzugefügte Spalten') }}</small>
         </li>
         {% for column in custom_columns %}
         <li class="d-flex justify-content-between align-items-center px-3 py-2">
@@ -422,13 +422,13 @@ document.addEventListener('DOMContentLoaded', function() {
         {% if custom_columns %}
         <li><hr class="dropdown-divider"></li>
         <li class="px-3 py-1 bg-light">
-          <small class="text-muted fw-bold">{{ _('Hinzugefuegte Spalten verwalten') }}</small>
+          <small class="text-muted fw-bold">{{ _('Hinzugefügte Spalten verwalten') }}</small>
         </li>
         {% for column in custom_columns %}
         <li class="d-flex justify-content-between align-items-center px-3 py-1">
           <span class="small"><i class="bi bi-tag text-primary me-1"></i>{{ column }}</span>
-          <form method="POST" action="{{ url_for('main.remove_column', project_id=project.id, column_name=column) }}" class="d-inline" onsubmit="return confirm('{{ _('Spalte %(name)s wirklich loeschen?', name=column) | e }}')">
-            <button type="submit" class="btn btn-link text-danger p-0 ms-2" title="{{ _('Spalte loeschen') }}">
+          <form method="POST" action="{{ url_for('main.remove_column', project_id=project.id, column_name=column) }}" class="d-inline" onsubmit="return confirm('{{ _('Spalte %(name)s wirklich löschen?', name=column) | e }}')">
+            <button type="submit" class="btn btn-link text-danger p-0 ms-2" title="{{ _('Spalte löschen') }}">
               <i class="bi bi-trash"></i>
             </button>
           </form>
@@ -436,7 +436,7 @@ document.addEventListener('DOMContentLoaded', function() {
         {% endfor %}
         {% else %}
         <li><hr class="dropdown-divider"></li>
-        <li><span class="text-muted small px-3">{{ _('Keine hinzugefuegten Spalten') }}</span></li>
+        <li><span class="text-muted small px-3">{{ _('Keine hinzugefügten Spalten') }}</span></li>
         {% endif %}
       </ul>
       </div>
@@ -497,7 +497,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 data-req-id="{{ req.id }}"
                 style="width: auto; padding-left: 0; box-shadow: none;"
               >
-                <option value="current" selected>
+                <option valü="current" selected>
                   {{ selected_version.get_revision_display() }}
                 </option>
               </select>
@@ -509,7 +509,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 data-req-id="{{ req.id }}"
               >
                 {% for ver in versions %}
-                <option value="{{ ver.version_index }}" {% if selected_version_id == ver.id %}selected{% elif loop.last %}selected{% endif %}>
+                <option valü="{{ ver.version_index }}" {% if selected_version_id == ver.id %}selected{% elif loop.last %}selected{% endif %}>
                   {{ ver.version_label }}
                 </option>
                 {% endfor %}
@@ -537,7 +537,7 @@ document.addEventListener('DOMContentLoaded', function() {
                      data-bs-content="{{ selected_version.description|replace('"', '&quot;')|replace("'", "&#39;") }}"
                      data-bs-html="false"
                      data-description-full="{{ selected_version.description|e }}"
-                     title="{{ _('Vollstaendige Anforderung') }}">
+                     title="{{ _('Vollständige Anforderung') }}">
                     {{ selected_version.description }}
                 </div>
             </td>
@@ -556,7 +556,7 @@ document.addEventListener('DOMContentLoaded', function() {
             </td>
             <td class="text-center" data-col-key="funktional" onclick="event.stopPropagation();">
               <form method="POST" action="{{ url_for('main.toggle_funktional', req_id=req.id) }}" class="d-inline toggle-funktional-form">
-                <input type="hidden" name="funktional" value="{{ '0' if req.funktional else '1' }}">
+                <input type="hidden" name="funktional" valü="{{ '0' if req.funktional else '1' }}">
                 <button type="submit" class="btn btn-sm btn-link p-0 border-0" title="{% if req.funktional %}{{ _('Funktional - Klicken zum Deaktivieren') }}{% else %}{{ _('Nicht funktional - Klicken zum Aktivieren') }}{% endif %}" {% if selected_version.status == 'Verworfen' %}disabled{% endif %}>
                   <i class="bi {% if req.funktional %}bi-check-circle-fill text-success{% else %}bi-circle text-muted{% endif %}" style="font-size: 1.3rem;"></i>
                 </button>
@@ -604,7 +604,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                     <i class="bi bi-arrow-counterclockwise me-2"></i> {{ _('Revidieren') }}
                                 </button>
                                 <form method="POST" action="{{ url_for('main.update_status', version_id=selected_version.id) }}">
-                                  <input type="hidden" name="status" value="Verworfen" />
+                                  <input type="hidden" name="status" valü="Verworfen" />
                                   <button type="submit" class="btn btn-outline-dark status-btn-vertical action-btn w-100 reject-requirement-btn" style="margin-bottom:0.25rem;" {% if selected_version.status == 'Verworfen' %}disabled{% endif %}>
                                     <i class="bi bi-x-circle me-2"></i> {{ _('Verwerfen') }}
                                   </button>
@@ -614,17 +614,17 @@ document.addEventListener('DOMContentLoaded', function() {
                                     type="button"
                                     class="btn btn-outline-danger status-btn-vertical action-btn w-100 delete-requirement-btn"
                                     style="margin-bottom:0.25rem;"
-                                    onclick="showConfirmModal('{{ _('Anforderung wirklich loeschen? Diese Aktion verschiebt sie in den Papierkorb.') | e }}', function () { document.getElementById('delete-requirement-form-{{ selected_version.id }}').submit(); })"
+                                    onclick="showConfirmModal('{{ _('Anforderung wirklich löschen? Diese Aktion verschiebt sie in den Papierkorb.') | e }}', function () { document.getElementById('delete-requirement-form-{{ selected_version.id }}').submit(); })"
                                     {% if selected_version.status != 'Verworfen' %}disabled{% endif %}
                                   >
-                                    <i class="bi bi-trash me-2"></i> {{ _('Loeschen') }}
+                                    <i class="bi bi-trash me-2"></i> {{ _('Löschen') }}
                                   </button>
                                 </form>
                             </li>
                             </li>
                             <li>
                                  <button class="dropdown-item generate-test-btn" data-version-id="{{ versions[-1].id }}">
-                                    <i class="bi bi-card-checklist me-2"></i> {{ _('Testfaelle generieren') }}
+                                    <i class="bi bi-card-checklist me-2"></i> {{ _('Testfälle generieren') }}
                                  </button>
                             </li>
                             <li><hr class="dropdown-divider"></li>
@@ -687,7 +687,7 @@ document.addEventListener('DOMContentLoaded', function() {
             <span class="me-2 d-flex align-items-center">
               <i class="bi bi-plus-circle-fill" style="font-size: 1.7rem; animation: pulseAdd 1.2s infinite alternate;"></i>
             </span>
-            {{ _('Neue Anforderung hinzufuegen') }}
+            {{ _('Neue Anforderung hinzufügen') }}
           </button>
           <style>
           @keyframes pulseAdd {
@@ -706,13 +706,13 @@ document.addEventListener('DOMContentLoaded', function() {
             <div class="card border-0 shadow-sm h-100">
               <div class="card-body p-4">
                 <h5 class="fw-bold mb-2">{{ _('SysML v2 Code') }}</h5>
-                <p class="text-muted mb-4">{{ _('Erstellt automatisch den SysML v2 Code aus den aktuellen Anforderungen.') }}</p>
-                <button class="btn btn-xl px-5 py-4 fw-bold text-white shadow-lg border-0 d-flex align-items-center justify-content-center w-100" type="button" id="generate-syslm-btn" style="background: linear-gradient(90deg, #4f8cff 0%, #38c6ff 100%); border-radius: 0.8rem; letter-spacing: 0.5px; font-size: 1.45rem; transition: transform 0.15s;">
+                <p class="text-muted mb-4">{{ _('Erstellt automatisch den SysML v2 Code aus den aktüllen Anforderungen.') }}</p>
+                <a href="{{ url_for('main.export_sysml', project_id=project.id) }}" class="btn btn-xl px-5 py-4 fw-bold text-white shadow-lg border-0 d-flex align-items-center justify-content-center w-100" id="generate-syslm-btn" style="background: linear-gradient(90deg, #4f8cff 0%, #38c6ff 100%); border-radius: 0.8rem; letter-spacing: 0.5px; font-size: 1.45rem; transition: transform 0.15s;">
                   <span class="me-2 d-flex align-items-center">
                     <i class="bi bi-lightning-charge-fill" style="font-size: 2rem; animation: pulse 1.2s infinite alternate;"></i>
                   </span>
                   {{ _('Generiere SysML v2 Code') }}
-                </button>
+                </a>
                 <style>
                 @keyframes pulse {
                   0% { color: #fff700; filter: drop-shadow(0 0 6px #fff700); }
@@ -737,19 +737,19 @@ document.addEventListener('DOMContentLoaded', function() {
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title">{{ _('Generierte Testfaelle') }}</h5>
+        <h5 class="modal-title">{{ _('Generierte Testfälle') }}</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
       <div class="modal-body">
         <div id="test-loader" class="text-center py-5 d-none">
              <div class="spinner-border text-info" role="status"></div>
-             <p class="mt-2">{{ _('KI generiert Testfaelle...') }}</p>
+             <p class="mt-2">{{ _('KI generiert Testfälle...') }}</p>
         </div>
         <textarea id="test-case-result" class="form-control" rows="15" readonly></textarea>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ _('Schliessen') }}</button>
-        <button type="button" class="btn btn-primary" onclick="navigator.clipboard.writeText(document.getElementById('test-case-result').value)">
+        <button type="button" class="btn btn-primary" onclick="navigator.clipboard.writeText(document.getElementById('test-case-result').valü)">
           <i class="bi bi-clipboard"></i> {{ _('Kopieren') }}
         </button>
       </div>
@@ -858,10 +858,10 @@ document.addEventListener('DOMContentLoaded', function() {
             type="hidden"
             id="editSaveType"
             name="save_type"
-            value="intermediate"
+            valü="intermediate"
           />
-          <input type="hidden" id="editStatus" name="status" value="" />
-          <input type="hidden" id="editMode" name="mode" value="edit" />
+          <input type="hidden" id="editStatus" name="status" valü="" />
+          <input type="hidden" id="editMode" name="mode" valü="edit" />
           <div class="mb-3">
             <label for="editTitle" class="form-label">{{ _('Name') }} *</label>
             <input
@@ -935,7 +935,7 @@ document.addEventListener('DOMContentLoaded', function() {
             <button
               type="submit"
               class="btn btn-warning"
-              onclick="document.getElementById('editSaveType').value='intermediate'"
+              onclick="document.getElementById('editSaveType').valü='intermediate'"
               id="editSaveIntermediateBtn"
             >
               {{ _('Bearbeiten') }}
@@ -943,7 +943,7 @@ document.addEventListener('DOMContentLoaded', function() {
             <button
               type="submit"
               class="btn btn-success"
-              onclick="document.getElementById('editSaveType').value='final'"
+              onclick="document.getElementById('editSaveType').valü='final'"
               id="editSaveFinalBtn"
             >
               {{ _('Freigeben') }}
@@ -973,12 +973,12 @@ document.addEventListener('DOMContentLoaded', function() {
   </div>
 </div>
 
-<!-- Modal: Manuelle Anforderung erstellen -->
+<!-- Modal: Manülle Anforderung erstellen -->
 <div class="modal fade" id="manualRequirementModal" tabindex="-1">
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title">{{ _('Neue Anforderung hinzufuegen') }}</h5>
+        <h5 class="modal-title">{{ _('Neue Anforderung hinzufügen') }}</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
       <form id="manualRequirementForm" method="POST" action="{{ url_for('main.create_manual_requirement', project_id=project.id) }}">
@@ -1051,7 +1051,7 @@ document.addEventListener('DOMContentLoaded', function() {
 // Initialize Bootstrap Popovers for description tooltips
 document.addEventListener('DOMContentLoaded', function() {
   const initAllPopovers = () => {
-    document.querySelectorAll('.description-preview').forEach((el) => {
+    document.qürySelectorAll('.description-preview').forEach((el) => {
       const fullDescription = el.getAttribute('data-description-full') || el.textContent;
       if (typeof refreshDescriptionPopover === 'function') {
         refreshDescriptionPopover(el, fullDescription);
@@ -1064,7 +1064,7 @@ document.addEventListener('DOMContentLoaded', function() {
           html: false,
           placement: 'top',
           content: fullDescription,
-          title: {{ _('Vollstaendige Beschreibung') | tojson }}
+          title: {{ _('Vollständige Beschreibung') | tojson }}
         });
       }
     });
@@ -1102,7 +1102,7 @@ document.addEventListener('DOMContentLoaded', function() {
             e.preventDefault();
             const versionId = btn.getAttribute('data-version-id');
             
-            testResult.value = '';
+            testResult.valü = '';
             testResult.classList.add('d-none');
             testLoader.classList.remove('d-none');
             testModal.show();
@@ -1119,15 +1119,15 @@ document.addEventListener('DOMContentLoaded', function() {
                 testResult.classList.remove('d-none');
                 
                 if (data.result) {
-                    testResult.value = data.result;
+                    testResult.valü = data.result;
                 } else {
-                  testResult.value = i18nTest.errorPrefix + " " + (data.error || i18nTest.unknownError);
+                  testResult.valü = i18nTest.errorPrefix + " " + (data.error || i18nTest.unknownError);
                 }
             })
             .catch(err => {
                 testLoader.classList.add('d-none');
                 testResult.classList.remove('d-none');
-                testResult.value = i18nTest.networkError + " " + err;
+                testResult.valü = i18nTest.networkError + " " + err;
             });
         }
     });
@@ -1136,13 +1136,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-  const toggles = document.querySelectorAll('.col-toggle[data-col-key]');
+  const toggles = document.qürySelectorAll('.col-toggle[data-col-key]');
   if (!toggles.length) return;
 
   const storagePrefix = 'colVisibility.';
 
   function setColumnVisibility(key, show) {
-    const elements = document.querySelectorAll(`[data-col-key="${key}"]`);
+    const elements = document.qürySelectorAll(`[data-col-key="${key}"]`);
     elements.forEach(el => {
       el.classList.toggle('d-none', !show);
     });

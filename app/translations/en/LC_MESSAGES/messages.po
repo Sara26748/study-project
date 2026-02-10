@@ -122,22 +122,22 @@ msgstr "Here you can create new projects."
 msgid "Projektname"
 msgstr "Project name"
 
-msgid "Zurueck zur Startseite"
+msgid "Zurück zur Startseite"
 msgstr "Back to home"
 
-msgid "Zurueck zur Uebersicht"
+msgid "Zurück zur Übersicht"
 msgstr "Back to overview"
 
 msgid "Teilen"
 msgstr "Share"
 
-msgid "Gefundene Widersprueche (KI-Analyse)"
+msgid "Gefundene Widersprüche (KI-Analyse)"
 msgstr "Detected conflicts (AI analysis)"
 
 msgid "Laden..."
 msgstr "Loading..."
 
-msgid "KI analysiert alle Anforderungen auf logische Brueche..."
+msgid "KI analysiert alle Anforderungen auf logische Brüche..."
 msgstr "AI is analyzing all requirements for logical inconsistencies..."
 
 msgid "Schliessen"
@@ -149,7 +149,7 @@ msgstr "The following potential conflicts were found:"
 msgid "Hoch"
 msgstr "High"
 
-msgid "Keine logischen Widersprueche gefunden."
+msgid "Keine logischen Widersprüche gefunden."
 msgstr "No logical conflicts found."
 
 msgid "Fehler bei der Analyse:"
@@ -194,16 +194,25 @@ msgstr "Import Excel file"
 msgid "Import"
 msgstr "Import"
 
-msgid "Neue Spalte hinzufuegen:"
+msgid "Dateien auswählen"
+msgstr "Select files"
+
+msgid "Keine gewählte Dateien"
+msgstr "No files selected"
+
+msgid "Bitte auswählen"
+msgstr "Please select"
+
+msgid "Neue Spalte hinzufügen:"
 msgstr "Add new column:"
 
-msgid "Name (z.B. Prioritaet)"
+msgid "Name (z.B. Priorität)"
 msgstr "Name (e.g. Priority)"
 
-msgid "Hinzufuegen"
+msgid "Hinzufügen"
 msgstr "Add"
 
-msgid "Die KI wird diese Spalte bei zukuenftigen Generierungen beruecksichtigen."
+msgid "Die KI wird diese Spalte bei zukünftigen Generierungen berücksichtigen."
 msgstr "The AI will consider this column for future generations."
 
 msgid "Anforderungsliste"
@@ -212,16 +221,16 @@ msgstr "Requirements list"
 msgid "Kanban Board"
 msgstr "Kanban board"
 
-msgid "Widersprueche pruefen"
+msgid "Widersprüche prüfen"
 msgstr "Check conflicts"
 
-msgid "Neue Anforderung hinzufuegen"
+msgid "Neue Anforderung hinzufügen"
 msgstr "Add new requirement"
 
 msgid "Spalten verwalten"
 msgstr "Manage columns"
 
-msgid "+ Einfuegen"
+msgid "+ Einfügen"
 msgstr "+ Insert"
 
 msgid "Neue Spalte"
@@ -248,19 +257,19 @@ msgstr "Functional"
 msgid "Quantifizierbar"
 msgstr "Quantifiable"
 
-msgid "Hinzugefuegte Spalten"
+msgid "Hinzugefügte Spalten"
 msgstr "Added columns"
 
-msgid "Hinzugefuegte Spalten verwalten"
+msgid "Hinzugefügte Spalten verwalten"
 msgstr "Manage added columns"
 
-msgid "Spalte %(name)s wirklich loeschen?"
+msgid "Spalte %(name)s wirklich löschen?"
 msgstr "Really delete column %(name)s?"
 
-msgid "Spalte loeschen"
+msgid "Spalte löschen"
 msgstr "Delete column"
 
-msgid "Keine hinzugefuegten Spalten"
+msgid "Keine hinzugefügten Spalten"
 msgstr "No added columns"
 
 msgid "Name"
@@ -278,7 +287,7 @@ msgstr "Quantifiable: This requirement can be measured quantitatively (e.g. perf
 msgid "Aktionen"
 msgstr "Actions"
 
-msgid "Vollstaendige Anforderung"
+msgid "Vollständige Anforderung"
 msgstr "Full requirement"
 
 msgid "Funktional - Klicken zum Deaktivieren"
@@ -308,13 +317,13 @@ msgstr "Revise"
 msgid "Verwerfen"
 msgstr "Reject"
 
-msgid "Anforderung wirklich loeschen? Diese Aktion verschiebt sie in den Papierkorb."
+msgid "Anforderung wirklich löschen? Diese Aktion verschiebt sie in den Papierkorb."
 msgstr "Really delete the requirement? This will move it to the trash."
 
-msgid "Loeschen"
+msgid "Löschen"
 msgstr "Delete"
 
-msgid "Testfaelle generieren"
+msgid "Testfälle generieren"
 msgstr "Generate test cases"
 
 msgid "Neu generieren (KI)"
@@ -326,16 +335,16 @@ msgstr "No requirements yet."
 msgid "Erste Anforderung generieren"
 msgstr "Generate first requirement"
 
-msgid "Erstellt automatisch den SysML v2 Code aus den aktuellen Anforderungen."
+msgid "Erstellt automatisch den SysML v2 Code aus den aktüllen Anforderungen."
 msgstr "Automatically generates SysML v2 code from current requirements."
 
 msgid "Generiere SysML v2 Code"
 msgstr "Generate SysML v2 code"
 
-msgid "Generierte Testfaelle"
+msgid "Generierte Testfälle"
 msgstr "Generated test cases"
 
-msgid "KI generiert Testfaelle..."
+msgid "KI generiert Testfälle..."
 msgstr "AI is generating test cases..."
 
 msgid "Kopieren"
@@ -368,7 +377,7 @@ msgstr "Revised"
 msgid "Erstellen"
 msgstr "Create"
 
-msgid "Vollstaendige Beschreibung"
+msgid "Vollständige Beschreibung"
 msgstr "Full description"
 
 msgid "Fehler:"
@@ -407,7 +416,7 @@ msgstr "Analyze structure"
 msgid "Anforderungen formulieren"
 msgstr "Formulate requirements"
 
-msgid "Qualitaets-Check"
+msgid "Qualitäts-Check"
 msgstr "Quality check"
 
 msgid "Produkt/System"
@@ -419,10 +428,10 @@ msgstr "Name the product/system to be considered"
 msgid "Kontext (Optional)"
 msgstr "Context (optional)"
 
-msgid "Bestehende Anforderungslisten und/oder weiterfuehrende Informationen zur Produktbeschreibung (z.B. Pflichten-/Lastenheft) hochladen & Bestehende Anforderungen ueberarbeiten oder erweitern"
+msgid "Bestehende Anforderungslisten und/oder weiterführende Informationen zur Produktbeschreibung (z.B. Pflichten-/Lastenheft) hochladen & Bestehende Anforderungen überarbeiten oder erweitern"
 msgstr "Upload existing requirement lists and/or additional product description info (e.g. specification) & revise or extend existing requirements"
 
-msgid "Dateityp auswaehlen"
+msgid "Dateityp auswählen"
 msgstr "Select file type"
 
 msgid "Kein Upload (optional)"
@@ -440,13 +449,13 @@ msgstr "Excel & PDF"
 msgid "PDF-Datei hier ablegen oder klicken"
 msgstr "Drop PDF file here or click"
 
-msgid "Unterstuetzt .pdf Dateien"
+msgid "Unterstützt .pdf Dateien"
 msgstr "Supports .pdf files"
 
 msgid "Excel-Datei hier ablegen oder klicken"
 msgstr "Drop Excel file here or click"
 
-msgid "Unterstuetzt .xlsx und .xls Dateien"
+msgid "Unterstützt .xlsx und .xls Dateien"
 msgstr "Supports .xlsx and .xls files"
 
 msgid "Produkt-/Systembeschreibung"
@@ -467,10 +476,10 @@ msgstr "innovative & creative"
 msgid "Erweiterung:"
 msgstr "Extension:"
 
-msgid "geaenderte oder neue, ergaenzende Anforderungen"
+msgid "geänderte oder neue, ergänzende Anforderungen"
 msgstr "changed or new, additional requirements"
 
-msgid "Ueberpruefung/Verbesserung der Anforderungsqualitaet:"
+msgid "Überprüfung/Verbesserung der Anforderungsqualität:"
 msgstr "Review/improve requirement quality:"
 
 msgid "z.B. widerspruchsfrei, qualitativ hochwertige Formulierungen, quantifizierbare/messbare Anforderungen"
@@ -485,13 +494,13 @@ msgstr "Number of requirements"
 msgid "Mindestens"
 msgstr "At least"
 
-msgid "Hoechstens"
+msgid "Höchstens"
 msgstr "At most"
 
 msgid "Automatisch"
 msgstr "Automatic"
 
-msgid "\"Automatisch\": KI schaetzt und entscheidet selbst, basierend auf dem bereitgestellten Kontext."
+msgid "\"Automatisch\": KI schätzt und entscheidet selbst, basierend auf dem bereitgestellten Kontext."
 msgstr "\"Automatic\": AI estimates and decides based on the provided context."
 
 msgid "Ausgabeformat"
@@ -515,7 +524,7 @@ msgstr "Arabic"
 msgid "Französisch"
 msgstr "French"
 
-msgid "Die KI formuliert alle Anforderungen in der gewaehlten Sprache."
+msgid "Die KI formuliert alle Anforderungen in der gewählten Sprache."
 msgstr "The AI formulates all requirements in the selected language."
 
 msgid "Tabellenspalten"
@@ -530,10 +539,10 @@ msgstr "ID"
 msgid "Standard"
 msgstr "Standard"
 
-msgid "Spalte hinzufuegen"
+msgid "Spalte hinzufügen"
 msgstr "Add column"
 
-msgid "Gewuenschtes LLM auswaehlen"
+msgid "Gewünschtes LLM auswählen"
 msgstr "Select desired LLM"
 
 msgid "GPT-4o Mini (OpenAI)"
@@ -542,16 +551,16 @@ msgstr "GPT-4o Mini (OpenAI)"
 msgid "Experten-Einstellungen"
 msgstr "Expert settings"
 
-msgid "Zusaetzliche Parameter (Key-Value)"
+msgid "Zusätzliche Parameter (Key-Valü)"
 msgstr "Additional parameters (key-value)"
 
 msgid "Key (z.B. Sprache)"
 msgstr "Key (e.g. Language)"
 
-msgid "Value (z.B. Deutsch)"
+msgid "Valü (z.B. Deutsch)"
 msgstr "Value (e.g. German)"
 
-msgid "Parameter hinzufuegen"
+msgid "Parameter hinzufügen"
 msgstr "Add parameter"
 
 msgid "Anforderungsliste generieren"
@@ -569,13 +578,13 @@ msgstr "Note:"
 msgid "Bitte Produkt/System angeben, bevor die Anforderungsliste generiert wird."
 msgstr "Please specify a product/system before generating the requirement list."
 
-msgid "Bitte einen Generierungs-Modus auswaehlen."
+msgid "Bitte einen Generierungs-Modus auswählen."
 msgstr "Please choose a generation mode."
 
-msgid "Bitte ein LLM auswaehlen, bevor generiert wird."
+msgid "Bitte ein LLM auswählen, bevor generiert wird."
 msgstr "Please choose an LLM before generating."
 
-msgid "Bitte eine Anzahl fuer die Generierung angeben."
+msgid "Bitte eine Anzahl für die Generierung angeben."
 msgstr "Please specify a number for generation."
 
 msgid "Antwortformat ist kein JSON."
@@ -584,7 +593,7 @@ msgstr "Response format is not JSON."
 msgid "Erfolg!"
 msgstr "Success!"
 
-msgid "Sie werden in Kuerze zum Projekt weitergeleitet..."
+msgid "Sie werden in Kürze zum Projekt weitergeleitet..."
 msgstr "You will be redirected to the project shortly..."
 
 msgid "Anforderungen wurden erfolgreich generiert und gespeichert."
@@ -593,16 +602,16 @@ msgstr "Requirements were successfully generated and saved."
 msgid "Anforderungen wurden erfolgreich verbessert und gespeichert (keine neuen erstellt)."
 msgstr "Requirements were successfully improved and saved (no new ones created)."
 
-msgid "Neue Anforderungen wurden basierend auf dem Bestand erfolgreich erstellt und hinzugefuegt."
+msgid "Neue Anforderungen wurden basierend auf dem Bestand erfolgreich erstellt und hinzugefügt."
 msgstr "New requirements were created based on the existing set and added successfully."
 
 msgid "Key"
 msgstr "Key"
 
-msgid "Value"
+msgid "Valü"
 msgstr "Value"
 
-msgid "Neue Spalte hinzufuegen"
+msgid "Neue Spalte hinzufügen"
 msgstr "Add new column"
 
 msgid "Erstellt:"

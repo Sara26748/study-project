@@ -385,7 +385,7 @@ endblock %} {% block content %}
                 <i class="bi bi-circle me-2 text-primary"></i> {{ _('Anforderungen formulieren') }}
               </div>
               <div id="step-4">
-                <i class="bi bi-circle me-2 text-primary"></i> {{ _('Qualitaets-Check') }}
+                <i class="bi bi-circle me-2 text-primary"></i> {{ _('Qualitäts-Check') }}
               </div>
             </div>
           </div>
@@ -430,18 +430,18 @@ endblock %} {% block content %}
                     {{ _('Kontext (Optional)') }}
                   </h3>
                   <p class="config-card-subtitle">
-                    {{ _('Bestehende Anforderungslisten und/oder weiterfuehrende Informationen zur Produktbeschreibung (z.B. Pflichten-/Lastenheft) hochladen & Bestehende Anforderungen ueberarbeiten oder erweitern') }}
+                    {{ _('Bestehende Anforderungslisten und/oder weiterführende Informationen zur Produktbeschreibung (z.B. Pflichten-/Lastenheft) hochladen & Bestehende Anforderungen überarbeiten oder erweitern') }}
                   </p>
                 </div>
               </div>
               <div class="context-upload" id="context-upload">
                 <div class="mb-3">
-                  <label for="context_file_type" class="form-label">{{ _('Dateityp auswaehlen') }}</label>
+                  <label for="context_file_type" class="form-label">{{ _('Dateien auswählen') }}</label>
                   <select id="context_file_type" name="context_file_type" class="form-select">
-                    <option value="none" selected>{{ _('Kein Upload (optional)') }}</option>
-                    <option value="pdf">{{ _('PDF') }}</option>
-                    <option value="excel">{{ _('EXCEL') }}</option>
-                    <option value="both">{{ _('EXCEL & PDF') }}</option>
+                    <option valü="none" selected>{{ _('Keine gewählte Dateien') }}</option>
+                    <option valü="pdf">{{ _('PDF') }}</option>
+                    <option valü="excel">{{ _('EXCEL') }}</option>
+                    <option valü="both">{{ _('EXCEL & PDF') }}</option>
                   </select>
                 </div>
                 <div class="drop-zone-wrapper d-none" id="pdf-drop-wrapper">
@@ -456,7 +456,7 @@ endblock %} {% block content %}
                     <div class="drop-zone-content mt-2">
                       <i class="bi bi-cloud-upload"></i>
                       <p>{{ _('PDF-Datei hier ablegen oder klicken') }}</p>
-                      <small class="text-muted">{{ _('Unterstuetzt .pdf Dateien') }}</small>
+                      <small class="text-muted">{{ _('Unterstützt .pdf Dateien') }}</small>
                     </div>
                     <div id="pdf-file-name-display" class="d-none mt-3">
                       <span class="file-info">
@@ -478,7 +478,7 @@ endblock %} {% block content %}
                     <div class="drop-zone-content mt-2">
                       <i class="bi bi-cloud-upload"></i>
                       <p>{{ _('Excel-Datei hier ablegen oder klicken') }}</p>
-                      <small class="text-muted">{{ _('Unterstuetzt .xlsx und .xls Dateien') }}</small>
+                      <small class="text-muted">{{ _('Unterstützt .xlsx und .xls Dateien') }}</small>
                     </div>
                     <div id="excel-file-name-display" class="d-none mt-3">
                       <span class="file-info">
@@ -511,7 +511,7 @@ endblock %} {% block content %}
                       type="radio"
                       name="generation_mode"
                       id="mode_standard"
-                      value="standard"
+                      valü="standard"
                     />
                     <label class="form-check-label" for="mode_standard">
                       <strong>{{ _('Neugenerierung:') }}</strong> {{ _('innovativ & kreativ') }}
@@ -524,10 +524,10 @@ endblock %} {% block content %}
                       type="radio"
                       name="generation_mode"
                       id="mode_extend"
-                      value="extend"
+                      valü="extend"
                     />
                     <label class="form-check-label" for="mode_extend">
-                      <strong>{{ _('Erweiterung:') }}</strong> {{ _('geaenderte oder neue, ergaenzende Anforderungen') }}
+                      <strong>{{ _('Erweiterung:') }}</strong> {{ _('geänderte oder neue, ergänzende Anforderungen') }}
                     </label>
                   </div>
 
@@ -537,17 +537,17 @@ endblock %} {% block content %}
                       type="radio"
                       name="generation_mode"
                       id="mode_improve"
-                      value="improve"
+                      valü="improve"
                     />
                     <label class="form-check-label" for="mode_improve">
-                      <strong>{{ _('Ueberpruefung/Verbesserung der Anforderungsqualitaet:') }}</strong> {{ _('z.B. widerspruchsfrei, qualitativ hochwertige Formulierungen, quantifizierbare/messbare Anforderungen') }}
+                      <strong>{{ _('Überprüfung/Verbesserung der Anforderungsqualität:') }}</strong> {{ _('z.B. widerspruchsfrei, qualitativ hochwertige Formulierungen, quantifizierbare/messbare Anforderungen') }}
                     </label>
                   </div>
                 </div>
 
                 <!-- Hidden inputs for backend compatibility (will be set via JS) -->
-                <input type="hidden" id="improve_only" name="improve_only" value="false" />
-                <input type="hidden" id="extend_existing" name="extend_existing" value="false" />
+                <input type="hidden" id="improve_only" name="improve_only" valü="false" />
+                <input type="hidden" id="extend_existing" name="extend_existing" valü="false" />
               </div>
 
               <textarea
@@ -608,25 +608,25 @@ endblock %} {% block content %}
                     style="max-width: 200px"
                   >
              
-                    <option value="min">{{ _('Mindestens') }}</option>
-                    <option value="max">{{ _('Hoechstens') }}</option>
-                    <option value="auto" selected>{{ _('Automatisch') }}</option>
+                    <option valü="min">{{ _('Mindestens') }}</option>
+                    <option valü="max">{{ _('Höchstens') }}</option>
+                    <option valü="auto" selected>{{ _('Automatisch') }}</option>
                   </select>
                   <input
                     type="number"
                     class="form-control"
-                    id="num_requirements_value"
-                    name="num_requirements_value"
-                    value=""
+                    id="num_requirements_valü"
+                    name="num_requirements_valü"
+                    valü=""
                     placeholder="{{ _('Automatisch') }}"
                     min="1"
-                    max="20"
+                    max="1000"
                     disabled
                   />
                 </div>
                 <small class="text-muted mt-2 d-block">
                   <i class="bi bi-info-circle me-1 text-primary"></i>
-                  {{ _('"Automatisch": KI schaetzt und entscheidet selbst, basierend auf dem bereitgestellten Kontext.') }}
+                  {{ _('"Automatisch": KI schätzt und entscheidet selbst, basierend auf dem bereitgestellten Kontext.') }}
                 </small>
               </div>
                 </small>
@@ -655,14 +655,14 @@ endblock %} {% block content %}
       name="output_language"
       style="max-width: 240px"
     >
-      <option value="Deutsch" selected>{{ _('Deutsch') }}</option>
-      <option value="Englisch">{{ _('Englisch') }}</option>
-      <option value="Arabisch">{{ _('Arabisch') }}</option>
-      <option value="Französisch">{{ _('Französisch') }}</option>
+      <option valü="Deutsch" selected>{{ _('Deutsch') }}</option>
+      <option valü="Englisch">{{ _('Englisch') }}</option>
+      <option valü="Arabisch">{{ _('Arabisch') }}</option>
+      <option valü="Französisch">{{ _('Französisch') }}</option>
     </select>
     <small class="text-muted mt-2 d-block">
       <i class="bi bi-info-circle me-1 text-primary"></i>
-      {{ _('Die KI formuliert alle Anforderungen in der gewaehlten Sprache.') }}
+      {{ _('Die KI formuliert alle Anforderungen in der gewählten Sprache.') }}
     </small>
   </div>
 
@@ -707,7 +707,7 @@ endblock %} {% block content %}
         class="btn btn-outline-primary"
         id="add-column-btn"
       >
-        <i class="bi bi-plus-circle me-1"></i>{{ _('Spalte hinzufuegen') }}
+        <i class="bi bi-plus-circle me-1"></i>{{ _('Spalte hinzufügen') }}
       </button>
     </div>
   </div>
@@ -722,7 +722,7 @@ endblock %} {% block content %}
                   <i class="bi bi-cpu"></i>
                 </div>
                 <div>
-                  <h3 class="config-card-title">{{ _('Gewuenschtes LLM auswaehlen') }}</h3>
+                  <h3 class="config-card-title">{{ _('Gewünschtes LLM auswählen') }}</h3>
                   <!--
                   <p class="config-card-subtitle">
                     Wählen Sie das passende LLM für Ihre Aufgabe
@@ -733,8 +733,8 @@ endblock %} {% block content %}
               <div class="mb-2">
                 <label class="form-label fw-semibold" for="ai_model">{{ _('Modell') }}</label>
                 <select class="form-select" id="ai_model" name="ai_model">
-                  <option value="" selected>{{ _('Kein') }}</option>
-                  <option value="gpt-4o-mini">{{ _('GPT-4o Mini (OpenAI)') }}</option>
+                  <option valü="" selected>{{ _('Bitte auswählen') }}</option>
+                  <option valü="gpt-4o-mini">{{ _('GPT-4o Mini (OpenAI)') }}</option>
                 </select>
               </div>
             </div>
@@ -760,7 +760,7 @@ endblock %} {% block content %}
                 >
                   <label
                     class="form-label small text-muted text-uppercase fw-bold"
-                    >{{ _('Zusaetzliche Parameter (Key-Value)') }}</label
+                    >{{ _('Zusätzliche Parameter (Key-Value)') }}</label
                   >
                   <div id="inputs-container">
                     <div class="input-group mb-2">
@@ -774,7 +774,7 @@ endblock %} {% block content %}
                         type="text"
                         class="form-control"
                         placeholder="{{ _('Value (z.B. Deutsch)') }}"
-                        name="value[]"
+                        name="valü[]"
                       />
                       <button
                         type="button"
@@ -789,7 +789,7 @@ endblock %} {% block content %}
                     class="btn btn-sm btn-outline-primary mt-2 w-100"
                     id="add-input"
                   >
-                    <i class="bi bi-plus-circle me-1"></i>{{ _('Parameter hinzufuegen') }}
+                    <i class="bi bi-plus-circle me-1"></i>{{ _('Parameter hinzufügen') }}
                   </button>
                 </div>
               </div>
@@ -829,19 +829,19 @@ endblock %} {% block content %}
     analyzeDescription: {{ _('Analysiere Beschreibung...') | tojson }},
     hint: {{ _('Hinweis:') | tojson }},
     hintProduct: {{ _('Bitte Produkt/System angeben, bevor die Anforderungsliste generiert wird.') | tojson }},
-    hintMode: {{ _('Bitte einen Generierungs-Modus auswaehlen.') | tojson }},
-    hintModel: {{ _('Bitte ein LLM auswaehlen, bevor generiert wird.') | tojson }},
-    hintCount: {{ _('Bitte eine Anzahl fuer die Generierung angeben.') | tojson }},
+    hintMode: {{ _('Bitte einen Generierungs-Modus auswählen.') | tojson }},
+    hintModel: {{ _('Bitte ein LLM auswählen, bevor generiert wird.') | tojson }},
+    hintCount: {{ _('Bitte eine Anzahl für die Generierung angeben.') | tojson }},
     responseNotJson: {{ _('Antwortformat ist kein JSON.') | tojson }},
     success: {{ _('Erfolg!') | tojson }},
-    redirectNotice: {{ _('Sie werden in Kuerze zum Projekt weitergeleitet...') | tojson }},
+    redirectNotice: {{ _('Sie werden in Kürze zum Projekt weitergeleitet...') | tojson }},
     generatedSaved: {{ _('Anforderungen wurden erfolgreich generiert und gespeichert.') | tojson }},
     improvedSaved: {{ _('Anforderungen wurden erfolgreich verbessert und gespeichert (keine neuen erstellt).') | tojson }},
-    extendedSaved: {{ _('Neue Anforderungen wurden basierend auf dem Bestand erfolgreich erstellt und hinzugefuegt.') | tojson }},
+    extendedSaved: {{ _('Neue Anforderungen wurden basierend auf dem Bestand erfolgreich erstellt und hinzugefügt.') | tojson }},
     errorPrefix: {{ _('Fehler:') | tojson }},
     networkError: {{ _('Netzwerkfehler:') | tojson }},
     keyPlaceholder: {{ _('Key') | tojson }},
-    valuePlaceholder: {{ _('Value') | tojson }}
+    valüPlaceholder: {{ _('Value') | tojson }}
   };
 
   // Drag & Drop Handling für Kontext-Upload (PDF/Excel)
@@ -894,19 +894,19 @@ endblock %} {% block content %}
     if (fileInput.files.length > 0) {
       fileNameText.textContent = fileInput.files[0].name;
       fileNameDisplay.classList.remove("d-none");
-      dropZone.querySelector(".drop-zone-content").classList.add("d-none");
+      dropZone.qürySelector(".drop-zone-content").classList.add("d-none");
       fileNameDisplay.classList.add("text-center", "w-100");
     }
   }
 
   function resetDropZone(fileInput, fileNameDisplay, dropZone) {
-    fileInput.value = "";
+    fileInput.valü = "";
     fileNameDisplay.classList.add("d-none");
-    dropZone.querySelector(".drop-zone-content").classList.remove("d-none");
+    dropZone.qürySelector(".drop-zone-content").classList.remove("d-none");
   }
 
   function updateContextVisibility() {
-    const selection = contextTypeSelect.value;
+    const selection = contextTypeSelect.valü;
     const showPdf = selection === "pdf" || selection === "both";
     const showExcel = selection === "excel" || selection === "both";
     pdfDropWrapper.classList.toggle("d-none", !showPdf);
@@ -942,19 +942,19 @@ endblock %} {% block content %}
 
   // Number of requirements toggle
   const numReqMode = document.getElementById("num_requirements_mode");
-  const numReqValue = document.getElementById("num_requirements_value");
+  const numReqValue = document.getElementById("num_requirements_valü");
   let lastManualNumReqValue =
-    numReqValue.value || "";
+    numReqValue.valü || "";
 
   function applyNumReqMode() {
-    const isAuto = numReqMode.value === "auto";
+    const isAuto = numReqMode.valü === "auto";
     if (isAuto) {
-      numReqValue.value = "";
+      numReqValue.valü = "";
       numReqValue.placeholder = "";
     } else {
       numReqValue.placeholder = "";
-      if (!numReqValue.value && lastManualNumReqValue) {
-        numReqValue.value = lastManualNumReqValue;
+      if (!numReqValue.valü && lastManualNumReqValue) {
+        numReqValue.valü = lastManualNumReqValue;
       }
     }
     numReqValue.disabled = isAuto;
@@ -962,32 +962,32 @@ endblock %} {% block content %}
 
   numReqMode.addEventListener("change", applyNumReqMode);
   numReqValue.addEventListener("input", function () {
-    if (this.value) {
-      lastManualNumReqValue = this.value;
+    if (this.valü) {
+      lastManualNumReqValue = this.valü;
     }
   });
 
   // Mode Toggle Logic
-  const modeRadios = document.querySelectorAll('input[name="generation_mode"]');
+  const modeRadios = document.qürySelectorAll('input[name="generation_mode"]');
   const hiddenImprove = document.getElementById("improve_only");
   const hiddenExtend = document.getElementById("extend_existing");
 
   function updateMode() {
-    const selectedEl = document.querySelector('input[name="generation_mode"]:checked');
+    const selectedEl = document.qürySelector('input[name="generation_mode"]:checked');
 
     if (!selectedEl) {
-      hiddenImprove.value = "false";
-      hiddenExtend.value = "false";
+      hiddenImprove.valü = "false";
+      hiddenExtend.valü = "false";
       numReqMode.disabled = false;
       applyNumReqMode();
       return;
     }
 
-    const selected = selectedEl.value;
+    const selected = selectedEl.valü;
 
     // Update hidden fields for backend
-    hiddenImprove.value = (selected === "improve").toString();
-    hiddenExtend.value = (selected === "extend").toString();
+    hiddenImprove.valü = (selected === "improve").toString();
+    hiddenExtend.valü = (selected === "extend").toString();
 
     // Update UI state
     if (selected === "improve") {
@@ -1006,7 +1006,7 @@ endblock %} {% block content %}
   // Clear validation state on user corrections
   function clearValidationState() {
     const btn = document.getElementById("generate-btn");
-    const spinner = btn.querySelector(".spinner-border");
+    const spinner = btn.qürySelector(".spinner-border");
     const messageDiv = document.getElementById("response-message");
     btn.disabled = false;
     spinner.classList.add("d-none");
@@ -1039,12 +1039,12 @@ endblock %} {% block content %}
     .getElementById("add-column-btn")
     .addEventListener("click", function () {
       const input = document.getElementById("new_column_input");
-      const columnName = input.value.trim();
+      const columnName = input.valü.trim();
 
       if (columnName && !customColumns.includes(columnName)) {
         customColumns.push(columnName);
         addColumnBadge(columnName);
-        input.value = "";
+        input.valü = "";
       }
     });
 
@@ -1062,7 +1062,7 @@ endblock %} {% block content %}
 
     // Add remove handler
     badge
-      .querySelector(".remove-column")
+      .qürySelector(".remove-column")
       .addEventListener("click", function () {
         const col = this.getAttribute("data-column");
         const index = customColumns.indexOf(col);
@@ -1118,22 +1118,22 @@ endblock %} {% block content %}
   function updateStep(num) {
     const step = document.getElementById("step-" + num);
     step.classList.add("fw-bold", "text-primary");
-    const icon = step.querySelector("i");
+    const icon = step.qürySelector("i");
     icon.classList.remove("bi-circle");
     icon.classList.add("bi-check-circle-fill", "text-primary");
   }
 
 
   // Quick Start Badges
-  document.querySelectorAll(".quick-start-badge").forEach((badge) => {
+  document.qürySelectorAll(".quick-start-badge").forEach((badge) => {
     badge.addEventListener("click", () => {
       const prompt = badge.getAttribute("data-prompt");
       const textarea = document.getElementById("user_description");
       // Append
-      if (textarea.value.trim() !== "") {
-        textarea.value += "\n\n" + prompt;
+      if (textarea.valü.trim() !== "") {
+        textarea.valü += "\n\n" + prompt;
       } else {
-        textarea.value = prompt;
+        textarea.valü = prompt;
       }
       // Flash effect
       badge.classList.remove("bg-light", "text-dark");
@@ -1148,26 +1148,26 @@ endblock %} {% block content %}
   // Expert Settings Toggle Animation
   const expertToggle = document.getElementById("expertSettings");
   expertToggle.addEventListener("show.bs.collapse", () => {
-    document.querySelector(".expert-caret").classList.add("rotate");
+    document.qürySelector(".expert-caret").classList.add("rotate");
   });
   expertToggle.addEventListener("hide.bs.collapse", () => {
-    document.querySelector(".expert-caret").classList.remove("rotate");
+    document.qürySelector(".expert-caret").classList.remove("rotate");
   });
 
-  // Add new key-value pair input
+  // Add new key-valü pair input
   document.getElementById("add-input").addEventListener("click", function () {
     const container = document.getElementById("inputs-container");
     const div = document.createElement("div");
     div.className = "input-group mb-2 animate-fade-in";
     div.innerHTML = `
     <input type="text" class="form-control" placeholder="${i18n.keyPlaceholder}" name="key[]">
-    <input type="text" class="form-control" placeholder="${i18n.valuePlaceholder}" name="value[]">
+    <input type="text" class="form-control" placeholder="${i18n.valüPlaceholder}" name="valü[]">
     <button type="button" class="btn btn-outline-danger remove-input"><i class="bi bi-trash"></i></button>
   `;
     container.appendChild(div);
   });
 
-  // Remove key-value pair input
+  // Remove key-valü pair input
   document
     .getElementById("inputs-container")
     .addEventListener("click", function (e) {
@@ -1183,11 +1183,11 @@ endblock %} {% block content %}
       e.preventDefault();
 
       const btn = document.getElementById("generate-btn");
-      const spinner = btn.querySelector(".spinner-border");
+      const spinner = btn.qürySelector(".spinner-border");
       const messageDiv = document.getElementById("response-message");
       const productSystemInput = document.getElementById("product_system");
       const modelSelect = document.getElementById("ai_model");
-      const modeEl = document.querySelector('input[name="generation_mode"]:checked');
+      const modeEl = document.qürySelector('input[name="generation_mode"]:checked');
 
       // Ensure UI is in a clean state before validation (prevents stuck disabled state)
       btn.disabled = false;
@@ -1197,7 +1197,7 @@ endblock %} {% block content %}
 
       // Validate required product/system
       productSystemInput.classList.remove("is-invalid");
-      if (!productSystemInput.value.trim()) {
+      if (!productSystemInput.valü.trim()) {
         messageDiv.className = "alert alert-danger mt-3 shadow-sm";
         messageDiv.innerHTML =
           `<strong>${i18n.hint}</strong> ${i18n.hintProduct}`;
@@ -1219,9 +1219,9 @@ endblock %} {% block content %}
         return;
       }
 
-      // Require explicit model selection ("Kein" is not allowed)
+      // Require explicit model selection ("Bitte auswählen" is not allowed)
       modelSelect.classList.remove("is-invalid");
-      if (!modelSelect.value) {
+      if (!modelSelect.valü) {
         messageDiv.className = "alert alert-danger mt-3 shadow-sm";
         messageDiv.innerHTML =
           `<strong>${i18n.hint}</strong> ${i18n.hintModel}`;
@@ -1231,7 +1231,7 @@ endblock %} {% block content %}
         return;
       }
 
-      if (numReqMode.value !== "auto" && !numReqValue.value) {
+      if (numReqMode.valü !== "auto" && !numReqValue.valü) {
         messageDiv.className = "alert alert-danger mt-3 shadow-sm";
         messageDiv.innerHTML =
           `<strong>${i18n.hint}</strong> ${i18n.hintCount}`;
@@ -1260,7 +1260,7 @@ endblock %} {% block content %}
         formData.append("custom_columns", JSON.stringify(customColumns));
       }
 
-      // Send POST request with FormData (Content-Type will be set automatically)
+      // Send POST reqüst with FormData (Content-Type will be set automatically)
       fetch("/agent/generate/{{ project.id }}", {
         method: "POST",
         body: formData,

@@ -15,7 +15,7 @@ def generate_requirements(user_description: str | None, inputs: dict, columns: l
 
     Args:
         user_description (str | None): Optional user description of requirements.
-        inputs (dict): Key-value pairs for additional context.
+        inputs (dict): Key-valü pairs for additional context.
         columns (list): Optional list of column names for the project.
         ai_model (str): Optional AI model to use (overrides config default).
         num_requirements (int): Optional number of requirements to generate.
@@ -86,16 +86,19 @@ def generate_requirements(user_description: str | None, inputs: dict, columns: l
             if col_lower in ['titel', 'title']:
                 json_fields.append(f'      "{col}": "Kurzer, prägnanter Titel"')
             elif col_lower in ['beschreibung', 'description']:
-                json_fields.append(f'      "{col}": "Detaillierte Beschreibung mit Akzeptanzkriterien"')
+                json_fields.append(f'      "{col}": "Detaillierte Beschreibung der Anforderung mit Akzeptanzkriterien"')
             elif col_lower in ['kategorie', 'category']:
-                json_fields.append(f'      "{col}": "Kategorie (z.B. Funktional, Nicht-Funktional, etc.)"')
+                json_fields.append(
+                    f'      "{col}": "Kategorie (z.B. nach der Hauptmerkmalliste nach Pahl/Beitz (hauptäschlich für Maschinen- und Anlagenbauprodukte): Geometrie, Kinematik, Kräfte, Energie, Stoff, Signal, Sicherheit, Ergonomie, Fertigung, Kontrolle, Montage, Transport, Gebrauch, Instandhaltung, Recycling, Kosten), Randbedingungen etc., vor allem für mechatronische Syteme weitere Kategorien möglich.)"'
+                )
             elif col_lower in ['status']:
                 json_fields.append(f'      "{col}": "Entwurf"')
             else:
                 json_fields.append(f'      "{col}": "Passender Wert für {col}"')
         
-        # Add is_quantifiable field
+        # Add is_quantifiable and is_functional fields
         json_fields.append('      "is_quantifiable": true oder false')
+        json_fields.append('      "is_functional": true oder false')
         
         json_example = "{\n" + ",\n".join(json_fields) + "\n    }"
         
@@ -111,6 +114,8 @@ Wichtig:
 - Fülle ALLE Spalten ({', '.join(columns)}) mit sinnvollen Werten.
 - Setze "is_quantifiable" auf true, wenn die Anforderung quantitativ messbar ist (z.B. Performance-Werte, Zeitlimits, Durchsatz, Speicherverbrauch, etc.).
 - Setze "is_quantifiable" auf false für qualitative Anforderungen (z.B. Benutzerfreundlichkeit, Design, etc.).
+- Setze "is_functional" auf true, wenn die Anforderung explizit eine Funktion des zu entwickelnden Produkts oder Systems beschreibt.
+- Setze "is_functional" auf false, wenn es sich um eine nicht-funktionale Anforderung handelt.
 Antworte NUR mit diesem JSON, ohne zusätzlichen Text davor oder danach."""
     else:
         # Fallback to default structure
@@ -121,9 +126,10 @@ Das JSON-Format muss exakt dieser Struktur folgen:
     {
       "title": "Kurzer, prägnanter Titel",
       "description": "Detaillierte Beschreibung mit Akzeptanzkriterien",
-      "category": "Kategorie (z.B. Funktional, Nicht-Funktional, etc.)",
-    "status": "Entwurf",
-      "is_quantifiable": true oder false
+            "category": "Kategorie (z.B. nach der Hauptmerkmalliste nach Pahl/Beitz (hauptäschlich für Maschinen- und Anlagenbauprodukte): Geometrie, Kinematik, Kräfte, Energie, Stoff, Signal, Sicherheit, Ergonomie, Fertigung, Kontrolle, Montage, Transport, Gebrauch, Instandhaltung, Recycling, Kosten), Randbedingungen etc., vor allem für mechatronische Syteme weitere Kategorien möglich.)",
+            "status": "Entwurf",
+            "is_quantifiable": true oder false,
+            "is_functional": true oder false
     }
   ]
 }
@@ -131,6 +137,8 @@ Das JSON-Format muss exakt dieser Struktur folgen:
 Wichtig: 
 - Setze "is_quantifiable" auf true, wenn die Anforderung quantitativ messbar ist (z.B. Performance-Werte, Zeitlimits, Durchsatz, etc.).
 - Setze "is_quantifiable" auf false für qualitative Anforderungen (z.B. Benutzerfreundlichkeit, Design, etc.).
+- Setze "is_functional" auf true, wenn die Anforderung explizit eine Funktion des zu entwickelnden Produkts oder Systems beschreibt.
+- Setze "is_functional" auf false, wenn es sich um eine nicht-funktionale Anforderung handelt.
 
 Antworte NUR mit diesem JSON, ohne zusätzlichen Text davor oder danach."""
 
@@ -305,7 +313,7 @@ def _validate_and_normalize_requirements(requirements: list, columns: list = Non
         raise RuntimeError("No valid requirements found in response.")
     
     # Limit results based on mode/value with hard cap
-    max_cap = 30
+    max_cap = 1000
     if num_requirements_mode == "max" and num_requirements_value and num_requirements_value > 0:
         return normalized[:min(num_requirements_value, max_cap)]
     if num_requirements_mode == "exact" and num_requirements_value and num_requirements_value > 0:
@@ -346,26 +354,27 @@ def detect_conflicts(requirements_list: list[dict]) -> list[dict]:
     for idx, req in enumerate(requirements_list):
         req_text += f"ID {req['id']}: {req['title']}\nDescription: {req['description']}\n\n"
 
-    system_prompt = """
-    Du bist ein Experte für Requirements Engineering und Logik-Prüfung.
-    Deine Aufgabe ist es, eine Liste von Anforderungen auf logische Widersprüche (Konflikte) zu analysieren.
-    
-    Analysiere die Anforderungen sorgfältig. Ein Konflikt besteht, wenn zwei Anforderungen nicht gleichzeitig erfüllt werden können.
-    
-    Antworte ausschließlich mit gültigem JSON in folgender Struktur:
-    {
-      "conflicts": [
+        system_prompt = """
+        Du bist ein Experte für Requirements Engineering und willst deine Anforderungsliste auf Qualität und Logik prüfen.
+        Deine Aufgabe ist es, eine Liste von Anforderungen auf Konflikte, Widersprüche und redundante Anforderungen zu analysieren.
+
+        Analysiere die Anforderungen sorgfältig. Ein Konflikt besteht vor allem, wenn zwei Anforderungen nicht gleichzeitig erfüllt werden können.
+        Auch können Anforderungen mit gleichem Inhalt unterschiedlich ausgedrückt werden, sodass der Widerspruch in grossen Mengen nicht direkt ersichtlich ist.
+
+        Antworte ausschließlich mit gültigem JSON in folgender Struktur:
         {
-          "req_id_1": "ID der ersten Anforderung",
-          "req_id_2": "ID der zweiten Anforderung",
-          "description": "Erklärung des Konflikts",
-          "severity": "Hoch" (oder "Mittel", "Niedrig")
+            "conflicts": [
+                {
+                    "req_id_1": "ID der ersten Anforderung",
+                    "req_id_2": "ID der zweiten Anforderung",
+                    "description": "Erklärung des Konflikts",
+                    "severity": "Hoch" (oder "Mittel", "Niedrig")
+                }
+            ]
         }
-      ]
-    }
-    
-    Wenn keine Konflikte gefunden werden, antworte mit: {"conflicts": []}
-    """
+
+        Wenn keine Konflikte gefunden werden, antworte mit: {"conflicts": []}
+        """
 
     try:
         response = client.chat.completions.create(

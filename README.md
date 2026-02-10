@@ -73,7 +73,6 @@ Diese Anwendung ermöglicht es Benutzern, Software-Anforderungen zu erstellen, z
 - **Jinja2**: Template-Engine
 - **JavaScript**: Interaktive Funktionen
 
-
 ## 📦 Installation
 
 ### Voraussetzungen
@@ -148,14 +147,12 @@ Die Anwendung verwendet SQLite und erstellt automatisch alle Tabellen beim erste
 
 - Projekte können mit anderen registrierten Benutzern geteilt werden
 
-
 ### Anforderungslebenszyklus
 
 1. **Erstellung**: Neue Anforderung mit KI-Unterstützung
 2. **Bearbeitung**: Versionierung und Status-Updates
 3. **Archivierung**: Soft-Delete in Papierkorb
 4. **Endgültige Löschung**: Permanente Entfernung
-
 
 ## 🧪 Tests
 
@@ -209,9 +206,6 @@ interface_for_mbse_models/
 - SQL-Injection-Schutz durch SQLAlchemy
 - XSS-Schutz durch Jinja2 Auto-Escaping
 - Sichere Session-Verwaltung
-
-
-
 
 ## 🔄 Migration und Updates
 

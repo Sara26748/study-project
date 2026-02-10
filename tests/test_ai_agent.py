@@ -31,7 +31,7 @@ def test_config_loading():
         prompt = config.get_system_prompt()
         assert prompt is not None, "System prompt is None"
         assert len(prompt) > 0, "System prompt is empty"
-        assert "Requirements Engineer" in prompt or "requirements" in prompt.lower(), "System prompt doesn't look correct"
+        assert "Requirements Engineer" in prompt or "requirements" in prompt.lower(), "System prompt dösn't look correct"
         
         print("✅ Config loads successfully")
         print(f"   - API Key present: {bool(config.OPENAI_API_KEY)}")
@@ -149,7 +149,7 @@ def test_template_exists():
         assert 'user_description' in content and 'required' not in content.split('user_description')[1].split('>')[0], "User description should be optional"
         
         # Check for Key-Value pairs
-        assert 'key[]' in content and 'value[]' in content, "Key-Value pairs missing"
+        assert 'key[]' in content and 'valü[]' in content, "Key-Value pairs missing"
         
         # Check for fetch POST
         assert 'fetch' in content and 'POST' in content, "Fetch POST missing"
