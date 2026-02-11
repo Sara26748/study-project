@@ -55,26 +55,31 @@ def _roman_to_int(value: str) -> int:
     return total
 
 
-def _split_revision_label(value: str) -> tuple[int, str]:
-    """Parse revision label like 'ii.A' into (2, 'A')."""
+def _parse_revision_number(value: str) -> int:
+    """Parse revision label like 'ii' or legacy 'ii.A' into a number."""
     if not value or value == 'Entwurf':
-        return 0, 'A'
+        return 0
+    raw = value.strip()
+    roman_part = raw.split('.', 1)[0].strip() if '.' in raw else raw
+    return _roman_to_int(roman_part)
+
+
+def _parse_revision_round(value: str) -> str:
+    """Parse legacy revision label like 'ii.A' into round letter 'A'."""
+    if not value or value == 'Entwurf':
+        return 'A'
     raw = value.strip()
     if '.' in raw:
-        roman_part, round_part = raw.split('.', 1)
-        roman_part = roman_part.strip()
-        round_letter = round_part.strip().upper()[:1] or 'A'
-    else:
-        roman_part = raw
-        round_letter = 'A'
-    return _roman_to_int(roman_part), round_letter
+        _, round_part = raw.split('.', 1)
+        return round_part.strip().upper()[:1] or 'A'
+    return 'A'
 
 
-def _format_revision_label(number: int, round_letter: str) -> str:
-    """Format revision label like 'i.A'."""
+def _format_revision_label(number: int) -> str:
+    """Format revision label like 'i'."""
     if number <= 0:
         return ''
-    return f"{_int_to_roman(number)}.{(round_letter or 'A').upper()}"
+    return _int_to_roman(number)
 
 
 def _next_round_letter(letter: str) -> str:
@@ -109,8 +114,8 @@ def _parse_revision_key(value: str) -> tuple[str, int]:
 
 def _normalize_revision_label(value: str) -> str:
     """Normalize revision labels for display."""
-    number, round_letter = _split_revision_label(value)
-    return _format_revision_label(number, round_letter)
+    number = _parse_revision_number(value)
+    return _format_revision_label(number)
 
 # Route: Manuelle Anforderung erstellen
 @bp.route("/project/<int:project_id>/manual_requirement", methods=["POST"])
@@ -753,6 +758,20 @@ def requirement_revisions_json(req_id):
     if version_obj.requirement_id != req.id:
         abort(404)
 
+    version_labels = [ver.version_label for ver in (req.versions or [])]
+    if not version_labels:
+        version_labels = [version_obj.version_label]
+
+    version_order = {label: idx for idx, label in enumerate(version_labels, start=1)}
+
+    def normalize_round_label(value: str) -> str:
+        candidate = (value or '').strip().upper()[:1]
+        if not candidate:
+            return version_labels[0] if version_labels else 'A'
+        if candidate in version_order:
+            return candidate
+        return version_labels[0] if version_labels else candidate
+
     history_entries = (
         RequirementVersionHistory.query
         .filter(
@@ -775,12 +794,16 @@ def requirement_revisions_json(req_id):
         baseline_snapshot = changes.get('revision_baseline')
         if baseline_snapshot and not baseline_added:
             baseline_label = _normalize_revision_label(baseline_snapshot.get('revision_label'))
-            baseline_number, baseline_round = _split_revision_label(baseline_label)
+            baseline_number = baseline_snapshot.get('revision_number') or _parse_revision_number(baseline_label)
+            baseline_round = normalize_round_label(
+                baseline_snapshot.get('version_label') or _parse_revision_round(baseline_snapshot.get('revision_label'))
+            )
             revisions_data.append({
                 'revision_label': baseline_label,
-                'revision_number': baseline_snapshot.get('revision_number') or 0,
-                'revision_key': f"{baseline_round}-{baseline_snapshot.get('revision_number') or 0}",
-                'version_label': baseline_snapshot.get('version_label'),
+                'revision_number': baseline_number or 0,
+                'revision_key': f"{baseline_round}-{baseline_number or 0}",
+                'version_label': baseline_round,
+                'revision_sort': (version_order.get(baseline_round, 0) * 10) + (baseline_number or 0),
                 'title': baseline_snapshot.get('title'),
                 'description': baseline_snapshot.get('description'),
                 'category': baseline_snapshot.get('category'),
@@ -795,12 +818,14 @@ def requirement_revisions_json(req_id):
     # Add fallback baseline when no baseline snapshot exists yet
     if not baseline_added:
         fallback_label = _normalize_revision_label(version_obj.revision)
-        fallback_number, fallback_round = _split_revision_label(fallback_label)
+        fallback_number = _parse_revision_number(fallback_label)
+        fallback_round = normalize_round_label(version_obj.version_label)
         revisions_data.append({
             'revision_label': fallback_label,
             'revision_number': fallback_number,
             'revision_key': f"{fallback_round}-{fallback_number}",
-            'version_label': version_obj.version_label,
+            'version_label': fallback_round,
+            'revision_sort': (version_order.get(fallback_round, 0) * 10) + (fallback_number or 0),
             'title': version_obj.title,
             'description': version_obj.description,
             'category': version_obj.category,
@@ -822,13 +847,17 @@ def requirement_revisions_json(req_id):
             continue
 
         snapshot_label = _normalize_revision_label(snapshot.get('revision_label'))
-        snapshot_number, snapshot_round = _split_revision_label(snapshot_label)
+        snapshot_number = snapshot.get('revision_number') or _parse_revision_number(snapshot_label)
+        snapshot_round = normalize_round_label(
+            snapshot.get('version_label') or _parse_revision_round(snapshot.get('revision_label'))
+        )
 
         revisions_data.append({
             'revision_label': snapshot_label,
-            'revision_number': snapshot.get('revision_number'),
-            'revision_key': f"{snapshot_round}-{snapshot.get('revision_number') or 0}",
-            'version_label': snapshot.get('version_label'),
+            'revision_number': snapshot_number,
+            'revision_key': f"{snapshot_round}-{snapshot_number or 0}",
+            'version_label': snapshot_round,
+            'revision_sort': (version_order.get(snapshot_round, 0) * 10) + (snapshot_number or 0),
             'title': snapshot.get('title'),
             'description': snapshot.get('description'),
             'category': snapshot.get('category'),
@@ -1033,6 +1062,9 @@ def revise_requirement_version(version_id):
     category = request.form.get('category', '').strip()
     revision_key = request.form.get('revision_key', '').strip()
     target_round, revision_number = _parse_revision_key(revision_key)
+    update_existing = request.form.get('revision_update') == '1'
+    if revision_key and not update_existing:
+        revision_number = 0
 
     if not title or not description:
         flash("Title and description are required for a Revision.", "danger")
@@ -1084,41 +1116,85 @@ def revise_requirement_version(version_id):
         version_id=version.id, change_type='revised'
     ).order_by(RequirementVersionHistory.created_at.asc()).all()
 
-    def find_revision_entry(target_number, target_round_letter):
+    version_labels = [ver.version_label for ver in (version.requirement.versions or [])]
+    if not version_labels:
+        version_labels = [version.version_label]
+
+    def normalize_round_label(label: str) -> str:
+        candidate = (label or '').strip().upper()[:1]
+        if not candidate:
+            return version_labels[0] if version_labels else 'A'
+        if candidate in version_labels:
+            return candidate
+        return version_labels[0] if version_labels else candidate
+
+    def next_round_label(label: str) -> str:
+        if not version_labels:
+            return label or 'A'
+        if label not in version_labels:
+            return version_labels[0]
+        idx = version_labels.index(label)
+        if idx + 1 < len(version_labels):
+            return version_labels[idx + 1]
+        return label
+
+    def snapshot_round_and_number(snapshot: dict) -> tuple[str, int]:
+        round_label = normalize_round_label(
+            snapshot.get('version_label') or _parse_revision_round(snapshot.get('revision_label'))
+        )
+        number = snapshot.get('revision_number') or _parse_revision_number(snapshot.get('revision_label'))
+        try:
+            number = int(number)
+        except Exception:
+            number = 0
+        return round_label, number
+
+    def find_revision_entry(target_number, target_round_label):
+        target_round_label = normalize_round_label(target_round_label)
         for entry in history_entries:
             try:
                 snapshot = (entry.get_changes() or {}).get('revision_snapshot') or {}
-                label = snapshot.get('revision_label') or ''
-                snap_number, snap_round = _split_revision_label(label)
-                if snap_number and snap_round == target_round_letter and int(snap_number) == int(target_number):
+                snap_round, snap_number = snapshot_round_and_number(snapshot)
+                if snap_number and snap_round == target_round_label and int(snap_number) == int(target_number):
                     return entry, snapshot
             except Exception:
                 continue
         return None, None
 
-    current_number, current_round = _split_revision_label(version.revision)
-    round_for_new = current_round if version.revision else 'A'
-    if version.revision and version.status == 'Freigabe':
-        round_for_new = _next_round_letter(current_round)
-
-    def latest_number_for_round(round_letter: str) -> int:
+    def latest_number_for_round(round_label: str) -> int:
         numbers = []
         for entry in history_entries:
             try:
                 snapshot = (entry.get_changes() or {}).get('revision_snapshot') or {}
-                label = snapshot.get('revision_label') or ''
-                snap_number, snap_round = _split_revision_label(label)
-                if snap_number and snap_round == round_letter:
+                snap_round, snap_number = snapshot_round_and_number(snapshot)
+                if snap_number and snap_round == round_label:
                     numbers.append(int(snap_number))
             except Exception:
                 continue
-        if current_number and current_round == round_letter:
-            numbers.append(current_number)
         return max(numbers) if numbers else 0
 
-    latest_number = latest_number_for_round(round_for_new)
+    def latest_revision_state() -> tuple[str, int]:
+        for entry in reversed(history_entries):
+            try:
+                snapshot = (entry.get_changes() or {}).get('revision_snapshot') or {}
+                if snapshot:
+                    snap_round, snap_number = snapshot_round_and_number(snapshot)
+                    if snap_number:
+                        return snap_round, snap_number
+            except Exception:
+                continue
+        return normalize_round_label(version_labels[0] if version_labels else 'A'), 0
 
-    def build_snapshot(target_status, target_revision_number, round_letter):
+    max_per_round = 3
+    last_round, last_number = latest_revision_state()
+    if last_number >= max_per_round:
+        round_for_new = next_round_label(last_round)
+        next_revision_number = 1
+    else:
+        round_for_new = last_round
+        next_revision_number = last_number + 1 if last_number else 1
+
+    def build_snapshot(target_status, target_revision_number, round_label):
         return {
             "title": title,
             "description": description,
@@ -1127,18 +1203,20 @@ def revise_requirement_version(version_id):
             "status_color": status_color_for(target_status),
             "custom_data": custom_data,
             "is_quantifiable": is_quantifiable,
-            "version_label": version.version_label,
-            "revision_label": _format_revision_label(target_revision_number, round_letter) if target_revision_number else _normalize_revision_label(version.revision),
-            "revision_number": target_revision_number if target_revision_number else _split_revision_label(version.revision)[0],
+            "version_label": round_label,
+            "revision_label": _format_revision_label(target_revision_number) if target_revision_number else _normalize_revision_label(version.revision),
+            "revision_number": target_revision_number if target_revision_number else _parse_revision_number(version.revision),
         }
 
     # CASE 1: Update an existing revision (revision_number provided)
     if revision_number:
-        target_round = target_round or current_round
+        target_round = normalize_round_label(target_round or round_for_new)
+        apply_to_version = target_round == version.version_label
         target_entry, existing_snapshot = find_revision_entry(revision_number, target_round)
         if not target_entry:
             # If the requested revision doesn't exist yet, fall back to creating a new one
             revision_number = None
+            round_for_new = target_round
         else:
             prev_custom = existing_snapshot.get('custom_data') or {}
             prev_status = existing_snapshot.get('status') or version.status
@@ -1180,12 +1258,12 @@ def revise_requirement_version(version_id):
             new_snapshot = build_snapshot(target_status, revision_number, target_round)
             changes = target_entry.get_changes() or {}
             changes['revision_snapshot'] = new_snapshot
-            changes['revision'] = f"Revision {_format_revision_label(revision_number, target_round)} aktualisiert"
+            changes['revision'] = f"Revision {_format_revision_label(revision_number)} aktualisiert"
             target_entry.changes = json.dumps(changes)
 
             # Only push the edited values onto the live version when editing the latest revision
             latest_number_for_target = latest_number_for_round(target_round)
-            if revision_number >= latest_number_for_target:
+            if apply_to_version and revision_number >= latest_number_for_target:
                 version.title = title
                 version.description = description
                 version.category = category
@@ -1193,12 +1271,12 @@ def revise_requirement_version(version_id):
                 version.set_custom_data(custom_data)
                 if target_status in allowed_status:
                     version.status = target_status
-                version.revision = _format_revision_label(revision_number, target_round)
+                version.revision = _format_revision_label(revision_number)
 
             db.session.commit()
 
             flash(
-                f"Revision {_format_revision_label(revision_number, target_round)} wurde aktualisiert.",
+                f"Revision {_format_revision_label(revision_number)} wurde aktualisiert.",
                 "success",
             )
             return redirect(
@@ -1206,22 +1284,32 @@ def revise_requirement_version(version_id):
                     'main.manage_project',
                     project_id=version.requirement.project_id,
                     selected_version_id=version.id,
+                    selected_req_id=version.requirement_id,
+                    selected_revision_key=f"{target_round}-{revision_number}",
                 )
             )
 
     # CASE 2: Create a new revision (existing behavior)
-    # Preserve old state for baseline snapshot (before first revision)
+    # Preserve old state for baseline snapshot (before first revision of a round)
+    baseline_source = None
+    for ver in version.requirement.versions or []:
+        if ver.version_label == round_for_new:
+            baseline_source = ver
+            break
+    if not baseline_source:
+        baseline_source = version
+
     old_state_snapshot = {
-        "title": version.title,
-        "description": version.description,
-        "category": version.category,
-        "status": version.status,
-        "status_color": version.get_status_color(),
-        "custom_data": version.get_custom_data(),
-        "is_quantifiable": version.get_custom_data().get('is_quantifiable') in ['true', True],
-        "version_label": version.version_label,
-        "revision_label": _normalize_revision_label(version.revision),
-        "revision_number": _split_revision_label(version.revision)[0],
+        "title": baseline_source.title,
+        "description": baseline_source.description,
+        "category": baseline_source.category,
+        "status": baseline_source.status,
+        "status_color": baseline_source.get_status_color(),
+        "custom_data": baseline_source.get_custom_data(),
+        "is_quantifiable": baseline_source.get_custom_data().get('is_quantifiable') in ['true', True],
+        "version_label": round_for_new,
+        "revision_label": _normalize_revision_label(baseline_source.revision),
+        "revision_number": _parse_revision_number(baseline_source.revision),
     }
 
     changes = {}
@@ -1244,14 +1332,19 @@ def revise_requirement_version(version_id):
         changes['is_quantifiable'] = f"{'Ja' if old_quantifiable == 'true' else 'Nein'} → {'Ja' if new_quantifiable == 'true' else 'Nein'}"
 
     old_status = version.status
+    pending_status = None
     if status_from_form and status_from_form in allowed_status:
         if old_status != status_from_form:
             changes['status'] = f"{old_status} → {status_from_form}"
-        version.status = status_from_form
+        snapshot_status = status_from_form
+        pending_status = status_from_form
     elif changes:
         if old_status != 'In Bearbeitung':
             changes['status'] = f"{old_status} → In Bearbeitung"
-        version.status = 'In Bearbeitung'
+        snapshot_status = 'In Bearbeitung'
+        pending_status = 'In Bearbeitung'
+    else:
+        snapshot_status = old_status
 
     if not changes:
         flash("Keine Änderungen erkannt. Nimm Änderungen vor, bevor du revidierst.", "warning")
@@ -1263,22 +1356,32 @@ def revise_requirement_version(version_id):
             )
         )
 
+    # Recalculate the next revision slot for the chosen round
+    latest_for_round = latest_number_for_round(round_for_new)
+    if latest_for_round >= max_per_round:
+        round_for_new = next_round_label(round_for_new)
+        latest_for_round = latest_number_for_round(round_for_new)
+    next_revision_number = latest_for_round + 1
+
+    apply_to_version = round_for_new == version.version_label
+
     # Persist field updates for the latest revision path
-    version.title = title
-    version.description = description
-    version.category = category
-    version.last_modified_by_id = current_user.id
-    version.set_custom_data(custom_data)
+    if apply_to_version:
+        version.title = title
+        version.description = description
+        version.category = category
+        version.last_modified_by_id = current_user.id
+        version.set_custom_data(custom_data)
+        if pending_status in allowed_status:
+            version.status = pending_status
+        version.revision = _format_revision_label(next_revision_number)
 
-    next_revision_number = latest_number_for_round(round_for_new) + 1
-    version.revision = _format_revision_label(next_revision_number, round_for_new)
-
-    snapshot = build_snapshot(version.status, next_revision_number, round_for_new)
+    snapshot = build_snapshot(snapshot_status, next_revision_number, round_for_new)
 
     if next_revision_number == 1:
         changes['revision_baseline'] = old_state_snapshot
 
-    changes['revision'] = f"Revision {version.revision} auf Version {version.version_label} gesetzt"
+    changes['revision'] = f"Revision {version.revision} auf Version {round_for_new} gesetzt"
     changes['revision_snapshot'] = snapshot
     history_entry = RequirementVersionHistory(
         version_id=version.id,
@@ -1291,7 +1394,7 @@ def revise_requirement_version(version_id):
     db.session.commit()
 
     flash(
-        f"Revision {version.revision} wurde auf Version {version.version_label} gesetzt.",
+        f"Revision {version.revision} wurde auf Version {round_for_new} gesetzt.",
         "success",
     )
     return redirect(
@@ -1299,6 +1402,8 @@ def revise_requirement_version(version_id):
             'main.manage_project',
             project_id=version.requirement.project_id,
             selected_version_id=version.id,
+            selected_req_id=version.requirement_id,
+            selected_revision_key=f"{round_for_new}-{next_revision_number}",
         )
     )
 
@@ -1570,13 +1675,14 @@ def generate_single_requirement_alternative(context, columns):
         raise
 
 # Route to export project requirements to Excel
-@bp.route("/project/<int:project_id>/export_excel")
+@bp.route("/project/<int:project_id>/export_excel", methods=["GET", "POST"])
 @login_required
 def export_excel(project_id):
     from openpyxl import Workbook
     from openpyxl.styles import Font, Alignment
     from io import BytesIO
     from flask import send_file
+    from .models import RequirementVersionHistory
     
     project = Project.query.get_or_404(project_id)
     check_project_access(project)
@@ -1611,44 +1717,161 @@ def export_excel(project_id):
         cell.font = Font(bold=True)
         cell.alignment = Alignment(horizontal="center", vertical="top")
     
+    selection_payload = request.form.get("selection_payload", "").strip()
+    selected_items = []
+    if selection_payload:
+        try:
+            selected_items = json.loads(selection_payload)
+        except Exception:
+            selected_items = []
+
+    def _status_is_release(value: str) -> bool:
+        return str(value or "").lower() == "freigabe"
+
+    def _find_revision_snapshot(revision_version_id, revision_key_value):
+        if not revision_version_id or not revision_key_value:
+            return None
+        target_round, target_number = _parse_revision_key(revision_key_value)
+        if not target_round or not target_number:
+            return None
+        entries = (
+            RequirementVersionHistory.query
+            .filter_by(version_id=revision_version_id, change_type='revised')
+            .order_by(RequirementVersionHistory.created_at.asc())
+            .all()
+        )
+        for entry in entries:
+            try:
+                changes = entry.get_changes() or {}
+            except Exception:
+                changes = {}
+            snapshot = changes.get('revision_snapshot') or {}
+            if not snapshot:
+                continue
+            snap_round = snapshot.get('version_label') or _parse_revision_round(snapshot.get('revision_label'))
+            snap_number = snapshot.get('revision_number') or _parse_revision_number(snapshot.get('revision_label'))
+            try:
+                snap_number = int(snap_number)
+            except Exception:
+                snap_number = 0
+            if snap_round and str(snap_round).upper()[:1] == target_round and snap_number == int(target_number):
+                return snapshot
+        return None
+
     # Write data rows
     row_num = 2
     display_id = 1
-    
-    for req in requirements:
-        latest_version = req.get_latest_version()
-        if not latest_version:
-            continue
-        
-        custom_data = latest_version.get_custom_data()
-        
-        # Prepare row data in requested order
-        creator = latest_version.created_by.email if latest_version.created_by else "–"
-        revision = latest_version.revision or "Entwurf"
-        row_data = [
-            creator,
-            revision,
-            latest_version.version_label,
-            display_id,
-            latest_version.title,
-            latest_version.description,
-        ]
-        
-        # Add custom column values
-        for col in custom_columns:
-            row_data.append(custom_data.get(col, "–"))
-        
-        # Add category and status
-        row_data.append(latest_version.category or "–")
-        row_data.append(latest_version.status)
-        
-        # Write row
-        for col_num, value in enumerate(row_data, 1):
-            cell = ws.cell(row=row_num, column=col_num, value=value)
-            cell.alignment = Alignment(wrap_text=True, vertical="top")
-        
-        row_num += 1
-        display_id += 1
+
+    if selected_items:
+        for item in selected_items:
+            try:
+                req_id = int(item.get("req_id"))
+            except Exception:
+                continue
+            req = Requirement.query.filter_by(
+                id=req_id,
+                project_id=project_id,
+                is_deleted=False,
+            ).first()
+            if not req:
+                continue
+
+            version_id = item.get("version_id")
+            revision_key_value = item.get("revision_key") or ""
+            revision_version_id = item.get("revision_version_id") or version_id
+
+            version_obj = None
+            if version_id:
+                version_obj = RequirementVersion.query.get(version_id)
+                if not version_obj or version_obj.requirement_id != req.id:
+                    version_obj = None
+
+            snapshot = _find_revision_snapshot(revision_version_id, revision_key_value)
+            if snapshot and _status_is_release(snapshot.get("status")):
+                custom_data = snapshot.get("custom_data") or {}
+                creator = (
+                    version_obj.created_by.email
+                    if version_obj and version_obj.created_by
+                    else "–"
+                )
+                revision = _normalize_revision_label(snapshot.get("revision_label"))
+                row_data = [
+                    creator,
+                    revision,
+                    snapshot.get("version_label") or (version_obj.version_label if version_obj else ""),
+                    display_id,
+                    snapshot.get("title") or "–",
+                    snapshot.get("description") or "–",
+                ]
+                for col in custom_columns:
+                    row_data.append(custom_data.get(col, "–"))
+                row_data.append(snapshot.get("category") or "–")
+                row_data.append(snapshot.get("status") or "–")
+            elif version_obj and _status_is_release(version_obj.status):
+                custom_data = version_obj.get_custom_data()
+                creator = version_obj.created_by.email if version_obj.created_by else "–"
+                revision = version_obj.get_revision_display() or ""
+                row_data = [
+                    creator,
+                    revision,
+                    version_obj.version_label,
+                    display_id,
+                    version_obj.title,
+                    version_obj.description,
+                ]
+                for col in custom_columns:
+                    row_data.append(custom_data.get(col, "–"))
+                row_data.append(version_obj.category or "–")
+                row_data.append(version_obj.status)
+            else:
+                continue
+
+            for col_num, value in enumerate(row_data, 1):
+                cell = ws.cell(row=row_num, column=col_num, value=value)
+                cell.alignment = Alignment(wrap_text=True, vertical="top")
+
+            row_num += 1
+            display_id += 1
+    else:
+        for req in requirements:
+            latest_version = req.get_latest_version()
+            if not latest_version:
+                continue
+            latest_released = req.get_latest_released_version()
+            if not latest_released:
+                continue
+            if latest_released.status != 'Freigabe':
+                continue
+
+            custom_data = latest_released.get_custom_data()
+
+            # Prepare row data in requested order
+            creator = latest_released.created_by.email if latest_released.created_by else "–"
+            revision = latest_released.get_revision_display() or ""
+            row_data = [
+                creator,
+                revision,
+                latest_released.version_label,
+                display_id,
+                latest_released.title,
+                latest_released.description,
+            ]
+
+            # Add custom column values
+            for col in custom_columns:
+                row_data.append(custom_data.get(col, "–"))
+
+            # Add category and status
+            row_data.append(latest_released.category or "–")
+            row_data.append(latest_released.status)
+
+            # Write row
+            for col_num, value in enumerate(row_data, 1):
+                cell = ws.cell(row=row_num, column=col_num, value=value)
+                cell.alignment = Alignment(wrap_text=True, vertical="top")
+
+            row_num += 1
+            display_id += 1
     
     # Set column widths (readable layout)
     ws.column_dimensions['A'].width = 24  # Verantwortlicher

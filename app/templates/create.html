@@ -218,9 +218,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 <button id="scrollToSyslmBtn" class="btn btn-outline-primary btn-modern px-3 d-flex align-items-center shadow-sm" type="button" title="{{ _('SysML v2 Code') }}">
                   <i class="bi bi-lightning-charge-fill me-2"></i> {{ _('SysML v2 Code') }}
                 </button>
-                <a href="{{ url_for('main.export_excel', project_id=project.id) }}" class="btn btn-outline-success btn-modern px-3 d-flex align-items-center shadow-sm" title="{{ _('Liste als Excel exportieren') }}">
+                <form id="exportExcelForm" method="POST" action="{{ url_for('main.export_excel', project_id=project.id) }}" class="d-inline">
+                  <input type="hidden" id="exportSelectionPayload" name="selection_payload" value="" />
+                  <button id="exportExcelBtn" type="button" class="btn btn-outline-success btn-modern px-3 d-flex align-items-center shadow-sm" title="{{ _('Liste als Excel exportieren') }}">
                     <i class="bi bi-file-earmark-arrow-up me-2 fw-bold"></i> {{ _('Export') }}
-                </a>
+                  </button>
+                </form>
                 <button class="btn btn-outline-primary btn-modern btn-import px-3 d-flex align-items-center shadow-sm" type="button" data-bs-toggle="modal" data-bs-target="#importExcelModal" title="{{ _('Excel-Datei importieren') }}">
                     <i class="bi bi-file-earmark-arrow-down me-2 fw-bold"></i> {{ _('Import') }}
                 </button>
@@ -956,7 +959,7 @@ document.addEventListener('DOMContentLoaded', function() {
               id="revisionSubmit"
               disabled
             >
-              {{ _('Revidiert') }}
+              {{ _('Revidieren') }}
             </button>
             <button
               type="submit"

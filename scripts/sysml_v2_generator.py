@@ -182,7 +182,7 @@ def generate_sysmlv2_code(df, output_path):
     sysml_code.append("")
 
     # Req package und view oeffnen
-    sysml_code.append("package 'Reqirements' {")
+    sysml_code.append("package 'Requirements' {")
     sysml_code.append("view 'Requirements' : DS_Views::SymbolicViews::gv {")
 
     # Requirements generieren

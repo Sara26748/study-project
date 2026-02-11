@@ -219,16 +219,12 @@ class RequirementVersion(db.Model):
         return status_colors.get(self.status, 'secondary')
 
     def get_revision_display(self):
-        """Format revision label like 'i.A' for display."""
+        """Format revision label like 'i' for display."""
         if not self.revision or self.revision == 'Entwurf':
             return ''
         value = self.revision.strip()
-        if '.' in value:
-            roman_part, round_part = value.split('.', 1)
-            roman_part = roman_part.strip().lower()
-            round_letter = round_part.strip().upper()[:1] or 'A'
-            return f"{roman_part}.{round_letter}"
-        return f"{value.lower()}.A"
+        roman_part = value.split('.', 1)[0].strip().lower()
+        return roman_part
     
     def can_be_edited_by(self, user):
         """Check if user can edit this version (not blocked or blocked by this user or project owner)."""
