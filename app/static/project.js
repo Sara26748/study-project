@@ -309,6 +309,9 @@ async function loadRevisions(reqId, versionId) {
 function populateRevisionSelector(reqId, row, revisions) {
   const selector = row.querySelector(".revision-selector");
   if (!selector) return;
+  const versionSelector = row.querySelector(".version-selector");
+  const currentVersionLabel =
+    versionSelector?.selectedOptions?.[0]?.textContent?.trim() || "";
 
   // Prefer an explicit value, fall back to the existing option text
   const currentRevision =
@@ -322,9 +325,16 @@ function populateRevisionSelector(reqId, row, revisions) {
   currentOption.textContent = `${currentRevision || ""}`;
   selector.appendChild(currentOption);
 
-  const sortedRevs = [...revisions].sort(
-    (a, b) => (a.revision_number || 0) - (b.revision_number || 0),
-  );
+  const scopedRevisions = currentVersionLabel
+    ? revisions.filter((rev) => rev.version_label === currentVersionLabel)
+    : [...revisions];
+
+  const sortedRevs = [...scopedRevisions].sort((a, b) => {
+    const sortA = a.revision_sort ?? 0;
+    const sortB = b.revision_sort ?? 0;
+    if (sortA !== sortB) return sortA - sortB;
+    return (a.revision_number || 0) - (b.revision_number || 0);
+  });
 
   sortedRevs.forEach((rev) => {
     const opt = document.createElement("option");
@@ -333,8 +343,11 @@ function populateRevisionSelector(reqId, row, revisions) {
     selector.appendChild(opt);
   });
 
-  // Default to current version to avoid overwriting the live view
-  selector.value = "current";
+  // Preserve selected revision if one is active for this row
+  const preferredValue = row.dataset.selectedRevisionKey || "current";
+  selector.value = selector.querySelector(`option[value="${preferredValue}"]`)
+    ? preferredValue
+    : "current";
 }
 
 function applyRevisionSnapshot(reqId, revisionData) {
@@ -395,6 +408,16 @@ function applyRevisionSnapshot(reqId, revisionData) {
   if (revisionSelect) {
     revisionSelect.value = `${revisionData.revision_key}`;
   }
+
+  const versionSelect = row.querySelector(".version-selector");
+  if (versionSelect && revisionData.version_label) {
+    const targetOption = Array.from(versionSelect.options).find(
+      (opt) => opt.textContent.trim() === `${revisionData.version_label}`,
+    );
+    if (targetOption) {
+      versionSelect.value = targetOption.value;
+    }
+  }
 }
 
 function getSelectedRevisionSnapshot(reqId) {
@@ -428,6 +451,76 @@ function refreshDescriptionPopover(element, description) {
     placement: "top",
     content: safeDescription,
     title: "Vollständige Anforderung",
+  });
+}
+
+function buildExportSelectionPayload() {
+  const selections = [];
+  document.querySelectorAll("tr[data-req-id]").forEach((row) => {
+    const reqId = row.getAttribute("data-req-id");
+    if (!reqId) return;
+
+    const versionSelector = row.querySelector(".version-selector");
+    const versionIndex = versionSelector?.value;
+    const versionData = versionIndex
+      ? row.querySelector(`.version-data[data-version-index="${versionIndex}"]`)
+      : null;
+    const versionId = versionData?.getAttribute("data-version-id") || "";
+
+    const releasedVersionId = row.dataset.releasedVersionId || "";
+    const revisionVersionId = releasedVersionId || versionId || "";
+
+    const revisionSelector = row.querySelector(".revision-selector");
+    const revisionKey =
+      revisionSelector && revisionSelector.value !== "current"
+        ? revisionSelector.value
+        : "";
+
+    selections.push({
+      req_id: Number(reqId),
+      version_id: versionId ? Number(versionId) : null,
+      revision_key: revisionKey,
+      revision_version_id: revisionVersionId ? Number(revisionVersionId) : null,
+    });
+  });
+
+  return selections;
+}
+
+function applyRevisionSelectionFromUrl() {
+  const params = new URLSearchParams(window.location.search);
+  const reqId = params.get("selected_req_id");
+  const revisionKey = params.get("selected_revision_key");
+  if (!reqId || !revisionKey) return;
+
+  const row = document.getElementById(`req-row-${reqId}`);
+  if (!row) return;
+
+  const versionSelector = row.querySelector(".version-selector");
+  const versionIndex = versionSelector?.value;
+  const versionData = versionIndex
+    ? row.querySelector(`.version-data[data-version-index="${versionIndex}"]`)
+    : null;
+  const releasedVersionId = row.dataset.releasedVersionId || "";
+  const revisionVersionId =
+    releasedVersionId || versionData?.getAttribute("data-version-id");
+  if (!revisionVersionId) return;
+
+  loadRevisions(reqId, revisionVersionId).then((revs) => {
+    populateRevisionSelector(reqId, row, revs);
+    const match = revs.find(
+      (rev) => `${rev.revision_key}` === `${revisionKey}`,
+    );
+    if (!match) return;
+
+    row.dataset.selectedRevisionJson = JSON.stringify(match);
+    row.dataset.selectedRevisionKey = `${match.revision_key || ""}`;
+
+    const selector = row.querySelector(".revision-selector");
+    if (selector) {
+      selector.value = `${match.revision_key}`;
+    }
+    applyRevisionSnapshot(reqId, match);
   });
 }
 
@@ -474,7 +567,7 @@ function updateRevisionButtonState() {
   if (!revisionButton || mode !== "revision") return;
   const disabledState = !hasRevisionChanges();
   revisionButton.disabled = disabledState;
-  if (revisionFinalizeBtn) revisionFinalizeBtn.disabled = disabledState;
+  if (revisionFinalizeBtn) revisionFinalizeBtn.disabled = false;
 }
 
 // Functions
@@ -855,7 +948,7 @@ function openEditModal(
     if (editButtons) editButtons.classList.add("d-none");
     if (revisionButtonWrap) revisionButtonWrap.classList.remove("d-none");
     if (revisionButton) revisionButton.disabled = true;
-    if (revisionFinalizeBtn) revisionFinalizeBtn.disabled = true;
+    if (revisionFinalizeBtn) revisionFinalizeBtn.disabled = false;
   } else {
     if (saveTypeInput) saveTypeInput.value = "intermediate";
     if (editButtons) editButtons.classList.remove("d-none");
@@ -1042,6 +1135,8 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
+  applyRevisionSelectionFromUrl();
+
   // Initialize filters
   initializeFilters();
 
@@ -1075,6 +1170,17 @@ document.addEventListener("DOMContentLoaded", function () {
     // Poll active users every 5 seconds
     pollActiveUsers();
     setInterval(pollActiveUsers, 5000);
+  }
+
+  const exportBtn = document.getElementById("exportExcelBtn");
+  const exportForm = document.getElementById("exportExcelForm");
+  const exportPayload = document.getElementById("exportSelectionPayload");
+  if (exportBtn && exportForm && exportPayload) {
+    exportBtn.addEventListener("click", () => {
+      const selections = buildExportSelectionPayload();
+      exportPayload.value = JSON.stringify(selections);
+      exportForm.submit();
+    });
   }
 });
 
