@@ -197,6 +197,8 @@ def generate_sysmlv2_code(df, output_path):
         req_description = escape_string(row["Beschreibung"])
         verantwortlicher = escape_string(row["Verantwortlicher"]).split("@", 1)[0]
         revision = escape_string(row["Revision"])
+        if revision.lower() == "entwurf":
+            revision = ""
         version = escape_string(row["Version"])
         status = escape_string(row["Status"])
         category = row["Kategorie"]
@@ -242,6 +244,8 @@ def generate_sysmlv2_code(df, output_path):
                 req_description = escape_string(row["Beschreibung"])
                 verantwortlicher = escape_string(row["Verantwortlicher"])
                 revision = escape_string(row["Revision"])
+                if revision.lower() == "entwurf":
+                    revision = ""
                 version = escape_string(row["Version"])
                 status = escape_string(row["Status"])
                 category_ = row["Kategorie"]
