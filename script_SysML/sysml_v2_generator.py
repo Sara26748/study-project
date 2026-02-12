@@ -24,7 +24,7 @@ except ImportError:
 
 def find_latest_requirements_file(downloads_folder):
     """
-    Findet die neüste Excel- oder CSV-Datei im Downloads-Ordner
+    Findet die neuste Excel- oder CSV-Datei im Downloads-Ordner
 
     Parameter:
         downloads_folder: Pfad zum Downloads-Ordner
