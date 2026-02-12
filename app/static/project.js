@@ -1179,7 +1179,14 @@ document.addEventListener("DOMContentLoaded", function () {
     exportBtn.addEventListener("click", () => {
       const selections = buildExportSelectionPayload();
       exportPayload.value = JSON.stringify(selections);
-      exportForm.submit();
+      if (typeof exportForm.requestSubmit === "function") {
+        exportForm.requestSubmit();
+      } else {
+        exportForm.dispatchEvent(
+          new Event("submit", { bubbles: true, cancelable: true }),
+        );
+        exportForm.submit();
+      }
     });
   }
 });
