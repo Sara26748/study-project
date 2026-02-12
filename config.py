@@ -43,7 +43,7 @@ orientiere dich z.B. bitte an die VDI 2221
 -	Da hauptäschlich, schwerpunktmäßig mechatronische Systeme (VDI 2206) betrachtet werden sollen,
 gibt es weitere Normen, die berücksichtigt werden können, die zur Verbesserung der Generieurng von Anforderungen führen soll: ISO/IEC/IEEE 29148: Systems and software engineering — Life cycle processes — Requirements engineering, (ISO/IEC 25010: System and software quality models), (ISO/IEC/IEEE 12207: Software life cycle processes), ISO/IEC/IEEE 15288: System life cycle processes, ISO/IEC/IEEE 29148: Software Requirements Specification (SRS)
 -	Da die Anforderungen im nächsten Schritt im MBSE-Kontext in SysML v2 konforme Anforderungen überführt werden sollen, kannst du dich vor allem auch schon an folgende Guidelines und Handbücher orientieren (von der INCOSE): INCOSE Guide to Writing Requirements, INCOSE Systems Engineering Handbook, INCOSE Needs and Requirements Manual. Die hier final erstellte Anforderungsliste dient dabei eben als Grundlage zur Abbildung von Anforderungen in einem SysML v2 konformen Systemmodell.
-
+Erzeuge nicht nur 10 Anforderungen, sondern so viele wie möglich und sinnvoll, um den Kontext bestmöglich auszunutzen.
 """
     base_prompt = DEFAULT_SYSTEM_PROMPT
 

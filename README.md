@@ -173,7 +173,7 @@ python test_integration.py
 ## 📁 Projektstruktur
 
 ```
-interface_for_mbse_models/
+study-project/
 ├── app/
 │   ├── __init__.py          # Flask-App Factory
 │   ├── models.py            # Datenbankmodelle
@@ -183,21 +183,44 @@ interface_for_mbse_models/
 │   ├── migration.py         # Datenbankmigrationen
 │   ├── services/
 │   │   └── ai_client.py     # OpenAI Integration
-│   ├── static/              # Statische Dateien
-│   │   ├── style.css
-│   │   ├── project.js
-│   │   └── bootstrap-icons.css
-│   └── templates/           # Jinja2 Templates
-│       ├── base.html
-│       ├── start.html
-│       ├── create.html
-│       └── ...
+│   ├── static/              # Statische Dateien (CSS, JS, Icons)
+│   ├── templates/           # Jinja2 Templates (HTML)
+│   ├── translations/        # Übersetzungen (i18n, .po/.mo)
+│   └── utils/               # Hilfsfunktionen (z.B. Benachrichtigungen)
+├── archive/                 # Datenbank- und Migrationsskripte (manuell)
+├── migrations/              # Alembic Migrationen (automatisiert)
+│   ├── versions/            # Einzelne Migrationsskripte
+├── tests/                   # Unittests und Integrationstests
 ├── config.py                # Konfiguration
 ├── main.py                  # Anwendungsstart
 ├── requirements.txt         # Python-Abhängigkeiten
-├── test_*.py               # Tests
-└── instance/               # Datenbank (wird erstellt)
+├── README.md                # Projektdokumentation
+├── run_migration.bat        # Migration-Skript (Windows)
+├── cookies.txt              # Beispiel für gespeicherte Cookies
+└── instance/                # Datenbank (wird erstellt)
 ```
+
+**Wichtige Ordner und Dateien:**
+
+- `archive/`: Manuelle Migrationen, Datenbank-Skripte, Backups, Fixes
+- `migrations/`: Alembic Migrationen für automatische Schema-Updates
+- `tests/`: Test-Skripte für verschiedene Komponenten
+- `app/static/`: CSS, JS, Bootstrap, Icons
+- `app/templates/`: HTML-Templates für alle Ansichten
+- `app/translations/`: Übersetzungen für Mehrsprachigkeit (de, en, fr, es)
+- `instance/`: SQLite-Datenbank und Instanzdaten (wird beim Start erstellt)
+
+**Hinweis zu Migrationen:**
+Für Datenbankänderungen werden Alembic-Migrationen im Ordner `migrations/` verwendet. Zusätzliche oder manuelle Migrationen und Datenbank-Skripte befinden sich im Ordner `archive/`.
+
+**Lokalisierung:**
+Die Anwendung unterstützt Mehrsprachigkeit. Übersetzungen liegen im Ordner `app/translations/` als `.po` und `.mo` Dateien für verschiedene Sprachen.
+
+**Statische Dateien & Templates:**
+Alle CSS-, JS- und Icon-Dateien liegen in `app/static/`. Die Benutzeroberfläche wird mit Jinja2-Templates aus `app/templates/` gerendert.
+
+**Konfiguration:**
+Umgebungsvariablen werden über eine `.env` Datei oder direkt in der Umgebung gesetzt. Beispiel siehe Abschnitt "Konfiguration" oben.
 
 ## 🔒 Sicherheit
 
@@ -209,7 +232,7 @@ interface_for_mbse_models/
 
 ## 🔄 Migration und Updates
 
-Die Anwendung unterstützt Datenbankmigrationen für Schema-Updates. Bei größeren Änderungen werden Migrationsskripte im `migrate_*.py` Format bereitgestellt.
+Die Anwendung unterstützt Datenbankmigrationen für Schema-Updates. Bei größeren Änderungen werden Migrationsskripte im `archive/` (z.B. `migrate_*.py`) bereitgestellt. Für reguläre Migrationen wird Alembic (`migrations/`) verwendet.
 
 ## 🌟 Besondere Features
 
@@ -221,5 +244,3 @@ Die Anwendung unterstützt Datenbankmigrationen für Schema-Updates. Bei größe
 - **Responsive Design**: Funktioniert auf Desktop und Mobile
 
 ---
-
-Entwickelt mit ❤️ für effektives Requirements Engineering.

@@ -427,7 +427,7 @@ endblock %} {% block content %}
                 </div>
                 <div>
                   <h3 class="config-card-title">
-                    {{ _('Kontext (Optional)') }}
+                    {{ _('Kontext') }}
                   </h3>
                   <p class="config-card-subtitle">
                     {{ _('Bestehende Anforderungslisten und/oder weiterführende Informationen zur Produktbeschreibung (z.B. Pflichten-/Lastenheft) hochladen & Bestehende Anforderungen überarbeiten oder erweitern') }}
@@ -439,9 +439,9 @@ endblock %} {% block content %}
                   <label for="context_file_type" class="form-label">{{ _('Dateien auswählen') }}</label>
                   <select id="context_file_type" name="context_file_type" class="form-select">
                     <option value="none" selected>{{ _('Keine gewählte Dateien') }}</option>
-                    <option value="pdf">{{ _('PDF') }}</option>
-                    <option value="excel">{{ _('EXCEL') }}</option>
-                    <option value="both">{{ _('EXCEL & PDF') }}</option>
+                    <option value="pdf">{{ _('PDF (.pdf)') }}</option>
+                    <option value="excel">{{ _('Excel/CSV (.xlsx, .xls, .csv)') }}</option>
+                    <option value="both">{{ _('Excel/CSV (.xlsx, .xls, .csv) & PDF (.pdf)') }}</option>
                   </select>
                 </div>
                 <div class="drop-zone-wrapper d-none" id="pdf-drop-wrapper">
@@ -473,12 +473,12 @@ endblock %} {% block content %}
                       type="file"
                       id="excel_file"
                       name="excel_file"
-                      accept=".xlsx, .xls"
+                      accept=".xlsx, .xls, .csv"
                     />
                     <div class="drop-zone-content mt-2">
                       <i class="bi bi-cloud-upload"></i>
                       <p>{{ _('Excel-Datei hier ablegen oder klicken') }}</p>
-                      <small class="text-muted">{{ _('Unterstützt .xlsx und .xls Dateien') }}</small>
+                      <small class="text-muted">{{ _('Unterstützt .xlsx, .xls und .csv Dateien') }}</small>
                     </div>
                     <div id="excel-file-name-display" class="d-none mt-3">
                       <span class="file-info">

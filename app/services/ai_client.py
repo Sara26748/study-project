@@ -116,6 +116,7 @@ Wichtig:
 - Setze "is_quantifiable" auf false für qualitative Anforderungen (z.B. Benutzerfreundlichkeit, Design, etc.).
 - Setze "is_functional" auf true, wenn die Anforderung explizit eine Funktion des zu entwickelnden Produkts oder Systems beschreibt.
 - Setze "is_functional" auf false, wenn es sich um eine nicht-funktionale Anforderung handelt.
+Erzeuge nicht nur 10 Anforderungen, sondern so viele wie möglich und sinnvoll, um den Kontext bestmöglich auszunutzen.
 Antworte NUR mit diesem JSON, ohne zusätzlichen Text davor oder danach."""
     else:
         # Fallback to default structure
@@ -139,6 +140,7 @@ Wichtig:
 - Setze "is_quantifiable" auf false für qualitative Anforderungen (z.B. Benutzerfreundlichkeit, Design, etc.).
 - Setze "is_functional" auf true, wenn die Anforderung explizit eine Funktion des zu entwickelnden Produkts oder Systems beschreibt.
 - Setze "is_functional" auf false, wenn es sich um eine nicht-funktionale Anforderung handelt.
+Erzeuge nicht nur 10 Anforderungen, sondern so viele wie möglich und sinnvoll, um den Kontext bestmöglich auszunutzen.
 
 Antworte NUR mit diesem JSON, ohne zusätzlichen Text davor oder danach."""
 

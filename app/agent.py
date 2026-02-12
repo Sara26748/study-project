@@ -1,3 +1,5 @@
+import csv
+import io
 import re
 from pypdf.errors import PdfReadError
 from flask import Blueprint, render_template, request, jsonify, redirect, url_for, abort
@@ -163,39 +165,86 @@ def generate(project_id):
         # Handle Excel file (only if not improving existing, or as supplemental context)
         if 'excel_file' in request.files:
             file = request.files['excel_file']
-            if file and file.filename != '' and (file.filename.endswith('.xlsx') or file.filename.endswith('.xls')):
-                try:
-                    from openpyxl import load_workbook
-                    wb = load_workbook(file, data_only=True)
-                    ws = wb.active
-                    
-                    excel_context = "\n\n--- KONTEXT AUS EXCEL-DATEI ---\n"
-                    # Read max 50 rows to avoid context overflow
-                    count = 0
-                    headers = []
-                    
-                    for row in ws.iter_rows(values_only=True):
-                        if count == 0:
-                            headers = [str(cell) if cell else "" for cell in row]
-                            excel_context += " | ".join(headers) + "\n"
+            if file and file.filename != '':
+                filename = file.filename.lower()
+                if filename.endswith(('.xlsx', '.xls')):
+                    try:
+                        from openpyxl import load_workbook
+                        file.stream.seek(0)
+                        wb = load_workbook(file, data_only=True)
+                        ws = wb.active
+
+                        excel_context = "\n\n--- KONTEXT AUS EXCEL-DATEI ---\n"
+                        # Read max 50 rows to avoid context overflow
+                        count = 0
+                        headers = []
+
+                        for row in ws.iter_rows(values_only=True):
+                            if count == 0:
+                                headers = [str(cell) if cell else "" for cell in row]
+                                excel_context += " | ".join(headers) + "\n"
+                                count += 1
+                                continue
+                            if count > 50:
+                                excel_context += "... (weitere Zeilen aus Platzgründen ausgelassen)\n"
+                                break
+                            row_vals = [str(cell) if cell is not None else "" for cell in row]
+                            excel_context += " | ".join(row_vals) + "\n"
                             count += 1
-                            continue
-                        if count > 50:
-                            excel_context += "... (weitere Zeilen aus Platzgründen ausgelassen)\n"
-                            break
-                        row_vals = [str(cell) if cell is not None else "" for cell in row]
-                        excel_context += " | ".join(row_vals) + "\n"
-                        count += 1
-                    excel_context += "--- ENDE EXCEL-KONTEXT ---\n"
-                    if not improve_only:
-                        excel_context += "\nWICHTIG: Die oben aufgeführten Anforderungen aus der Excel-Datei sind BESTEHENDE Anforderungen. Du sollst:\n"
-                        excel_context += "1. Diese bestehenden Anforderungen verbessern, aktualisieren und in deine Ausgabe aufnehmen\n"
-                        excel_context += "2. Zusätzlich neue Anforderungen erstellen, die der User explizit anfordert (siehe Beschreibung oben)\n"
-                        excel_context += "3. Weitere passende Anforderungen generieren, die zum Gesamtkontext passen\n"
-                        excel_context += "Die bestehenden Anforderungen aus Excel dürfen NICHT ignoriert werden!"
-                except Exception as e:
-                    print(f"Fehler beim Lesen der Excel-Datei: {e}")
-                    # We continue without the excel content if it fails
+                        excel_context += "--- ENDE EXCEL-KONTEXT ---\n"
+                        if not improve_only:
+                            excel_context += "\nWICHTIG: Die oben aufgeführten Anforderungen aus der Excel-Datei sind BESTEHENDE Anforderungen. Du sollst:\n"
+                            excel_context += "1. Diese bestehenden Anforderungen verbessern, aktualisieren und in deine Ausgabe aufnehmen\n"
+                            excel_context += "2. Zusätzlich neue Anforderungen erstellen, die der User explizit anfordert (siehe Beschreibung oben)\n"
+                            excel_context += "3. Weitere passende Anforderungen generieren, die zum Gesamtkontext passen\n"
+                            excel_context += "Die bestehenden Anforderungen aus Excel dürfen NICHT ignoriert werden!"
+                    except Exception as e:
+                        print(f"Fehler beim Lesen der Excel-Datei: {e}")
+                        # We continue without the excel content if it fails
+                elif filename.endswith('.csv'):
+                    try:
+                        file.stream.seek(0)
+                        raw = file.read()
+                        if not raw:
+                            return jsonify({'ok': False, 'error': 'Die CSV-Datei ist leer oder konnte nicht gelesen werden.'}), 400
+                        try:
+                            text = raw.decode('utf-8-sig')
+                        except UnicodeDecodeError:
+                            text = raw.decode('latin-1')
+
+                        sample_lines = [ln for ln in text.splitlines() if ln.strip()]
+                        sample = "\n".join(sample_lines[:5])
+                        delimiter = ","
+                        if sample.count(";") > sample.count(","):
+                            delimiter = ";"
+                        reader = csv.reader(io.StringIO(text), delimiter=delimiter)
+                        excel_context = "\n\n--- KONTEXT AUS CSV-DATEI ---\n"
+                        count = 0
+                        headers = []
+                        for row in reader:
+                            if count == 0:
+                                headers = [cell if cell else "" for cell in row]
+                                excel_context += " | ".join(headers) + "\n"
+                                count += 1
+                                continue
+                            if count > 50:
+                                excel_context += "... (weitere Zeilen aus Platzgründen ausgelassen)\n"
+                                break
+                            row_vals = [cell if cell is not None else "" for cell in row]
+                            excel_context += " | ".join(row_vals) + "\n"
+                            count += 1
+                        excel_context += "--- ENDE CSV-KONTEXT ---\n"
+                        if not improve_only:
+                            excel_context += "\nWICHTIG: Die oben aufgeführten Anforderungen aus der CSV-Datei sind BESTEHENDE Anforderungen. Du sollst:\n"
+                            excel_context += "1. Diese bestehenden Anforderungen verbessern, aktualisieren und in deine Ausgabe aufnehmen\n"
+                            excel_context += "2. Zusätzlich neue Anforderungen erstellen, die der User explizit anfordert (siehe Beschreibung oben)\n"
+                            excel_context += "3. Weitere passende Anforderungen generieren, die zum Gesamtkontext passen\n"
+                            excel_context += "Die bestehenden Anforderungen aus CSV dürfen NICHT ignoriert werden!"
+                    except Exception as e:
+                        print(f"Fehler beim Lesen der CSV-Datei: {e}")
+                        # We continue without the csv content if it fails
+                else:
+                    return jsonify({'ok': False, 'error': 'Bitte lade eine gültige Excel- oder CSV-Datei hoch.'}), 400
         # Handle PDF file (as supplemental context)
         if 'pdf_file' in request.files:
             pdf_file = request.files['pdf_file']
