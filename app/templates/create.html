@@ -711,7 +711,7 @@ document.addEventListener('DOMContentLoaded', function() {
             <div class="card border-0 shadow-sm h-100">
               <div class="card-body p-4">
                 <h5 class="fw-bold mb-2">{{ _('SysML v2 Code') }}</h5>
-                <p class="text-muted mb-4">{{ _('Erstellt automatisch den SysML v2 Code aus den aktüllen Anforderungen.') }}</p>
+                  <p class="text-muted mb-4">{{ _('Erstellt automatisch den SysML v2 Code aus den aktuellen Anforderungen.') }}</p>
                 <form id="exportSysmlForm2" method="POST" action="{{ url_for('main.export_sysml', project_id=project.id) }}" class="d-inline w-100" data-download-loading="true">
                   <button id="generate-syslm-btn" type="button" class="btn btn-xl px-5 py-4 fw-bold text-white shadow-lg border-0 d-flex align-items-center justify-content-center w-100" style="background: linear-gradient(90deg, #4f8cff 0%, #38c6ff 100%); border-radius: 0.8rem; letter-spacing: 0.5px; font-size: 1.45rem; transition: transform 0.15s;">
                     <span class="me-2 d-flex align-items-center">

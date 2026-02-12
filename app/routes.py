@@ -1454,6 +1454,12 @@ def toggle_quantifiable(version_id):
     db.session.add(history_entry)
     db.session.commit()
     
+    flash(
+        f"Quantifizierbarkeit für Anforderung REQ{version.requirement.id} wurde "
+        f"{'aktiviert' if custom_data['is_quantifiable'] == 'true' else 'deaktiviert'}.",
+        "success"
+    )
+    
     return redirect(
         url_for(
             'main.manage_project',
@@ -2551,7 +2557,7 @@ def toggle_funktional(req_id):
         db.session.add(history_entry)
     db.session.commit()
     flash(
-        f"Funktionalität für Anforderung #{req.id} wurde "
+        f"Funktionalität für Anforderung REQ{req.id} wurde "
         f"{'aktiviert' if req.funktional else 'deaktiviert' }.",
         "success"
     )
