@@ -1189,6 +1189,36 @@ document.addEventListener("DOMContentLoaded", function () {
       }
     });
   }
+  // SysML Export
+  const exportSysmlBtn = document.getElementById("exportSysmlBtn");
+  const exportSysmlForm = document.getElementById("exportSysmlForm");
+  if (exportSysmlBtn && exportSysmlForm) {
+    exportSysmlBtn.addEventListener("click", () => {
+      if (typeof exportSysmlForm.requestSubmit === "function") {
+        exportSysmlForm.requestSubmit();
+      } else {
+        exportSysmlForm.dispatchEvent(
+          new Event("submit", { bubbles: true, cancelable: true }),
+        );
+        exportSysmlForm.submit();
+      }
+    });
+  }
+  // SysML Export (second button)
+  const generateSyslmBtn = document.getElementById("generate-syslm-btn");
+  const exportSysmlForm2 = document.getElementById("exportSysmlForm2");
+  if (generateSyslmBtn && exportSysmlForm2) {
+    generateSyslmBtn.addEventListener("click", () => {
+      if (typeof exportSysmlForm2.requestSubmit === "function") {
+        exportSysmlForm2.requestSubmit();
+      } else {
+        exportSysmlForm2.dispatchEvent(
+          new Event("submit", { bubbles: true, cancelable: true }),
+        );
+        exportSysmlForm2.submit();
+      }
+    });
+  }
 });
 
 function pollRequirementsStatus() {

@@ -1909,13 +1909,13 @@ def export_excel(project_id):
     )
 
 
-@bp.route("/project/<int:project_id>/export_sysml", methods=["GET"])
+@bp.route("/project/<int:project_id>/export_sysml", methods=["GET", "POST"])
 @login_required
 def export_sysml(project_id):
     from io import BytesIO
     import tempfile
     import pandas as pd
-    from scripts.sysml_v2_generator import generate_sysmlv2_code
+    from app.utils.sysml_v2_generator import generate_sysmlv2_code
 
     project = Project.query.get_or_404(project_id)
     check_project_access(project)
