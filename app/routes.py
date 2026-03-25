@@ -7,6 +7,9 @@ import json
 from . import db
 from .models import Project, Requirement, RequirementVersion, RequirementComment, Notification, User
 from .services.ai_client import generate_requirements
+import subprocess 
+import hmac
+import hashlib
 
 bp = Blueprint('main', __name__)
 
@@ -2593,3 +2596,33 @@ def analyze_requirement_route(version_id):
     }
     return jsonify({'result': analysis})
 
+# --- GITHUB WEBHOOK FÜR AUTOMATISCHES DEPLOYMENT ---
+
+# Denke dir hier ein sicheres Passwort aus (ohne Leerzeichen). 
+# Das tragen wir gleich exakt so bei GitHub ein!
+GITHUB_WEBHOOK_SECRET = 'SuperGeheimesPasswort123' 
+
+@bp.route('/webhook/github', methods=['POST'])
+def github_webhook():
+    # 1. Sicherheitscheck: Kommt der Request wirklich von GitHub?
+    signature = request.headers.get('X-Hub-Signature-256')
+    if not signature:
+        return jsonify({'error': 'Fehlende Signatur'}), 403
+    
+    mac = hmac.new(GITHUB_WEBHOOK_SECRET.encode(), msg=request.data, digestmod=hashlib.sha256)
+    if not hmac.compare_digest('sha256=' + mac.hexdigest(), signature):
+        return jsonify({'error': 'Falsche Signatur'}), 403
+
+    # 2. Den neuen Code von GitHub herunterladen (Git Pull)
+    try:
+        # Zieht die neuesten Änderungen vom 'main' Branch
+        subprocess.check_output(['git', 'pull', 'origin', 'main'])
+        
+        # 3. Die App auf PythonAnywhere neu starten
+        # WICHTIG: Hier steht dein exakter Username von PythonAnywhere!
+        wsgi_file = '/var/www/wesali1999_pythonanywhere_com_wsgi.py'
+        subprocess.call(['touch', wsgi_file])
+        
+        return jsonify({'status': 'Erfolgreich aktualisiert und neu gestartet!'}), 200
+    except subprocess.CalledProcessError as e:
+        return jsonify({'status': 'Fehler beim Git Pull', 'error': str(e)}), 500
